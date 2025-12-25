@@ -1,0 +1,824 @@
+import { useState } from "react";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { 
+  User, 
+  Briefcase, 
+  GraduationCap, 
+  Code, 
+  Award,
+  Plus,
+  Trash2,
+  Download,
+  Eye,
+  Save,
+  Mail,
+  Phone,
+  MapPin,
+  Globe,
+  Linkedin,
+  Calendar
+} from "lucide-react";
+
+interface PersonalInfo {
+  fullName: string;
+  jobTitle: string;
+  email: string;
+  phone: string;
+  location: string;
+  website: string;
+  linkedin: string;
+  summary: string;
+}
+
+interface Experience {
+  id: string;
+  company: string;
+  position: string;
+  startDate: string;
+  endDate: string;
+  current: boolean;
+  description: string;
+}
+
+interface Education {
+  id: string;
+  institution: string;
+  degree: string;
+  field: string;
+  startDate: string;
+  endDate: string;
+  grade: string;
+}
+
+interface Skill {
+  id: string;
+  name: string;
+  level: "مبتدئ" | "متوسط" | "متقدم" | "خبير";
+}
+
+interface Certificate {
+  id: string;
+  name: string;
+  issuer: string;
+  date: string;
+  credentialId: string;
+}
+
+const CVBuilder = () => {
+  const [activeSection, setActiveSection] = useState("personal");
+  const [showPreview, setShowPreview] = useState(false);
+
+  const [personalInfo, setPersonalInfo] = useState<PersonalInfo>({
+    fullName: "",
+    jobTitle: "",
+    email: "",
+    phone: "",
+    location: "",
+    website: "",
+    linkedin: "",
+    summary: ""
+  });
+
+  const [experiences, setExperiences] = useState<Experience[]>([]);
+  const [education, setEducation] = useState<Education[]>([]);
+  const [skills, setSkills] = useState<Skill[]>([]);
+  const [certificates, setCertificates] = useState<Certificate[]>([]);
+
+  const addExperience = () => {
+    setExperiences([...experiences, {
+      id: Date.now().toString(),
+      company: "",
+      position: "",
+      startDate: "",
+      endDate: "",
+      current: false,
+      description: ""
+    }]);
+  };
+
+  const removeExperience = (id: string) => {
+    setExperiences(experiences.filter(exp => exp.id !== id));
+  };
+
+  const updateExperience = (id: string, field: keyof Experience, value: string | boolean) => {
+    setExperiences(experiences.map(exp => 
+      exp.id === id ? { ...exp, [field]: value } : exp
+    ));
+  };
+
+  const addEducation = () => {
+    setEducation([...education, {
+      id: Date.now().toString(),
+      institution: "",
+      degree: "",
+      field: "",
+      startDate: "",
+      endDate: "",
+      grade: ""
+    }]);
+  };
+
+  const removeEducation = (id: string) => {
+    setEducation(education.filter(edu => edu.id !== id));
+  };
+
+  const updateEducation = (id: string, field: keyof Education, value: string) => {
+    setEducation(education.map(edu => 
+      edu.id === id ? { ...edu, [field]: value } : edu
+    ));
+  };
+
+  const addSkill = () => {
+    setSkills([...skills, {
+      id: Date.now().toString(),
+      name: "",
+      level: "متوسط"
+    }]);
+  };
+
+  const removeSkill = (id: string) => {
+    setSkills(skills.filter(skill => skill.id !== id));
+  };
+
+  const updateSkill = (id: string, field: keyof Skill, value: string) => {
+    setSkills(skills.map(skill => 
+      skill.id === id ? { ...skill, [field]: value } : skill
+    ));
+  };
+
+  const addCertificate = () => {
+    setCertificates([...certificates, {
+      id: Date.now().toString(),
+      name: "",
+      issuer: "",
+      date: "",
+      credentialId: ""
+    }]);
+  };
+
+  const removeCertificate = (id: string) => {
+    setCertificates(certificates.filter(cert => cert.id !== id));
+  };
+
+  const updateCertificate = (id: string, field: keyof Certificate, value: string) => {
+    setCertificates(certificates.map(cert => 
+      cert.id === id ? { ...cert, [field]: value } : cert
+    ));
+  };
+
+  const sections = [
+    { id: "personal", label: "المعلومات الشخصية", icon: User },
+    { id: "experience", label: "الخبرات العملية", icon: Briefcase },
+    { id: "education", label: "التعليم", icon: GraduationCap },
+    { id: "skills", label: "المهارات", icon: Code },
+    { id: "certificates", label: "الشهادات", icon: Award }
+  ];
+
+  const skillLevelColors: Record<string, string> = {
+    "مبتدئ": "bg-muted text-muted-foreground",
+    "متوسط": "bg-accent/20 text-accent",
+    "متقدم": "bg-primary/20 text-primary",
+    "خبير": "bg-success/20 text-success"
+  };
+
+  return (
+    <DashboardLayout>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">منشئ السيرة الذاتية</h1>
+            <p className="text-muted-foreground mt-1">أنشئ سيرتك الذاتية الاحترافية خطوة بخطوة</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowPreview(!showPreview)}
+              className="gap-2"
+            >
+              <Eye className="w-4 h-4" />
+              {showPreview ? "إخفاء المعاينة" : "معاينة"}
+            </Button>
+            <Button variant="outline" className="gap-2">
+              <Save className="w-4 h-4" />
+              حفظ
+            </Button>
+            <Button variant="gradient" className="gap-2">
+              <Download className="w-4 h-4" />
+              تحميل PDF
+            </Button>
+          </div>
+        </div>
+
+        <div className={`grid gap-6 ${showPreview ? "lg:grid-cols-2" : "grid-cols-1"}`}>
+          {/* Editor Section */}
+          <div className="space-y-6">
+            {/* Section Navigation */}
+            <Card className="card-elevated">
+              <CardContent className="p-2">
+                <div className="flex flex-wrap gap-2">
+                  {sections.map((section) => (
+                    <button
+                      key={section.id}
+                      onClick={() => setActiveSection(section.id)}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+                        activeSection === section.id
+                          ? "bg-primary text-primary-foreground"
+                          : "hover:bg-muted text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      <section.icon className="w-4 h-4" />
+                      <span className="text-sm font-medium">{section.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Personal Info Section */}
+            {activeSection === "personal" && (
+              <Card className="card-elevated">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <User className="w-5 h-5 text-primary" />
+                    المعلومات الشخصية
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">الاسم الكامل</label>
+                      <Input
+                        value={personalInfo.fullName}
+                        onChange={(e) => setPersonalInfo({...personalInfo, fullName: e.target.value})}
+                        placeholder="أحمد محمد علي"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">المسمى الوظيفي</label>
+                      <Input
+                        value={personalInfo.jobTitle}
+                        onChange={(e) => setPersonalInfo({...personalInfo, jobTitle: e.target.value})}
+                        placeholder="مطور برمجيات أول"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">البريد الإلكتروني</label>
+                      <Input
+                        type="email"
+                        value={personalInfo.email}
+                        onChange={(e) => setPersonalInfo({...personalInfo, email: e.target.value})}
+                        placeholder="ahmed@example.com"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">رقم الهاتف</label>
+                      <Input
+                        value={personalInfo.phone}
+                        onChange={(e) => setPersonalInfo({...personalInfo, phone: e.target.value})}
+                        placeholder="+966 5XX XXX XXXX"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">الموقع</label>
+                      <Input
+                        value={personalInfo.location}
+                        onChange={(e) => setPersonalInfo({...personalInfo, location: e.target.value})}
+                        placeholder="الرياض، المملكة العربية السعودية"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">الموقع الإلكتروني</label>
+                      <Input
+                        value={personalInfo.website}
+                        onChange={(e) => setPersonalInfo({...personalInfo, website: e.target.value})}
+                        placeholder="www.mywebsite.com"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">رابط LinkedIn</label>
+                    <Input
+                      value={personalInfo.linkedin}
+                      onChange={(e) => setPersonalInfo({...personalInfo, linkedin: e.target.value})}
+                      placeholder="linkedin.com/in/username"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">نبذة شخصية</label>
+                    <Textarea
+                      value={personalInfo.summary}
+                      onChange={(e) => setPersonalInfo({...personalInfo, summary: e.target.value})}
+                      placeholder="اكتب نبذة مختصرة عن نفسك وخبراتك المهنية..."
+                      rows={4}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Experience Section */}
+            {activeSection === "experience" && (
+              <Card className="card-elevated">
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <Briefcase className="w-5 h-5 text-primary" />
+                    الخبرات العملية
+                  </CardTitle>
+                  <Button variant="outline" size="sm" onClick={addExperience} className="gap-2">
+                    <Plus className="w-4 h-4" />
+                    إضافة خبرة
+                  </Button>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {experiences.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Briefcase className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                      <p>لم تضف أي خبرات عملية بعد</p>
+                      <Button variant="outline" size="sm" onClick={addExperience} className="mt-4 gap-2">
+                        <Plus className="w-4 h-4" />
+                        إضافة خبرة
+                      </Button>
+                    </div>
+                  ) : (
+                    experiences.map((exp, index) => (
+                      <div key={exp.id} className="p-4 border border-border rounded-lg space-y-4">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium text-muted-foreground">خبرة {index + 1}</span>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => removeExperience(exp.id)}
+                            className="text-destructive hover:text-destructive"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">اسم الشركة</label>
+                            <Input
+                              value={exp.company}
+                              onChange={(e) => updateExperience(exp.id, "company", e.target.value)}
+                              placeholder="اسم الشركة"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">المسمى الوظيفي</label>
+                            <Input
+                              value={exp.position}
+                              onChange={(e) => updateExperience(exp.id, "position", e.target.value)}
+                              placeholder="المسمى الوظيفي"
+                            />
+                          </div>
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">تاريخ البدء</label>
+                            <Input
+                              type="month"
+                              value={exp.startDate}
+                              onChange={(e) => updateExperience(exp.id, "startDate", e.target.value)}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">تاريخ الانتهاء</label>
+                            <Input
+                              type="month"
+                              value={exp.endDate}
+                              onChange={(e) => updateExperience(exp.id, "endDate", e.target.value)}
+                              disabled={exp.current}
+                            />
+                            <label className="flex items-center gap-2 text-sm">
+                              <input
+                                type="checkbox"
+                                checked={exp.current}
+                                onChange={(e) => updateExperience(exp.id, "current", e.target.checked)}
+                                className="rounded"
+                              />
+                              أعمل هنا حالياً
+                            </label>
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">وصف المهام والإنجازات</label>
+                          <Textarea
+                            value={exp.description}
+                            onChange={(e) => updateExperience(exp.id, "description", e.target.value)}
+                            placeholder="اكتب وصفاً لمهامك وإنجازاتك في هذا المنصب..."
+                            rows={3}
+                          />
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Education Section */}
+            {activeSection === "education" && (
+              <Card className="card-elevated">
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <GraduationCap className="w-5 h-5 text-primary" />
+                    التعليم
+                  </CardTitle>
+                  <Button variant="outline" size="sm" onClick={addEducation} className="gap-2">
+                    <Plus className="w-4 h-4" />
+                    إضافة تعليم
+                  </Button>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {education.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <GraduationCap className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                      <p>لم تضف أي مؤهلات تعليمية بعد</p>
+                      <Button variant="outline" size="sm" onClick={addEducation} className="mt-4 gap-2">
+                        <Plus className="w-4 h-4" />
+                        إضافة تعليم
+                      </Button>
+                    </div>
+                  ) : (
+                    education.map((edu, index) => (
+                      <div key={edu.id} className="p-4 border border-border rounded-lg space-y-4">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium text-muted-foreground">مؤهل {index + 1}</span>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => removeEducation(edu.id)}
+                            className="text-destructive hover:text-destructive"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">المؤسسة التعليمية</label>
+                            <Input
+                              value={edu.institution}
+                              onChange={(e) => updateEducation(edu.id, "institution", e.target.value)}
+                              placeholder="اسم الجامعة أو المعهد"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">الدرجة العلمية</label>
+                            <Input
+                              value={edu.degree}
+                              onChange={(e) => updateEducation(edu.id, "degree", e.target.value)}
+                              placeholder="بكالوريوس، ماجستير، دكتوراه..."
+                            />
+                          </div>
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">التخصص</label>
+                            <Input
+                              value={edu.field}
+                              onChange={(e) => updateEducation(edu.id, "field", e.target.value)}
+                              placeholder="علوم الحاسب، إدارة الأعمال..."
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">المعدل</label>
+                            <Input
+                              value={edu.grade}
+                              onChange={(e) => updateEducation(edu.id, "grade", e.target.value)}
+                              placeholder="ممتاز، 3.8/4.0..."
+                            />
+                          </div>
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">تاريخ البدء</label>
+                            <Input
+                              type="month"
+                              value={edu.startDate}
+                              onChange={(e) => updateEducation(edu.id, "startDate", e.target.value)}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">تاريخ التخرج</label>
+                            <Input
+                              type="month"
+                              value={edu.endDate}
+                              onChange={(e) => updateEducation(edu.id, "endDate", e.target.value)}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Skills Section */}
+            {activeSection === "skills" && (
+              <Card className="card-elevated">
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <Code className="w-5 h-5 text-primary" />
+                    المهارات
+                  </CardTitle>
+                  <Button variant="outline" size="sm" onClick={addSkill} className="gap-2">
+                    <Plus className="w-4 h-4" />
+                    إضافة مهارة
+                  </Button>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {skills.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Code className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                      <p>لم تضف أي مهارات بعد</p>
+                      <Button variant="outline" size="sm" onClick={addSkill} className="mt-4 gap-2">
+                        <Plus className="w-4 h-4" />
+                        إضافة مهارة
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {skills.map((skill) => (
+                        <div key={skill.id} className="flex items-center gap-4 p-3 border border-border rounded-lg">
+                          <div className="flex-1">
+                            <Input
+                              value={skill.name}
+                              onChange={(e) => updateSkill(skill.id, "name", e.target.value)}
+                              placeholder="اسم المهارة"
+                              className="border-0 p-0 h-auto focus-visible:ring-0"
+                            />
+                          </div>
+                          <select
+                            value={skill.level}
+                            onChange={(e) => updateSkill(skill.id, "level", e.target.value)}
+                            className="px-3 py-1 rounded-md border border-border bg-background text-sm"
+                          >
+                            <option value="مبتدئ">مبتدئ</option>
+                            <option value="متوسط">متوسط</option>
+                            <option value="متقدم">متقدم</option>
+                            <option value="خبير">خبير</option>
+                          </select>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => removeSkill(skill.id)}
+                            className="text-destructive hover:text-destructive"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Certificates Section */}
+            {activeSection === "certificates" && (
+              <Card className="card-elevated">
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <Award className="w-5 h-5 text-primary" />
+                    الشهادات
+                  </CardTitle>
+                  <Button variant="outline" size="sm" onClick={addCertificate} className="gap-2">
+                    <Plus className="w-4 h-4" />
+                    إضافة شهادة
+                  </Button>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {certificates.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Award className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                      <p>لم تضف أي شهادات بعد</p>
+                      <Button variant="outline" size="sm" onClick={addCertificate} className="mt-4 gap-2">
+                        <Plus className="w-4 h-4" />
+                        إضافة شهادة
+                      </Button>
+                    </div>
+                  ) : (
+                    certificates.map((cert, index) => (
+                      <div key={cert.id} className="p-4 border border-border rounded-lg space-y-4">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium text-muted-foreground">شهادة {index + 1}</span>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => removeCertificate(cert.id)}
+                            className="text-destructive hover:text-destructive"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">اسم الشهادة</label>
+                            <Input
+                              value={cert.name}
+                              onChange={(e) => updateCertificate(cert.id, "name", e.target.value)}
+                              placeholder="AWS Solutions Architect"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">الجهة المانحة</label>
+                            <Input
+                              value={cert.issuer}
+                              onChange={(e) => updateCertificate(cert.id, "issuer", e.target.value)}
+                              placeholder="Amazon Web Services"
+                            />
+                          </div>
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">تاريخ الحصول</label>
+                            <Input
+                              type="month"
+                              value={cert.date}
+                              onChange={(e) => updateCertificate(cert.id, "date", e.target.value)}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">رقم الشهادة</label>
+                            <Input
+                              value={cert.credentialId}
+                              onChange={(e) => updateCertificate(cert.id, "credentialId", e.target.value)}
+                              placeholder="ABC123XYZ"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </CardContent>
+              </Card>
+            )}
+          </div>
+
+          {/* Live Preview */}
+          {showPreview && (
+            <Card className="card-elevated sticky top-6 h-fit">
+              <CardHeader className="border-b border-border">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Eye className="w-5 h-5 text-primary" />
+                  معاينة السيرة الذاتية
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="bg-background border border-border rounded-lg p-6 space-y-6 min-h-[600px]">
+                  {/* Personal Info Preview */}
+                  <div className="text-center border-b border-border pb-6">
+                    <h2 className="text-2xl font-bold text-foreground">
+                      {personalInfo.fullName || "الاسم الكامل"}
+                    </h2>
+                    <p className="text-primary font-medium mt-1">
+                      {personalInfo.jobTitle || "المسمى الوظيفي"}
+                    </p>
+                    <div className="flex flex-wrap items-center justify-center gap-4 mt-4 text-sm text-muted-foreground">
+                      {personalInfo.email && (
+                        <span className="flex items-center gap-1">
+                          <Mail className="w-4 h-4" />
+                          {personalInfo.email}
+                        </span>
+                      )}
+                      {personalInfo.phone && (
+                        <span className="flex items-center gap-1">
+                          <Phone className="w-4 h-4" />
+                          {personalInfo.phone}
+                        </span>
+                      )}
+                      {personalInfo.location && (
+                        <span className="flex items-center gap-1">
+                          <MapPin className="w-4 h-4" />
+                          {personalInfo.location}
+                        </span>
+                      )}
+                    </div>
+                    {personalInfo.summary && (
+                      <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
+                        {personalInfo.summary}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Experience Preview */}
+                  {experiences.length > 0 && (
+                    <div>
+                      <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
+                        <Briefcase className="w-4 h-4 text-primary" />
+                        الخبرات العملية
+                      </h3>
+                      <div className="space-y-4">
+                        {experiences.map((exp) => (
+                          <div key={exp.id}>
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <p className="font-medium">{exp.position || "المسمى الوظيفي"}</p>
+                                <p className="text-sm text-primary">{exp.company || "اسم الشركة"}</p>
+                              </div>
+                              <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                <Calendar className="w-3 h-3" />
+                                {exp.startDate || "البداية"} - {exp.current ? "حتى الآن" : exp.endDate || "النهاية"}
+                              </span>
+                            </div>
+                            {exp.description && (
+                              <p className="text-sm text-muted-foreground mt-2">{exp.description}</p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Education Preview */}
+                  {education.length > 0 && (
+                    <div>
+                      <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
+                        <GraduationCap className="w-4 h-4 text-primary" />
+                        التعليم
+                      </h3>
+                      <div className="space-y-4">
+                        {education.map((edu) => (
+                          <div key={edu.id}>
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <p className="font-medium">{edu.degree} - {edu.field || "التخصص"}</p>
+                                <p className="text-sm text-primary">{edu.institution || "المؤسسة"}</p>
+                              </div>
+                              <span className="text-xs text-muted-foreground">
+                                {edu.endDate || "سنة التخرج"}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Skills Preview */}
+                  {skills.length > 0 && (
+                    <div>
+                      <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
+                        <Code className="w-4 h-4 text-primary" />
+                        المهارات
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        {skills.map((skill) => (
+                          <Badge key={skill.id} className={skillLevelColors[skill.level]}>
+                            {skill.name || "مهارة"} • {skill.level}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Certificates Preview */}
+                  {certificates.length > 0 && (
+                    <div>
+                      <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
+                        <Award className="w-4 h-4 text-primary" />
+                        الشهادات
+                      </h3>
+                      <div className="space-y-3">
+                        {certificates.map((cert) => (
+                          <div key={cert.id} className="flex justify-between items-center">
+                            <div>
+                              <p className="font-medium">{cert.name || "اسم الشهادة"}</p>
+                              <p className="text-sm text-muted-foreground">{cert.issuer || "الجهة المانحة"}</p>
+                            </div>
+                            <span className="text-xs text-muted-foreground">{cert.date}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Empty State */}
+                  {!personalInfo.fullName && experiences.length === 0 && education.length === 0 && skills.length === 0 && certificates.length === 0 && (
+                    <div className="text-center py-12 text-muted-foreground">
+                      <User className="w-16 h-16 mx-auto mb-4 opacity-30" />
+                      <p>ابدأ بملء بياناتك لمشاهدة المعاينة</p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </div>
+    </DashboardLayout>
+  );
+};
+
+export default CVBuilder;
