@@ -87,21 +87,6 @@ export const Sidebar = () => {
         })}
       </nav>
 
-      {/* Subscription Badge */}
-      {!collapsed && (
-        <div className="mx-4 mb-4 p-4 rounded-xl bg-gradient-to-br from-sidebar-primary/20 to-accent/20 border border-sidebar-primary/30">
-          <div className="flex items-center gap-2 mb-2">
-            <Crown className="w-4 h-4 text-sidebar-primary" />
-            <span className="text-sm font-medium text-white">الباقة المميزة</span>
-          </div>
-          <p className="text-xs text-sidebar-foreground/70 mb-3">
-            استمتع بجميع المميزات
-          </p>
-          <button className="w-full py-2 px-3 rounded-lg bg-sidebar-primary text-white text-sm font-medium hover:bg-sidebar-primary/90 transition-colors">
-            ترقية الاشتراك
-          </button>
-        </div>
-      )}
 
       {/* Bottom Navigation */}
       <div className="p-4 border-t border-sidebar-border space-y-2">
