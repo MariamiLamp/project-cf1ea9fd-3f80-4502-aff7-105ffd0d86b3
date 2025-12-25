@@ -26,6 +26,7 @@ const navItems = [
   { icon: TrendingUp, label: "المسار المهني", path: "/career-path" },
   { icon: MessageSquare, label: "أسئلة المقابلات", path: "/interview" },
   { icon: FileEdit, label: "منشئ السيرة الذاتية", path: "/cv-builder" },
+  { icon: Crown, label: "الاشتراكات", path: "/subscription" },
 ];
 
 const bottomNavItems = [
