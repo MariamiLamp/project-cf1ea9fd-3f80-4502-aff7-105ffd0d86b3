@@ -20,12 +20,6 @@ export const Header = () => {
 
       {/* Actions */}
       <div className="flex items-center gap-4">
-        {/* AI Credits */}
-        <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-accent/10">
-          <span className="text-sm font-medium text-accent">٤٥</span>
-          <span className="text-xs text-muted-foreground">رصيد الذكاء الاصطناعي</span>
-        </div>
-
         {/* Notifications */}
         <button className="relative p-2 rounded-lg hover:bg-muted transition-colors">
           <Bell className="w-5 h-5 text-muted-foreground" />
