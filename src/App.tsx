@@ -9,6 +9,7 @@ import CoverLetter from "./pages/CoverLetter";
 import Jobs from "./pages/Jobs";
 import Interview from "./pages/Interview";
 import CareerPath from "./pages/CareerPath";
+import CVBuilder from "./pages/CVBuilder";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/jobs" element={<Jobs />} />
           <Route path="/interview" element={<Interview />} />
           <Route path="/career-path" element={<CareerPath />} />
+          <Route path="/cv-builder" element={<CVBuilder />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
