@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -144,6 +144,8 @@ const candidatesData = [
 const CandidateProfile = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isCompanyView = searchParams.get("view") === "company";
   
   const candidate = candidatesData.find(c => c.id === Number(id));
 
@@ -187,9 +189,11 @@ const CandidateProfile = () => {
                 <div>
                   <div className="flex items-center gap-3 flex-wrap">
                     <h2 className="text-2xl font-bold">{candidate.name}</h2>
-                    <Badge className={`${candidate.matchScore >= 90 ? "bg-emerald-500" : candidate.matchScore >= 80 ? "bg-primary" : "bg-amber-500"}`}>
-                      نسبة التوافق: {candidate.matchScore}%
-                    </Badge>
+                    {isCompanyView && (
+                      <Badge className={`${candidate.matchScore >= 90 ? "bg-emerald-500" : candidate.matchScore >= 80 ? "bg-primary" : "bg-amber-500"}`}>
+                        نسبة التوافق: {candidate.matchScore}%
+                      </Badge>
+                    )}
                   </div>
                   <p className="text-muted-foreground mt-1">{candidate.appliedFor}</p>
                 </div>
