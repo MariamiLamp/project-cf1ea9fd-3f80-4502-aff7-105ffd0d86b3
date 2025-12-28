@@ -14,6 +14,8 @@ import {
   Calendar,
   Award,
   Target,
+  Download,
+  Eye,
 } from "lucide-react";
 
 // Mock candidates data (should be shared or fetched from API)
@@ -39,6 +41,7 @@ const candidatesData = [
     ],
     certifications: ["AWS Certified Developer", "React Professional Certificate"],
     languages: ["العربية (اللغة الأم)", "الإنجليزية (متقدم)"],
+    cvFile: { name: "Ahmed_Mohamed_CV.pdf", size: "245 KB", uploadDate: "2024-01-15" },
   },
   { 
     id: 2, 
@@ -62,6 +65,7 @@ const candidatesData = [
     ],
     certifications: ["Google Data Analytics Certificate", "Tableau Desktop Specialist"],
     languages: ["العربية (اللغة الأم)", "الإنجليزية (متقدم)"],
+    cvFile: { name: "Sara_Ali_CV.pdf", size: "312 KB", uploadDate: "2024-02-20" },
   },
   { 
     id: 3, 
@@ -84,6 +88,7 @@ const candidatesData = [
     ],
     certifications: ["Meta Front-End Developer Certificate"],
     languages: ["العربية (اللغة الأم)", "الإنجليزية (متوسط)"],
+    cvFile: { name: "Mohamed_Khaled_CV.docx", size: "189 KB", uploadDate: "2024-03-05" },
   },
   { 
     id: 4, 
@@ -107,6 +112,7 @@ const candidatesData = [
     ],
     certifications: ["PMP Certified", "Certified Scrum Master", "PRINCE2 Practitioner"],
     languages: ["العربية (اللغة الأم)", "الإنجليزية (متقدم)", "الفرنسية (مبتدئ)"],
+    cvFile: { name: "Fatima_Ahmed_CV.pdf", size: "278 KB", uploadDate: "2024-01-28" },
   },
 ];
 
@@ -251,8 +257,41 @@ const CandidateProfile = () => {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Skills */}
-            <Card>
+          {/* CV File */}
+          <Card className="border-primary/20 bg-primary/5">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <FileText className="w-5 h-5 text-primary" />
+                السيرة الذاتية
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center gap-3 p-3 bg-background rounded-lg border border-border">
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                  <FileText className="w-6 h-6 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-sm truncate">{candidate.cvFile.name}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {candidate.cvFile.size} • {candidate.cvFile.uploadDate}
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" className="flex-1 gap-2">
+                  <Eye className="w-4 h-4" />
+                  عرض
+                </Button>
+                <Button size="sm" className="flex-1 gap-2">
+                  <Download className="w-4 h-4" />
+                  تحميل
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Skills */}
+          <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
                   <Target className="w-5 h-5 text-primary" />
