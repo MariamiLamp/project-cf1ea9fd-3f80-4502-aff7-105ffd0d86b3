@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth, UserRole } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-import { Briefcase, Shield, Building2, User } from "lucide-react";
+import { Briefcase, Building2, User } from "lucide-react";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
@@ -48,7 +48,6 @@ const Auth = () => {
   const roles = [
     { value: "user" as UserRole, label: "باحث عن عمل", icon: User, color: "text-blue-500" },
     { value: "company" as UserRole, label: "شركة / HR", icon: Building2, color: "text-emerald-500" },
-    { value: "admin" as UserRole, label: "مدير النظام", icon: Shield, color: "text-purple-500" },
   ];
 
   return (
@@ -129,7 +128,6 @@ const Auth = () => {
             <div className="mt-6 p-4 bg-muted/50 rounded-xl">
               <p className="text-sm font-medium text-muted-foreground mb-2">بيانات تجريبية:</p>
               <div className="space-y-1 text-xs text-muted-foreground">
-                <p>مدير: admin@hr.com / admin123</p>
                 <p>شركة: company@hr.com / company123</p>
                 <p>مستخدم: user@hr.com / user123</p>
               </div>
