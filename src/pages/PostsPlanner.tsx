@@ -653,34 +653,32 @@ ${generatorForm.includeHashtags ? "#تحفيز #إلهام #نجاح #motivation
 
           {/* Calendar Tab */}
           <TabsContent value="calendar" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+            <div className="flex flex-col lg:flex-row gap-6">
               {/* Calendar */}
-              <Card className="bg-card border-border lg:col-span-1 sticky top-4">
+              <Card className="bg-card border-border w-full lg:w-auto lg:flex-shrink-0">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <CalendarIcon className="w-5 h-5 text-primary" />
                     التقويم
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="overflow-visible">
-                  <div className="flex justify-center">
-                    <Calendar
-                      mode="single"
-                      selected={selectedDate}
-                      onSelect={(date) => date && setSelectedDate(date)}
-                      className="rounded-md border pointer-events-auto w-full"
-                      locale={ar}
-                      modifiers={{
-                        hasPost: getDatesWithPosts(),
-                      }}
-                      modifiersStyles={{
-                        hasPost: {
-                          backgroundColor: "hsl(var(--primary) / 0.2)",
-                          borderRadius: "50%",
-                        },
-                      }}
-                    />
-                  </div>
+                <CardContent>
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={(date) => date && setSelectedDate(date)}
+                    className="rounded-md border pointer-events-auto"
+                    locale={ar}
+                    modifiers={{
+                      hasPost: getDatesWithPosts(),
+                    }}
+                    modifiersStyles={{
+                      hasPost: {
+                        backgroundColor: "hsl(var(--primary) / 0.2)",
+                        borderRadius: "50%",
+                      },
+                    }}
+                  />
                   <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
                     <div className="w-3 h-3 rounded-full bg-primary/20" />
                     <span>أيام تحتوي على منشورات</span>
@@ -689,7 +687,7 @@ ${generatorForm.includeHashtags ? "#تحفيز #إلهام #نجاح #motivation
               </Card>
 
               {/* Posts for Selected Date */}
-              <Card className="bg-card border-border lg:col-span-2 min-h-[400px]">
+              <Card className="bg-card border-border flex-1 min-h-[400px]">
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between flex-wrap gap-2">
                     <span className="flex items-center gap-2">
