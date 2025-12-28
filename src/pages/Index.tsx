@@ -6,6 +6,7 @@ import { JobCard } from "@/components/dashboard/JobCard";
 import { CVScoreCard } from "@/components/dashboard/CVScoreCard";
 import { RecentActivity } from "@/components/dashboard/RecentActivity";
 import { Briefcase, FileText, Eye, TrendingUp, ArrowLeft } from "lucide-react";
+import { Link } from "react-router-dom";
 const stats = [{
   title: "الوظائف المتاحة",
   value: "٢٤٧",
@@ -94,10 +95,10 @@ const Index = () => {
         }}>
             <div className="section-header">
               <h2 className="section-title">وظائف مقترحة لك</h2>
-              <button className="text-sm text-primary hover:text-primary-light font-medium transition-colors flex items-center gap-1">
+              <Link to="/jobs" className="text-sm text-primary hover:text-primary-light font-medium transition-colors flex items-center gap-1">
                 عرض الكل
                 <ArrowLeft className="w-4 h-4" />
-              </button>
+              </Link>
             </div>
             <div className="space-y-4">
               {recommendedJobs.map((job, index) => <JobCard key={job.title} {...job} delay={500 + index * 100} />)}

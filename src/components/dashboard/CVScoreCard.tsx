@@ -1,5 +1,6 @@
 import { CVScoreRing } from "./CVScoreRing";
 import { CheckCircle, AlertCircle, ArrowLeft } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const improvements = [
   { text: "أضف ملخصاً مهنياً مختصراً", completed: true },
@@ -13,10 +14,10 @@ export const CVScoreCard = () => {
     <div className="card-elevated p-6 opacity-0 animate-fade-up" style={{ animationDelay: "200ms", animationFillMode: "forwards" }}>
       <div className="section-header">
         <h2 className="section-title">نتيجة السيرة الذاتية</h2>
-        <button className="text-sm text-primary hover:text-primary-light font-medium transition-colors flex items-center gap-1">
+        <Link to="/cv-check" className="text-sm text-primary hover:text-primary-light font-medium transition-colors flex items-center gap-1">
           تحسين الآن
           <ArrowLeft className="w-4 h-4" />
-        </button>
+        </Link>
       </div>
 
       <div className="flex flex-col items-center mb-6">

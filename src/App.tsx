@@ -20,6 +20,7 @@ import JobSeekerRegistration from "./pages/JobSeekerRegistration";
 import HRDashboard from "./pages/HRDashboard";
 import TemplatesMarketplace from "./pages/TemplatesMarketplace";
 import PostsPlanner from "./pages/PostsPlanner";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -48,6 +49,7 @@ const App = () => (
             <Route path="/hr" element={<HRDashboard />} />
             <Route path="/templates" element={<TemplatesMarketplace />} />
             <Route path="/posts-planner" element={<PostsPlanner />} />
+            <Route path="/settings" element={<Settings />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
