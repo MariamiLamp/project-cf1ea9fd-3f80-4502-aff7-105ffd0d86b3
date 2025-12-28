@@ -29,7 +29,10 @@ import {
   FileText,
   Sparkles,
   Wand2,
-  Loader2
+  Loader2,
+  Layout,
+  Palette,
+  Check
 } from "lucide-react";
 
 interface PersonalInfo {
@@ -83,8 +86,55 @@ const CVBuilder = () => {
   const [activeSection, setActiveSection] = useState("personal");
   const [showPreview, setShowPreview] = useState(false);
   const [showUploadDialog, setShowUploadDialog] = useState(false);
+  const [showTemplateDialog, setShowTemplateDialog] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isGenerating, setIsGenerating] = useState<string | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState("modern");
+
+  const templates = [
+    {
+      id: "modern",
+      name: "عصري",
+      description: "تصميم عصري وأنيق مع ألوان متدرجة",
+      primaryColor: "from-primary to-accent",
+      style: "gradient"
+    },
+    {
+      id: "classic",
+      name: "كلاسيكي",
+      description: "تصميم تقليدي واحترافي",
+      primaryColor: "bg-slate-800",
+      style: "simple"
+    },
+    {
+      id: "creative",
+      name: "إبداعي",
+      description: "تصميم مبتكر للمجالات الإبداعية",
+      primaryColor: "from-purple-500 to-pink-500",
+      style: "creative"
+    },
+    {
+      id: "minimal",
+      name: "بسيط",
+      description: "تصميم بسيط ونظيف",
+      primaryColor: "bg-gray-900",
+      style: "minimal"
+    },
+    {
+      id: "executive",
+      name: "تنفيذي",
+      description: "تصميم رسمي للمناصب القيادية",
+      primaryColor: "from-emerald-600 to-teal-600",
+      style: "executive"
+    },
+    {
+      id: "tech",
+      name: "تقني",
+      description: "تصميم للمجال التقني والبرمجة",
+      primaryColor: "from-cyan-500 to-blue-600",
+      style: "tech"
+    }
+  ];
 
   const [personalInfo, setPersonalInfo] = useState<PersonalInfo>({
     fullName: "",
@@ -403,6 +453,78 @@ const CVBuilder = () => {
           </DialogContent>
         </Dialog>
 
+        {/* Template Selection Dialog */}
+        <Dialog open={showTemplateDialog} onOpenChange={setShowTemplateDialog}>
+          <DialogContent className="max-w-3xl" dir="rtl">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Layout className="w-5 h-5 text-primary" />
+                اختر قالب السيرة الذاتية
+              </DialogTitle>
+              <DialogDescription>
+                اختر القالب المناسب لمجال عملك وأسلوبك
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {templates.map((template) => (
+                  <div
+                    key={template.id}
+                    onClick={() => setSelectedTemplate(template.id)}
+                    className={`relative cursor-pointer rounded-xl border-2 p-4 transition-all hover:scale-105 ${
+                      selectedTemplate === template.id
+                        ? "border-primary bg-primary/5"
+                        : "border-border hover:border-primary/50"
+                    }`}
+                  >
+                    {selectedTemplate === template.id && (
+                      <div className="absolute top-2 left-2 w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+                        <Check className="w-4 h-4 text-primary-foreground" />
+                      </div>
+                    )}
+                    <div className={`h-24 rounded-lg mb-3 ${
+                      template.style === "gradient" || template.style === "creative" || template.style === "executive" || template.style === "tech"
+                        ? `bg-gradient-to-br ${template.primaryColor}`
+                        : template.primaryColor
+                    } flex items-center justify-center`}>
+                      <div className="w-16 h-20 bg-white/90 rounded shadow-lg flex flex-col p-2">
+                        <div className={`h-2 w-8 rounded-full mb-1 ${
+                          template.style === "gradient" || template.style === "creative" || template.style === "executive" || template.style === "tech"
+                            ? `bg-gradient-to-r ${template.primaryColor}`
+                            : template.primaryColor
+                        }`} />
+                        <div className="h-1 w-10 bg-gray-300 rounded-full mb-1" />
+                        <div className="h-1 w-8 bg-gray-200 rounded-full mb-2" />
+                        <div className="flex-1 space-y-1">
+                          <div className="h-1 w-full bg-gray-200 rounded-full" />
+                          <div className="h-1 w-3/4 bg-gray-200 rounded-full" />
+                          <div className="h-1 w-full bg-gray-200 rounded-full" />
+                        </div>
+                      </div>
+                    </div>
+                    <h3 className="font-semibold text-foreground">{template.name}</h3>
+                    <p className="text-xs text-muted-foreground mt-1">{template.description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowTemplateDialog(false)}>
+                إلغاء
+              </Button>
+              <Button onClick={() => {
+                setShowTemplateDialog(false);
+                toast({
+                  title: "تم اختيار القالب!",
+                  description: `تم تطبيق قالب "${templates.find(t => t.id === selectedTemplate)?.name}"`,
+                });
+              }}>
+                تطبيق القالب
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
@@ -410,6 +532,14 @@ const CVBuilder = () => {
             <p className="text-muted-foreground mt-1">أنشئ سيرتك الذاتية الاحترافية أو قم برفع سيرة موجودة</p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowTemplateDialog(true)}
+              className="gap-2"
+            >
+              <Palette className="w-4 h-4" />
+              اختر قالب
+            </Button>
             <Button 
               variant="outline" 
               onClick={() => setShowUploadDialog(true)}
@@ -923,48 +1053,153 @@ const CVBuilder = () => {
           {showPreview && (
             <Card className="card-elevated sticky top-6 h-fit">
               <CardHeader className="border-b border-border">
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <Eye className="w-5 h-5 text-primary" />
-                  معاينة السيرة الذاتية
+                <CardTitle className="flex items-center justify-between text-lg">
+                  <span className="flex items-center gap-2">
+                    <Eye className="w-5 h-5 text-primary" />
+                    معاينة السيرة الذاتية
+                  </span>
+                  <Badge variant="secondary" className="text-xs">
+                    {templates.find(t => t.id === selectedTemplate)?.name}
+                  </Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-6">
-                <div className="bg-background border border-border rounded-lg p-6 space-y-6 min-h-[600px]">
-                  {/* Personal Info Preview */}
-                  <div className="text-center border-b border-border pb-6">
-                    <h2 className="text-2xl font-bold text-foreground">
-                      {personalInfo.fullName || "الاسم الكامل"}
-                    </h2>
-                    <p className="text-primary font-medium mt-1">
-                      {personalInfo.jobTitle || "المسمى الوظيفي"}
-                    </p>
-                    <div className="flex flex-wrap items-center justify-center gap-4 mt-4 text-sm text-muted-foreground">
-                      {personalInfo.email && (
-                        <span className="flex items-center gap-1">
-                          <Mail className="w-4 h-4" />
-                          {personalInfo.email}
-                        </span>
-                      )}
-                      {personalInfo.phone && (
-                        <span className="flex items-center gap-1">
-                          <Phone className="w-4 h-4" />
-                          {personalInfo.phone}
-                        </span>
-                      )}
-                      {personalInfo.location && (
-                        <span className="flex items-center gap-1">
-                          <MapPin className="w-4 h-4" />
-                          {personalInfo.location}
-                        </span>
+                {/* Template: Modern */}
+                {selectedTemplate === "modern" && (
+                  <div className="bg-white border border-border rounded-lg overflow-hidden min-h-[600px]">
+                    <div className="bg-gradient-to-r from-primary to-accent p-6 text-white">
+                      <h2 className="text-2xl font-bold">{personalInfo.fullName || "الاسم الكامل"}</h2>
+                      <p className="opacity-90 mt-1">{personalInfo.jobTitle || "المسمى الوظيفي"}</p>
+                      <div className="flex flex-wrap gap-4 mt-4 text-sm opacity-80">
+                        {personalInfo.email && <span className="flex items-center gap-1"><Mail className="w-3 h-3" />{personalInfo.email}</span>}
+                        {personalInfo.phone && <span className="flex items-center gap-1"><Phone className="w-3 h-3" />{personalInfo.phone}</span>}
+                        {personalInfo.location && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{personalInfo.location}</span>}
+                      </div>
+                    </div>
+                    <div className="p-6 space-y-6">
+                      {personalInfo.summary && <p className="text-sm text-gray-600 leading-relaxed">{personalInfo.summary}</p>}
+                    </div>
+                  </div>
+                )}
+
+                {/* Template: Classic */}
+                {selectedTemplate === "classic" && (
+                  <div className="bg-white border border-border rounded-lg p-6 min-h-[600px]">
+                    <div className="text-center border-b-2 border-slate-800 pb-4">
+                      <h2 className="text-2xl font-serif font-bold text-slate-800">{personalInfo.fullName || "الاسم الكامل"}</h2>
+                      <p className="text-slate-600 mt-1">{personalInfo.jobTitle || "المسمى الوظيفي"}</p>
+                      <div className="flex flex-wrap justify-center gap-4 mt-3 text-xs text-slate-500">
+                        {personalInfo.email && <span>{personalInfo.email}</span>}
+                        {personalInfo.phone && <span>•</span>}
+                        {personalInfo.phone && <span>{personalInfo.phone}</span>}
+                        {personalInfo.location && <span>•</span>}
+                        {personalInfo.location && <span>{personalInfo.location}</span>}
+                      </div>
+                    </div>
+                    {personalInfo.summary && <p className="mt-4 text-sm text-gray-600 leading-relaxed text-center">{personalInfo.summary}</p>}
+                  </div>
+                )}
+
+                {/* Template: Creative */}
+                {selectedTemplate === "creative" && (
+                  <div className="bg-white border border-border rounded-lg overflow-hidden min-h-[600px]">
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-pink-500 opacity-10" />
+                      <div className="relative p-6">
+                        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 mx-auto mb-4 flex items-center justify-center text-white text-2xl font-bold">
+                          {personalInfo.fullName?.charAt(0) || "؟"}
+                        </div>
+                        <h2 className="text-2xl font-bold text-center bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                          {personalInfo.fullName || "الاسم الكامل"}
+                        </h2>
+                        <p className="text-center text-gray-500 mt-1">{personalInfo.jobTitle || "المسمى الوظيفي"}</p>
+                        <div className="flex flex-wrap justify-center gap-3 mt-4">
+                          {personalInfo.email && <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs">{personalInfo.email}</span>}
+                          {personalInfo.phone && <span className="px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-xs">{personalInfo.phone}</span>}
+                        </div>
+                      </div>
+                    </div>
+                    {personalInfo.summary && <p className="px-6 pb-6 text-sm text-gray-600 leading-relaxed">{personalInfo.summary}</p>}
+                  </div>
+                )}
+
+                {/* Template: Minimal */}
+                {selectedTemplate === "minimal" && (
+                  <div className="bg-white border border-border rounded-lg p-8 min-h-[600px]">
+                    <h2 className="text-3xl font-light text-gray-900">{personalInfo.fullName || "الاسم الكامل"}</h2>
+                    <p className="text-gray-400 mt-1 uppercase tracking-widest text-sm">{personalInfo.jobTitle || "المسمى الوظيفي"}</p>
+                    <div className="w-12 h-0.5 bg-gray-900 my-6" />
+                    <div className="flex flex-wrap gap-6 text-xs text-gray-500">
+                      {personalInfo.email && <span>{personalInfo.email}</span>}
+                      {personalInfo.phone && <span>{personalInfo.phone}</span>}
+                      {personalInfo.location && <span>{personalInfo.location}</span>}
+                    </div>
+                    {personalInfo.summary && <p className="mt-6 text-sm text-gray-600 leading-loose">{personalInfo.summary}</p>}
+                  </div>
+                )}
+
+                {/* Template: Executive */}
+                {selectedTemplate === "executive" && (
+                  <div className="bg-white border border-border rounded-lg overflow-hidden min-h-[600px]">
+                    <div className="bg-gradient-to-r from-emerald-600 to-teal-600 p-1" />
+                    <div className="p-6">
+                      <div className="flex items-start gap-4">
+                        <div className="w-16 h-16 rounded bg-gradient-to-br from-emerald-600 to-teal-600 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
+                          {personalInfo.fullName?.charAt(0) || "؟"}
+                        </div>
+                        <div>
+                          <h2 className="text-xl font-bold text-gray-900">{personalInfo.fullName || "الاسم الكامل"}</h2>
+                          <p className="text-emerald-600 font-medium">{personalInfo.jobTitle || "المسمى الوظيفي"}</p>
+                          <div className="flex flex-wrap gap-3 mt-2 text-xs text-gray-500">
+                            {personalInfo.email && <span className="flex items-center gap-1"><Mail className="w-3 h-3" />{personalInfo.email}</span>}
+                            {personalInfo.phone && <span className="flex items-center gap-1"><Phone className="w-3 h-3" />{personalInfo.phone}</span>}
+                          </div>
+                        </div>
+                      </div>
+                      {personalInfo.summary && (
+                        <div className="mt-6 p-4 bg-emerald-50 rounded-lg">
+                          <p className="text-sm text-gray-700 leading-relaxed">{personalInfo.summary}</p>
+                        </div>
                       )}
                     </div>
+                  </div>
+                )}
+
+                {/* Template: Tech */}
+                {selectedTemplate === "tech" && (
+                  <div className="bg-slate-900 border border-border rounded-lg overflow-hidden min-h-[600px] text-white">
+                    <div className="p-6 border-b border-slate-700">
+                      <div className="flex items-center gap-2 text-cyan-400 text-xs mb-4 font-mono">
+                        <span className="w-3 h-3 rounded-full bg-red-500" />
+                        <span className="w-3 h-3 rounded-full bg-yellow-500" />
+                        <span className="w-3 h-3 rounded-full bg-green-500" />
+                        <span className="mr-4">portfolio.tsx</span>
+                      </div>
+                      <h2 className="text-2xl font-mono">
+                        <span className="text-pink-400">const</span>{" "}
+                        <span className="text-cyan-400">{personalInfo.fullName?.replace(/\s/g, "_") || "developer"}</span>{" "}
+                        <span className="text-white">=</span>{" "}
+                        <span className="text-yellow-400">{`{`}</span>
+                      </h2>
+                      <div className="pr-6 mt-2 text-sm font-mono space-y-1">
+                        <p><span className="text-purple-400">role</span>: <span className="text-green-400">"{personalInfo.jobTitle || "مطور"}"</span>,</p>
+                        <p><span className="text-purple-400">email</span>: <span className="text-green-400">"{personalInfo.email || "email@example.com"}"</span>,</p>
+                        <p><span className="text-purple-400">location</span>: <span className="text-green-400">"{personalInfo.location || "الموقع"}"</span></p>
+                      </div>
+                      <p className="text-yellow-400 font-mono">{`}`}</p>
+                    </div>
                     {personalInfo.summary && (
-                      <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
-                        {personalInfo.summary}
-                      </p>
+                      <div className="p-6">
+                        <p className="text-sm text-slate-300 leading-relaxed font-mono">
+                          <span className="text-gray-500">// </span>{personalInfo.summary}
+                        </p>
+                      </div>
                     )}
                   </div>
+                )}
 
+                {/* Shared Content Sections for all templates */}
+                <div className="bg-white border border-border rounded-lg p-6 mt-4 space-y-6">
                   {/* Experience Preview */}
                   {experiences.length > 0 && (
                     <div>
