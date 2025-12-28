@@ -6,10 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils";
 
 interface GeneratedQuestion {
   id: string;
@@ -19,47 +17,6 @@ interface GeneratedQuestion {
   difficulty: "easy" | "medium" | "hard";
 }
 
-const defaultJobTitles = [
-  "مطور واجهات أمامية",
-  "مهندس برمجيات",
-  "مصمم تجربة مستخدم",
-  "محلل بيانات",
-  "مدير مشاريع تقنية",
-  "مطور تطبيقات موبايل",
-];
-
-const defaultQuestions = [
-  {
-    question: "أخبرني عن نفسك وخبراتك المهنية",
-    answer: "ابدأ بملخص موجز عن خلفيتك التعليمية، ثم انتقل إلى خبراتك العملية الأكثر صلة بالوظيفة. ركز على الإنجازات القابلة للقياس واختم بما يميزك عن غيرك من المرشحين.",
-    category: "عام",
-  },
-  {
-    question: "لماذا تريد العمل في شركتنا؟",
-    answer: "أظهر أنك أجريت بحثاً عن الشركة. اذكر قيم الشركة أو مشاريعها التي تتوافق مع اهتماماتك. اربط إجابتك بأهدافك المهنية وكيف يمكنك المساهمة.",
-    category: "عام",
-  },
-  {
-    question: "ما هي نقاط قوتك وضعفك؟",
-    answer: "للقوة: اذكر مهارات مرتبطة بالوظيفة مع أمثلة عملية. للضعف: اختر نقطة حقيقية لكن غير جوهرية للوظيفة، واشرح كيف تعمل على تحسينها.",
-    category: "عام",
-  },
-  {
-    question: "صف موقفاً تعاملت فيه مع ضغط العمل",
-    answer: "استخدم طريقة STAR: الموقف، المهمة، الإجراء، النتيجة. اشرح كيف حددت الأولويات، وتواصلت مع الفريق، وحققت الهدف رغم الضغط.",
-    category: "سلوكي",
-  },
-  {
-    question: "كيف تتعامل مع الخلافات مع زملاء العمل؟",
-    answer: "أكد على أهمية التواصل المفتوح والاحترام المتبادل. اذكر مثالاً حقيقياً حيث استمعت للطرف الآخر، وجدت أرضية مشتركة، وتوصلت لحل يرضي الجميع.",
-    category: "سلوكي",
-  },
-  {
-    question: "أين ترى نفسك بعد خمس سنوات؟",
-    answer: "أظهر طموحاً واقعياً يتوافق مع مسار النمو في الشركة. تحدث عن تطوير مهاراتك والمساهمة في نجاح الفريق دون المبالغة في التوقعات.",
-    category: "عام",
-  },
-];
 
 const questionsByJobTitle: Record<string, GeneratedQuestion[]> = {
   "مطور واجهات أمامية": [
@@ -360,9 +317,6 @@ const topicQuestions: Record<string, GeneratedQuestion[]> = {
 
 const InterviewPage = () => {
   const { toast } = useToast();
-  const [selectedJob, setSelectedJob] = useState(defaultJobTitles[0]);
-  const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
-  const [activeTab, setActiveTab] = useState("browse");
   
   // Generator state
   const [searchQuery, setSearchQuery] = useState("");
@@ -534,63 +488,132 @@ const InterviewPage = () => {
         </p>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
-          <TabsTrigger value="browse" className="gap-2">
-            <HelpCircle className="w-4 h-4" />
-            تصفح الأسئلة
-          </TabsTrigger>
-          <TabsTrigger value="generate" className="gap-2">
-            <Sparkles className="w-4 h-4" />
-            توليد أسئلة
-          </TabsTrigger>
-        </TabsList>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Generator Form */}
+        <Card className="lg:col-span-1 card-elevated">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-primary" />
+              مولد الأسئلة
+            </CardTitle>
+            <CardDescription>
+              أدخل المسمى الوظيفي أو الموضوع التقني لتوليد أسئلة مخصصة
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>نوع البحث</Label>
+              <Select value={searchType} onValueChange={(v: "job" | "topic") => setSearchType(v)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="job">
+                    <div className="flex items-center gap-2">
+                      <Briefcase className="w-4 h-4" />
+                      مسمى وظيفي
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="topic">
+                    <div className="flex items-center gap-2">
+                      <HelpCircle className="w-4 h-4" />
+                      موضوع تقني
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-        {/* Browse Tab */}
-        <TabsContent value="browse">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            {/* Sidebar - Job Selection */}
-            <div className="lg:col-span-1">
-              <div className="card-elevated p-4 sticky top-24">
-                <h2 className="font-semibold text-foreground mb-4">اختر المسمى الوظيفي</h2>
-                <div className="space-y-2">
-                  {defaultJobTitles.map((job) => (
-                    <button
-                      key={job}
-                      onClick={() => setSelectedJob(job)}
-                      className={cn(
-                        "w-full text-right px-4 py-3 rounded-lg transition-colors",
-                        selectedJob === job
-                          ? "bg-primary/10 text-primary font-medium"
-                          : "hover:bg-muted text-muted-foreground"
-                      )}
-                    >
-                      {job}
-                    </button>
-                  ))}
-                </div>
+            <div className="space-y-2">
+              <Label>{searchType === "job" ? "المسمى الوظيفي" : "الموضوع"}</Label>
+              <div className="relative">
+                <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder={searchType === "job" ? "مثال: مطور واجهات أمامية" : "مثال: React, JavaScript, SQL"}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pr-10"
+                />
               </div>
             </div>
 
-            {/* Questions */}
-            <div className="lg:col-span-3 space-y-4">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-foreground">
-                  أسئلة لـ: {selectedJob}
-                </h2>
-                <div className="ai-indicator">
+            <div className="space-y-2">
+              <Label>عدد الأسئلة</Label>
+              <Select value={questionCount} onValueChange={setQuestionCount}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="3">3 أسئلة</SelectItem>
+                  <SelectItem value="5">5 أسئلة</SelectItem>
+                  <SelectItem value="10">10 أسئلة</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <Button
+              onClick={handleGenerate}
+              disabled={isGenerating || !searchQuery.trim()}
+              className="w-full btn-gradient"
+            >
+              {isGenerating ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  جاري التوليد...
+                </>
+              ) : (
+                <>
                   <Sparkles className="w-4 h-4" />
-                  مدعوم بالذكاء الاصطناعي
-                </div>
+                  توليد الأسئلة
+                </>
+              )}
+            </Button>
+
+            {generatedQuestions.length > 0 && (
+              <Button
+                variant="outline"
+                onClick={handleGenerate}
+                disabled={isGenerating}
+                className="w-full"
+              >
+                <RefreshCw className="w-4 h-4" />
+                إعادة التوليد
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Generated Questions */}
+        <div className="lg:col-span-2 space-y-4">
+          {isGenerating ? (
+            <Card className="card-elevated">
+              <CardContent className="py-12 text-center">
+                <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto mb-4" />
+                <p className="text-muted-foreground">جاري توليد الأسئلة...</p>
+                <p className="text-sm text-muted-foreground mt-2">
+                  يتم تحليل {searchType === "job" ? "المسمى الوظيفي" : "الموضوع"} وإنشاء أسئلة مخصصة
+                </p>
+              </CardContent>
+            </Card>
+          ) : generatedQuestions.length > 0 ? (
+            <>
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-foreground">
+                  الأسئلة المُولدة ({generatedQuestions.length})
+                </h2>
+                <Badge variant="secondary" className="gap-1">
+                  <Sparkles className="w-3 h-3" />
+                  {searchQuery}
+                </Badge>
               </div>
 
-              {defaultQuestions.map((q, index) => (
+              {generatedQuestions.map((q, index) => (
                 <div
-                  key={index}
+                  key={q.id}
                   className="card-elevated overflow-hidden"
                 >
                   <button
-                    onClick={() => setExpandedIndex(expandedIndex === index ? null : index)}
+                    onClick={() => setExpandedGenIndex(expandedGenIndex === index ? null : index)}
                     className="w-full p-5 flex items-start justify-between gap-4 text-right"
                   >
                     <div className="flex items-start gap-3">
@@ -598,230 +621,66 @@ const InterviewPage = () => {
                         {index + 1}
                       </span>
                       <div>
-                        <span className="px-2 py-0.5 rounded-full bg-muted text-muted-foreground text-xs mb-2 inline-block">
-                          {q.category}
-                        </span>
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="px-2 py-0.5 rounded-full bg-muted text-muted-foreground text-xs">
+                            {q.category}
+                          </span>
+                          {getDifficultyBadge(q.difficulty)}
+                        </div>
                         <h3 className="font-semibold text-foreground">{q.question}</h3>
                       </div>
                     </div>
-                    {expandedIndex === index ? (
+                    {expandedGenIndex === index ? (
                       <ChevronUp className="w-5 h-5 text-muted-foreground shrink-0" />
                     ) : (
                       <ChevronDown className="w-5 h-5 text-muted-foreground shrink-0" />
                     )}
                   </button>
 
-                  {expandedIndex === index && (
+                  {expandedGenIndex === index && (
                     <div className="px-5 pb-5 animate-fade-in">
                       <div className="bg-success/5 border border-success/20 rounded-xl p-4 mr-11">
-                        <h4 className="text-sm font-medium text-success mb-2">الإجابة المثالية:</h4>
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="text-sm font-medium text-success">الإجابة المثالية:</h4>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleCopy(q)}
+                            className="gap-1"
+                          >
+                            {copiedId === q.id ? (
+                              <>
+                                <Check className="w-3 h-3" />
+                                تم النسخ
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="w-3 h-3" />
+                                نسخ
+                              </>
+                            )}
+                          </Button>
+                        </div>
                         <p className="text-foreground leading-relaxed">{q.answer}</p>
                       </div>
                     </div>
                   )}
                 </div>
               ))}
-            </div>
-          </div>
-        </TabsContent>
-
-        {/* Generate Tab */}
-        <TabsContent value="generate">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Generator Form */}
-            <Card className="lg:col-span-1 card-elevated">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-primary" />
-                  مولد الأسئلة
-                </CardTitle>
-                <CardDescription>
-                  أدخل المسمى الوظيفي أو الموضوع التقني لتوليد أسئلة مخصصة
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label>نوع البحث</Label>
-                  <Select value={searchType} onValueChange={(v: "job" | "topic") => setSearchType(v)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="job">
-                        <div className="flex items-center gap-2">
-                          <Briefcase className="w-4 h-4" />
-                          مسمى وظيفي
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="topic">
-                        <div className="flex items-center gap-2">
-                          <HelpCircle className="w-4 h-4" />
-                          موضوع تقني
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>{searchType === "job" ? "المسمى الوظيفي" : "الموضوع"}</Label>
-                  <div className="relative">
-                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input
-                      placeholder={searchType === "job" ? "مثال: مطور واجهات أمامية" : "مثال: React, JavaScript, SQL"}
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pr-10"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>عدد الأسئلة</Label>
-                  <Select value={questionCount} onValueChange={setQuestionCount}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="3">3 أسئلة</SelectItem>
-                      <SelectItem value="5">5 أسئلة</SelectItem>
-                      <SelectItem value="10">10 أسئلة</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <Button
-                  onClick={handleGenerate}
-                  disabled={isGenerating || !searchQuery.trim()}
-                  className="w-full btn-gradient"
-                >
-                  {isGenerating ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      جاري التوليد...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-4 h-4" />
-                      توليد الأسئلة
-                    </>
-                  )}
-                </Button>
-
-                {generatedQuestions.length > 0 && (
-                  <Button
-                    variant="outline"
-                    onClick={handleGenerate}
-                    disabled={isGenerating}
-                    className="w-full"
-                  >
-                    <RefreshCw className="w-4 h-4" />
-                    إعادة التوليد
-                  </Button>
-                )}
+            </>
+          ) : (
+            <Card className="card-elevated">
+              <CardContent className="py-12 text-center">
+                <HelpCircle className="w-12 h-12 text-muted-foreground/50 mx-auto mb-4" />
+                <p className="text-muted-foreground">أدخل المسمى الوظيفي أو الموضوع وابدأ التوليد</p>
+                <p className="text-sm text-muted-foreground mt-2">
+                  سيتم إنشاء أسئلة مخصصة مع إجابات مثالية
+                </p>
               </CardContent>
             </Card>
-
-            {/* Generated Questions */}
-            <div className="lg:col-span-2 space-y-4">
-              {isGenerating ? (
-                <Card className="card-elevated">
-                  <CardContent className="py-12 text-center">
-                    <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto mb-4" />
-                    <p className="text-muted-foreground">جاري توليد الأسئلة...</p>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      يتم تحليل {searchType === "job" ? "المسمى الوظيفي" : "الموضوع"} وإنشاء أسئلة مخصصة
-                    </p>
-                  </CardContent>
-                </Card>
-              ) : generatedQuestions.length > 0 ? (
-                <>
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-semibold text-foreground">
-                      الأسئلة المُولدة ({generatedQuestions.length})
-                    </h2>
-                    <Badge variant="secondary" className="gap-1">
-                      <Sparkles className="w-3 h-3" />
-                      {searchQuery}
-                    </Badge>
-                  </div>
-
-                  {generatedQuestions.map((q, index) => (
-                    <div
-                      key={q.id}
-                      className="card-elevated overflow-hidden"
-                    >
-                      <button
-                        onClick={() => setExpandedGenIndex(expandedGenIndex === index ? null : index)}
-                        className="w-full p-5 flex items-start justify-between gap-4 text-right"
-                      >
-                        <div className="flex items-start gap-3">
-                          <span className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold shrink-0">
-                            {index + 1}
-                          </span>
-                          <div>
-                            <div className="flex items-center gap-2 mb-2">
-                              <span className="px-2 py-0.5 rounded-full bg-muted text-muted-foreground text-xs">
-                                {q.category}
-                              </span>
-                              {getDifficultyBadge(q.difficulty)}
-                            </div>
-                            <h3 className="font-semibold text-foreground">{q.question}</h3>
-                          </div>
-                        </div>
-                        {expandedGenIndex === index ? (
-                          <ChevronUp className="w-5 h-5 text-muted-foreground shrink-0" />
-                        ) : (
-                          <ChevronDown className="w-5 h-5 text-muted-foreground shrink-0" />
-                        )}
-                      </button>
-
-                      {expandedGenIndex === index && (
-                        <div className="px-5 pb-5 animate-fade-in">
-                          <div className="bg-success/5 border border-success/20 rounded-xl p-4 mr-11">
-                            <div className="flex items-center justify-between mb-2">
-                              <h4 className="text-sm font-medium text-success">الإجابة المثالية:</h4>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleCopy(q)}
-                                className="gap-1"
-                              >
-                                {copiedId === q.id ? (
-                                  <>
-                                    <Check className="w-3 h-3" />
-                                    تم النسخ
-                                  </>
-                                ) : (
-                                  <>
-                                    <Copy className="w-3 h-3" />
-                                    نسخ
-                                  </>
-                                )}
-                              </Button>
-                            </div>
-                            <p className="text-foreground leading-relaxed">{q.answer}</p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </>
-              ) : (
-                <Card className="card-elevated">
-                  <CardContent className="py-12 text-center">
-                    <HelpCircle className="w-12 h-12 text-muted-foreground/50 mx-auto mb-4" />
-                    <p className="text-muted-foreground">أدخل المسمى الوظيفي أو الموضوع وابدأ التوليد</p>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      سيتم إنشاء أسئلة مخصصة مع إجابات مثالية
-                    </p>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-          </div>
-        </TabsContent>
-      </Tabs>
+          )}
+        </div>
+      </div>
     </DashboardLayout>
   );
 };
