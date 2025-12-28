@@ -1,4 +1,5 @@
 import { Sparkles, ArrowLeft } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface WelcomeCardProps {
   userName: string;
@@ -34,14 +35,14 @@ export const WelcomeCard = ({ userName }: WelcomeCardProps) => {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3">
-          <button className="btn-gradient !bg-white !text-primary hover:!bg-white/90 flex items-center justify-center gap-2">
+          <Link to="/cv-builder" className="btn-gradient !bg-white !text-primary hover:!bg-white/90 flex items-center justify-center gap-2">
             <Sparkles className="w-4 h-4" />
             تحسين السيرة الذاتية
-          </button>
-          <button className="px-6 py-3 rounded-lg border border-white/30 text-white font-medium hover:bg-white/10 transition-colors flex items-center justify-center gap-2">
+          </Link>
+          <Link to="/jobs" className="px-6 py-3 rounded-lg border border-white/30 text-white font-medium hover:bg-white/10 transition-colors flex items-center justify-center gap-2">
             استكشف الوظائف
             <ArrowLeft className="w-4 h-4" />
-          </button>
+          </Link>
         </div>
       </div>
     </div>
