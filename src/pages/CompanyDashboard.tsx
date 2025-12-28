@@ -45,11 +45,8 @@ import {
   MapPin,
   Building2,
   TrendingUp,
-  Search,
   Edit,
   Trash2,
-  Mail,
-  UserPlus,
 } from "lucide-react";
 
 // Mock data
@@ -86,10 +83,8 @@ const CompanyDashboard = () => {
   
   const [isAddJobOpen, setIsAddJobOpen] = useState(false);
   const [isEditJobOpen, setIsEditJobOpen] = useState(false);
-  const [isViewCandidateOpen, setIsViewCandidateOpen] = useState(false);
   const [isViewApplicationOpen, setIsViewApplicationOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState<typeof initialJobs[0] | null>(null);
-  const [selectedCandidate, setSelectedCandidate] = useState<typeof initialCandidates[0] | null>(null);
   const [selectedApplication, setSelectedApplication] = useState<typeof initialApplications[0] | null>(null);
   
   const [newJob, setNewJob] = useState({
@@ -179,16 +174,8 @@ const CompanyDashboard = () => {
     });
   };
 
-  const handleViewCandidate = (candidate: typeof initialCandidates[0]) => {
-    setSelectedCandidate(candidate);
-    setIsViewCandidateOpen(true);
-  };
-
-  const handleInviteCandidate = (candidate: typeof initialCandidates[0]) => {
-    toast({
-      title: "تم إرسال الدعوة",
-      description: `تم إرسال دعوة للمقابلة إلى ${candidate.name}`,
-    });
+  const handleViewCandidate = (candidateId: number) => {
+    navigate(`/candidate/${candidateId}`);
   };
 
   const handleViewApplication = (app: typeof initialApplications[0]) => {
@@ -467,7 +454,7 @@ const CompanyDashboard = () => {
                       <TableRow key={candidate.id}>
                         <TableCell className="font-medium">
                           <button
-                            onClick={() => handleViewCandidate(candidate)}
+                            onClick={() => handleViewCandidate(candidate.id)}
                             className="text-primary hover:underline cursor-pointer font-medium"
                           >
                             {candidate.name}
@@ -646,81 +633,6 @@ const CompanyDashboard = () => {
                 حفظ التغييرات
               </Button>
             </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* View Candidate Dialog */}
-        <Dialog open={isViewCandidateOpen} onOpenChange={setIsViewCandidateOpen}>
-          <DialogContent className="max-w-lg" dir="rtl">
-            <DialogHeader>
-              <DialogTitle>الملف الشخصي للمرشح</DialogTitle>
-            </DialogHeader>
-            {selectedCandidate && (
-              <div className="space-y-4 mt-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Users className="w-8 h-8 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-lg">{selectedCandidate.name}</h3>
-                    <p className="text-muted-foreground">{selectedCandidate.appliedFor}</p>
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">البريد الإلكتروني</p>
-                    <p className="font-medium flex items-center gap-1">
-                      <Mail className="w-4 h-4" />
-                      {selectedCandidate.email}
-                    </p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">رقم الهاتف</p>
-                    <p className="font-medium">{selectedCandidate.phone}</p>
-                  </div>
-                </div>
-
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">التعليم</p>
-                  <p className="font-medium">{selectedCandidate.education}</p>
-                </div>
-
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">الخبرة</p>
-                  <p className="font-medium">{selectedCandidate.experience}</p>
-                </div>
-
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">نبذة</p>
-                  <p className="text-sm">{selectedCandidate.summary}</p>
-                </div>
-
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">المهارات</p>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedCandidate.skills.map((skill, i) => (
-                      <Badge key={i} variant="secondary">{skill}</Badge>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                  <span className="text-sm font-medium">نسبة التوافق</span>
-                  <Badge className={`${selectedCandidate.matchScore >= 90 ? "bg-emerald-500" : "bg-primary"}`}>
-                    {selectedCandidate.matchScore}%
-                  </Badge>
-                </div>
-
-                <Button onClick={() => {
-                  handleInviteCandidate(selectedCandidate);
-                  setIsViewCandidateOpen(false);
-                }} className="w-full gap-2">
-                  <UserPlus className="w-4 h-4" />
-                  إرسال دعوة للمقابلة
-                </Button>
-              </div>
-            )}
           </DialogContent>
         </Dialog>
 

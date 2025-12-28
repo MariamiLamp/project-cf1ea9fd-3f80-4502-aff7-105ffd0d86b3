@@ -1,0 +1,329 @@
+import { useParams, useNavigate } from "react-router-dom";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import {
+  ArrowRight,
+  Mail,
+  Phone,
+  MapPin,
+  GraduationCap,
+  Briefcase,
+  FileText,
+  Calendar,
+  Award,
+  Target,
+} from "lucide-react";
+
+// Mock candidates data (should be shared or fetched from API)
+const candidatesData = [
+  { 
+    id: 1, 
+    name: "أحمد محمد", 
+    email: "ahmed@email.com", 
+    phone: "0501234567", 
+    location: "الرياض",
+    matchScore: 95, 
+    skills: ["React", "TypeScript", "Node.js", "MongoDB", "Git"], 
+    experience: "5 سنوات", 
+    appliedFor: "مطور واجهات أمامية", 
+    education: "بكالوريوس علوم حاسب", 
+    summary: "مطور واجهات أمامية متمرس مع خبرة في بناء تطبيقات ويب حديثة باستخدام React و TypeScript. لدي شغف لتصميم تجارب مستخدم متميزة وتطوير حلول تقنية مبتكرة.",
+    workHistory: [
+      { title: "مطور واجهات أمامية أول", company: "شركة التقنية المتقدمة", period: "2021 - الحالي", description: "قيادة فريق تطوير الواجهات الأمامية وتطوير تطبيقات React" },
+      { title: "مطور واجهات أمامية", company: "شركة الحلول الرقمية", period: "2019 - 2021", description: "تطوير واجهات مستخدم تفاعلية باستخدام React و Vue" },
+    ],
+    educationHistory: [
+      { degree: "بكالوريوس علوم حاسب", institution: "جامعة الملك سعود", year: "2019" },
+    ],
+    certifications: ["AWS Certified Developer", "React Professional Certificate"],
+    languages: ["العربية (اللغة الأم)", "الإنجليزية (متقدم)"],
+  },
+  { 
+    id: 2, 
+    name: "سارة علي", 
+    email: "sara@email.com", 
+    phone: "0509876543",
+    location: "جدة", 
+    matchScore: 88, 
+    skills: ["Python", "SQL", "Tableau", "Power BI", "Machine Learning"], 
+    experience: "3 سنوات", 
+    appliedFor: "محلل بيانات", 
+    education: "ماجستير تحليل بيانات", 
+    summary: "محللة بيانات مع خبرة في استخراج الرؤى من البيانات الضخمة وتقديم توصيات استراتيجية للأعمال. متخصصة في التعلم الآلي وتصور البيانات.",
+    workHistory: [
+      { title: "محللة بيانات", company: "شركة البيانات الذكية", period: "2021 - الحالي", description: "تحليل البيانات الضخمة وإنشاء لوحات معلومات تفاعلية" },
+      { title: "محللة بيانات مبتدئة", company: "بنك الرياض", period: "2020 - 2021", description: "دعم فريق التحليلات في إعداد التقارير" },
+    ],
+    educationHistory: [
+      { degree: "ماجستير تحليل بيانات", institution: "جامعة الملك عبدالعزيز", year: "2020" },
+      { degree: "بكالوريوس إحصاء", institution: "جامعة الملك عبدالعزيز", year: "2018" },
+    ],
+    certifications: ["Google Data Analytics Certificate", "Tableau Desktop Specialist"],
+    languages: ["العربية (اللغة الأم)", "الإنجليزية (متقدم)"],
+  },
+  { 
+    id: 3, 
+    name: "محمد خالد", 
+    email: "mohamed@email.com", 
+    phone: "0551112233",
+    location: "الرياض", 
+    matchScore: 82, 
+    skills: ["React", "Vue", "CSS", "SASS", "JavaScript"], 
+    experience: "4 سنوات", 
+    appliedFor: "مطور واجهات أمامية", 
+    education: "بكالوريوس هندسة برمجيات", 
+    summary: "مطور واجهات مع شغف لتصميم تجارب مستخدم متميزة وبناء مواقع وتطبيقات سريعة ومتجاوبة.",
+    workHistory: [
+      { title: "مطور واجهات أمامية", company: "وكالة ديجيتال", period: "2020 - الحالي", description: "تطوير مواقع ويب للعملاء باستخدام React و Vue" },
+      { title: "مطور ويب", company: "شركة ناشئة", period: "2019 - 2020", description: "تطوير وصيانة مواقع الويب" },
+    ],
+    educationHistory: [
+      { degree: "بكالوريوس هندسة برمجيات", institution: "جامعة الأمير سلطان", year: "2019" },
+    ],
+    certifications: ["Meta Front-End Developer Certificate"],
+    languages: ["العربية (اللغة الأم)", "الإنجليزية (متوسط)"],
+  },
+  { 
+    id: 4, 
+    name: "فاطمة أحمد", 
+    email: "fatima@email.com", 
+    phone: "0544455566",
+    location: "الدمام", 
+    matchScore: 78, 
+    skills: ["Project Management", "Agile", "Scrum", "JIRA", "Leadership"], 
+    experience: "6 سنوات", 
+    appliedFor: "مدير مشاريع", 
+    education: "ماجستير إدارة أعمال", 
+    summary: "مديرة مشاريع معتمدة PMP مع خبرة في قيادة فرق تقنية وإدارة مشاريع معقدة بنجاح.",
+    workHistory: [
+      { title: "مديرة مشاريع أولى", company: "شركة الاتصالات السعودية", period: "2020 - الحالي", description: "إدارة مشاريع تقنية كبيرة وقيادة فرق متعددة" },
+      { title: "مديرة مشاريع", company: "شركة أرامكو للخدمات", period: "2018 - 2020", description: "إدارة مشاريع تطوير البرمجيات" },
+    ],
+    educationHistory: [
+      { degree: "ماجستير إدارة أعمال", institution: "جامعة الملك فهد للبترول", year: "2018" },
+      { degree: "بكالوريوس نظم معلومات", institution: "جامعة الدمام", year: "2015" },
+    ],
+    certifications: ["PMP Certified", "Certified Scrum Master", "PRINCE2 Practitioner"],
+    languages: ["العربية (اللغة الأم)", "الإنجليزية (متقدم)", "الفرنسية (مبتدئ)"],
+  },
+];
+
+const CandidateProfile = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  
+  const candidate = candidatesData.find(c => c.id === Number(id));
+
+  if (!candidate) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center" dir="rtl">
+        <Card className="p-8 text-center">
+          <p className="text-lg text-muted-foreground">لم يتم العثور على المرشح</p>
+          <Button onClick={() => navigate("/company")} className="mt-4">
+            العودة للوحة التحكم
+          </Button>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background" dir="rtl">
+      {/* Header */}
+      <header className="bg-card border-b border-border px-6 py-4">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" onClick={() => navigate("/company")}>
+            <ArrowRight className="w-5 h-5" />
+          </Button>
+          <div>
+            <h1 className="font-bold text-lg">الملف الشخصي للمرشح</h1>
+            <p className="text-sm text-muted-foreground">عرض تفاصيل السيرة الذاتية</p>
+          </div>
+        </div>
+      </header>
+
+      <main className="p-6 max-w-5xl mx-auto space-y-6">
+        {/* Profile Header */}
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex flex-col md:flex-row md:items-start gap-6">
+              <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center text-3xl font-bold text-primary shrink-0">
+                {candidate.name.charAt(0)}
+              </div>
+              <div className="flex-1 space-y-4">
+                <div>
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <h2 className="text-2xl font-bold">{candidate.name}</h2>
+                    <Badge className={`${candidate.matchScore >= 90 ? "bg-emerald-500" : candidate.matchScore >= 80 ? "bg-primary" : "bg-amber-500"}`}>
+                      نسبة التوافق: {candidate.matchScore}%
+                    </Badge>
+                  </div>
+                  <p className="text-muted-foreground mt-1">{candidate.appliedFor}</p>
+                </div>
+                
+                <div className="flex flex-wrap gap-4 text-sm">
+                  <span className="flex items-center gap-1 text-muted-foreground">
+                    <Mail className="w-4 h-4" />
+                    {candidate.email}
+                  </span>
+                  <span className="flex items-center gap-1 text-muted-foreground">
+                    <Phone className="w-4 h-4" />
+                    {candidate.phone}
+                  </span>
+                  <span className="flex items-center gap-1 text-muted-foreground">
+                    <MapPin className="w-4 h-4" />
+                    {candidate.location}
+                  </span>
+                </div>
+
+                <p className="text-sm leading-relaxed">{candidate.summary}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="grid md:grid-cols-3 gap-6">
+          {/* Main Content */}
+          <div className="md:col-span-2 space-y-6">
+            {/* Work Experience */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Briefcase className="w-5 h-5 text-primary" />
+                  الخبرة العملية
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {candidate.workHistory.map((job, index) => (
+                  <div key={index} className="relative">
+                    {index > 0 && <Separator className="mb-4" />}
+                    <div className="flex gap-4">
+                      <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                        <Briefcase className="w-5 h-5 text-muted-foreground" />
+                      </div>
+                      <div className="space-y-1">
+                        <h4 className="font-semibold">{job.title}</h4>
+                        <p className="text-sm text-muted-foreground">{job.company}</p>
+                        <p className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
+                          {job.period}
+                        </p>
+                        <p className="text-sm mt-2">{job.description}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            {/* Education */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <GraduationCap className="w-5 h-5 text-primary" />
+                  التعليم
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {candidate.educationHistory.map((edu, index) => (
+                  <div key={index} className="relative">
+                    {index > 0 && <Separator className="mb-4" />}
+                    <div className="flex gap-4">
+                      <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                        <GraduationCap className="w-5 h-5 text-muted-foreground" />
+                      </div>
+                      <div className="space-y-1">
+                        <h4 className="font-semibold">{edu.degree}</h4>
+                        <p className="text-sm text-muted-foreground">{edu.institution}</p>
+                        <p className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
+                          {edu.year}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Skills */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Target className="w-5 h-5 text-primary" />
+                  المهارات
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2">
+                  {candidate.skills.map((skill, index) => (
+                    <Badge key={index} variant="secondary">{skill}</Badge>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Certifications */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Award className="w-5 h-5 text-primary" />
+                  الشهادات
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2">
+                  {candidate.certifications.map((cert, index) => (
+                    <li key={index} className="flex items-start gap-2 text-sm">
+                      <FileText className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
+                      {cert}
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+
+            {/* Languages */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <FileText className="w-5 h-5 text-primary" />
+                  اللغات
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2">
+                  {candidate.languages.map((lang, index) => (
+                    <li key={index} className="text-sm">{lang}</li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+
+            {/* Experience Summary */}
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <Briefcase className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">إجمالي الخبرة</p>
+                    <p className="font-bold">{candidate.experience}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+};
+
+export default CandidateProfile;
