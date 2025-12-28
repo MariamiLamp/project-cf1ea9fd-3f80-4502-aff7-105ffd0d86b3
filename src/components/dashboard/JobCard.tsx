@@ -1,5 +1,6 @@
 import { MapPin, Clock, Building2, Bookmark, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Link } from "react-router-dom";
 
 interface JobCardProps {
   title: string;
@@ -85,10 +86,10 @@ export const JobCard = ({
           <span className={cn("match-badge", getMatchBadgeClass())}>
             نسبة التوافق: {matchScore}%
           </span>
-          <button className="flex items-center gap-1 text-sm font-medium text-primary hover:text-primary-light transition-colors group">
+          <Link to="/jobs" className="flex items-center gap-1 text-sm font-medium text-primary hover:text-primary-light transition-colors group">
             التقديم الآن
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          </button>
+          </Link>
         </div>
       </div>
     </div>
