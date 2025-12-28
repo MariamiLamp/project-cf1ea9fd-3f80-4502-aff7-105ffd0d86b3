@@ -1,8 +1,27 @@
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   ArrowRight,
   Mail,
@@ -21,7 +40,13 @@ import {
   XCircle,
   FileEdit,
   Building,
+  Sparkles,
+  Loader2,
+  Copy,
+  Check,
+  PenTool,
 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 // Mock candidates data (should be shared or fetched from API)
 const candidatesData = [
@@ -144,10 +169,65 @@ const candidatesData = [
 const CandidateProfile = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [searchParams] = useSearchParams();
   const isCompanyView = searchParams.get("view") === "company";
   
   const candidate = candidatesData.find(c => c.id === Number(id));
+
+  // Cover Letter Generator State
+  const [isCoverLetterDialogOpen, setIsCoverLetterDialogOpen] = useState(false);
+  const [coverLetterForm, setCoverLetterForm] = useState({
+    tone: "professional",
+    targetRole: "",
+    highlights: "",
+  });
+  const [generatedCoverLetter, setGeneratedCoverLetter] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleGenerateCoverLetter = async () => {
+    if (!candidate) return;
+    
+    setIsGenerating(true);
+    // Mock AI generation
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    const toneText = coverLetterForm.tone === "professional" ? "رسمي واحترافي" : 
+                     coverLetterForm.tone === "friendly" ? "ودي ومتحمس" : "مباشر وموجز";
+
+    const mockLetter = `السيد/السيدة مدير التوظيف المحترم،
+
+أتقدم بخالص اهتمامي للانضمام إلى فريقكم الموقر${coverLetterForm.targetRole ? ` في منصب ${coverLetterForm.targetRole}` : ""}. أنا ${candidate.name}، ${candidate.appliedFor} مع خبرة ${candidate.experience} في هذا المجال.
+
+${candidate.summary}
+
+${coverLetterForm.highlights ? `أود أن أبرز النقاط التالية:\n${coverLetterForm.highlights}` : `من أبرز مهاراتي: ${candidate.skills.slice(0, 4).join("، ")}.`}
+
+أتمتع بشغف حقيقي لتطوير مهاراتي والمساهمة في تحقيق أهداف المنظمة. أعتقد أن خبراتي ومهاراتي ستكون إضافة قيمة لفريقكم.
+
+أتطلع لفرصة مناقشة كيف يمكنني المساهمة في نجاح مؤسستكم الموقرة.
+
+مع خالص التقدير والاحترام،
+${candidate.name}
+${candidate.email}
+${candidate.phone}`;
+
+    setGeneratedCoverLetter(mockLetter);
+    setIsGenerating(false);
+  };
+
+  const handleCopyLetter = () => {
+    navigator.clipboard.writeText(generatedCoverLetter);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+    toast({ title: "تم النسخ", description: "تم نسخ خطاب التقديم إلى الحافظة" });
+  };
+
+  const handleSaveCoverLetter = () => {
+    toast({ title: "تم الحفظ", description: "تم حفظ خطاب التقديم في ملفك الشخصي" });
+    setIsCoverLetterDialogOpen(false);
+  };
 
   if (!candidate) {
     return (
@@ -324,13 +404,22 @@ const CandidateProfile = () => {
               </CardContent>
             </Card>
 
-            {/* Cover Letter */}
+            {/* Cover Letter Section with Generator */}
             <Card>
-              <CardHeader>
+              <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="flex items-center gap-2">
                   <FileEdit className="w-5 h-5 text-primary" />
                   خطاب التقديم العام
                 </CardTitle>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => setIsCoverLetterDialogOpen(true)}
+                  className="gap-2"
+                >
+                  <PenTool className="w-4 h-4" />
+                  إنشاء خطاب جديد
+                </Button>
               </CardHeader>
               <CardContent>
                 <div className="p-4 bg-muted/30 rounded-lg border border-border/50">
@@ -446,6 +535,111 @@ const CandidateProfile = () => {
           </div>
         </div>
       </main>
+
+      {/* Cover Letter Generator Dialog */}
+      <Dialog open={isCoverLetterDialogOpen} onOpenChange={setIsCoverLetterDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" dir="rtl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-primary" />
+              مولد خطاب التقديم العام
+            </DialogTitle>
+            <DialogDescription>
+              أنشئ خطاب تقديم احترافي باستخدام الذكاء الاصطناعي
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6 py-4">
+            {/* Generator Options */}
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>نبرة الخطاب</Label>
+                <Select 
+                  value={coverLetterForm.tone} 
+                  onValueChange={(v) => setCoverLetterForm({ ...coverLetterForm, tone: v })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="professional">رسمي واحترافي</SelectItem>
+                    <SelectItem value="friendly">ودي ومتحمس</SelectItem>
+                    <SelectItem value="concise">مباشر وموجز</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>الوظيفة المستهدفة (اختياري)</Label>
+                <Input
+                  value={coverLetterForm.targetRole}
+                  onChange={(e) => setCoverLetterForm({ ...coverLetterForm, targetRole: e.target.value })}
+                  placeholder="مثال: مطور واجهات أمامية"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>نقاط تريد إبرازها (اختياري)</Label>
+                <Textarea
+                  value={coverLetterForm.highlights}
+                  onChange={(e) => setCoverLetterForm({ ...coverLetterForm, highlights: e.target.value })}
+                  placeholder="مثال: خبرة في قيادة الفرق، مشاريع ناجحة..."
+                  rows={3}
+                />
+              </div>
+
+              <Button 
+                onClick={handleGenerateCoverLetter}
+                disabled={isGenerating}
+                className="w-full gap-2"
+              >
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    جاري التوليد...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4" />
+                    توليد خطاب التقديم
+                  </>
+                )}
+              </Button>
+            </div>
+
+            {/* Generated Letter */}
+            {generatedCoverLetter && (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <Label>خطاب التقديم المُولَّد</Label>
+                  <Button variant="ghost" size="sm" onClick={handleCopyLetter} className="gap-2">
+                    {copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
+                    {copied ? "تم النسخ" : "نسخ"}
+                  </Button>
+                </div>
+                <Textarea
+                  value={generatedCoverLetter}
+                  onChange={(e) => setGeneratedCoverLetter(e.target.value)}
+                  rows={12}
+                  className="resize-none"
+                />
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsCoverLetterDialogOpen(false)}>
+              إلغاء
+            </Button>
+            {generatedCoverLetter && (
+              <Button onClick={handleSaveCoverLetter} className="gap-2">
+                <FileEdit className="w-4 h-4" />
+                حفظ كخطاب عام
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
