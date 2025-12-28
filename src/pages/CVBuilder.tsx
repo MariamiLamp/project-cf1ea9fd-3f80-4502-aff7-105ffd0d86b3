@@ -1,4 +1,5 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,7 +33,8 @@ import {
   Loader2,
   Layout,
   Palette,
-  Check
+  Check,
+  AlertCircle
 } from "lucide-react";
 
 interface PersonalInfo {
@@ -82,7 +84,14 @@ interface Certificate {
 
 const CVBuilder = () => {
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Check if we're in HR mode
+  const isHRMode = searchParams.get("mode") === "hr";
+  const initialName = searchParams.get("name") || "";
+  const initialTitle = searchParams.get("title") || "";
+  
   const [activeSection, setActiveSection] = useState("personal");
   const [showPreview, setShowPreview] = useState(false);
   const [showUploadDialog, setShowUploadDialog] = useState(false);
@@ -137,8 +146,8 @@ const CVBuilder = () => {
   ];
 
   const [personalInfo, setPersonalInfo] = useState<PersonalInfo>({
-    fullName: "",
-    jobTitle: "",
+    fullName: initialName,
+    jobTitle: initialTitle,
     email: "",
     phone: "",
     location: "",
@@ -151,6 +160,17 @@ const CVBuilder = () => {
   const [education, setEducation] = useState<Education[]>([]);
   const [skills, setSkills] = useState<Skill[]>([]);
   const [certificates, setCertificates] = useState<Certificate[]>([]);
+  
+  // Update personal info when URL params change (for HR mode)
+  useEffect(() => {
+    if (isHRMode && initialName) {
+      setPersonalInfo(prev => ({
+        ...prev,
+        fullName: initialName,
+        jobTitle: initialTitle
+      }));
+    }
+  }, [isHRMode, initialName, initialTitle]);
 
   // Handle CV file upload
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -528,8 +548,20 @@ const CVBuilder = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-foreground">منشئ السيرة الذاتية</h1>
-            <p className="text-muted-foreground mt-1">أنشئ سيرتك الذاتية الاحترافية أو قم برفع سيرة موجودة</p>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-bold text-foreground">منشئ السيرة الذاتية</h1>
+              {isHRMode && (
+                <Badge className="bg-primary/20 text-primary">
+                  وضع الموارد البشرية
+                </Badge>
+              )}
+            </div>
+            <p className="text-muted-foreground mt-1">
+              {isHRMode 
+                ? `إنشاء سيرة ذاتية لـ: ${personalInfo.fullName || "مرشح جديد"}`
+                : "أنشئ سيرتك الذاتية الاحترافية أو قم برفع سيرة موجودة"
+              }
+            </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <Button 
@@ -566,6 +598,20 @@ const CVBuilder = () => {
             </Button>
           </div>
         </div>
+
+        {/* HR Mode Notice */}
+        {isHRMode && (
+          <Card className="border-primary/30 bg-primary/5">
+            <CardContent className="py-3 px-4">
+              <div className="flex items-center gap-2 text-sm">
+                <AlertCircle className="w-4 h-4 text-primary" />
+                <span className="text-foreground">
+                  أنت في وضع الموارد البشرية - يمكنك إنشاء سيرة ذاتية باسم أي مرشح
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <div className={`grid gap-6 ${showPreview ? "lg:grid-cols-2" : "grid-cols-1"}`}>
           {/* Editor Section */}
