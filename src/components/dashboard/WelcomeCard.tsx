@@ -35,7 +35,7 @@ export const WelcomeCard = ({ userName }: WelcomeCardProps) => {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3">
-          <Link to="/cv-builder" className="btn-gradient !bg-white !text-primary hover:!bg-white/90 flex items-center justify-center gap-2">
+          <Link to="/cv-builder" className="px-6 py-3 rounded-lg bg-white text-primary font-semibold hover:bg-white/90 transition-colors flex items-center justify-center gap-2 shadow-lg">
             <Sparkles className="w-4 h-4" />
             تحسين السيرة الذاتية
           </Link>
