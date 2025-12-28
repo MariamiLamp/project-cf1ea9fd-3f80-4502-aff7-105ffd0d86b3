@@ -50,8 +50,21 @@ const CareerPath = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [roadmap, setRoadmap] = useState<RoadmapPhase[] | null>(null);
   const [completedItems, setCompletedItems] = useState<Set<string>>(new Set());
+  const [completedResources, setCompletedResources] = useState<Set<string>>(new Set());
   const [openPhases, setOpenPhases] = useState<Set<string>>(new Set(["phase-1"]));
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
+
+  const toggleResourceCompletion = (resourceKey: string) => {
+    setCompletedResources(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(resourceKey)) {
+        newSet.delete(resourceKey);
+      } else {
+        newSet.add(resourceKey);
+      }
+      return newSet;
+    });
+  };
 
   const generateRoadmap = () => {
     if (!goal.trim()) return;
@@ -552,22 +565,45 @@ const CareerPath = () => {
 
                                   {/* Item Details - Collapsible Content */}
                                   <CollapsibleContent>
-                                    <div className="px-4 pb-4 pr-12 space-y-2">
-                                      <p className={`text-sm ${isCompleted ? 'text-muted-foreground/60' : 'text-muted-foreground'}`}>
+                                    <div className="px-4 pb-4 pr-12 space-y-3">
+                                      <p className="text-sm text-foreground/80">
                                         {item.description}
                                       </p>
                                       {item.resources && item.resources.length > 0 && (
-                                        <div className="flex items-center gap-2 flex-wrap pt-1">
-                                          <BookOpen className="h-3.5 w-3.5 text-muted-foreground" />
-                                          {item.resources.map((resource, idx) => (
-                                            <Badge 
-                                              key={idx} 
-                                              variant="secondary" 
-                                              className="text-xs bg-muted/50"
-                                            >
-                                              {resource}
-                                            </Badge>
-                                          ))}
+                                        <div className="space-y-2 pt-2">
+                                          <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                                            <BookOpen className="h-4 w-4 text-primary" />
+                                            <span>المصادر والمراجع</span>
+                                          </div>
+                                          <div className="space-y-2 mr-6">
+                                            {item.resources.map((resource, idx) => {
+                                              const resourceKey = `${item.id}-resource-${idx}`;
+                                              const isResourceCompleted = completedResources.has(resourceKey);
+                                              
+                                              return (
+                                                <label 
+                                                  key={idx} 
+                                                  className={`flex items-center gap-3 p-2 rounded-lg border cursor-pointer transition-all ${
+                                                    isResourceCompleted 
+                                                      ? 'bg-success/10 border-success/30' 
+                                                      : 'bg-card border-border hover:border-primary/30'
+                                                  }`}
+                                                >
+                                                  <Checkbox
+                                                    checked={isResourceCompleted}
+                                                    onCheckedChange={() => toggleResourceCompletion(resourceKey)}
+                                                  />
+                                                  <span className={`text-sm ${
+                                                    isResourceCompleted 
+                                                      ? 'line-through text-muted-foreground' 
+                                                      : 'text-foreground'
+                                                  }`}>
+                                                    {resource}
+                                                  </span>
+                                                </label>
+                                              );
+                                            })}
+                                          </div>
                                         </div>
                                       )}
                                     </div>
