@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
 import { 
   User, 
   Briefcase, 
@@ -22,7 +24,12 @@ import {
   MapPin,
   Globe,
   Linkedin,
-  Calendar
+  Calendar,
+  Upload,
+  FileText,
+  Sparkles,
+  Wand2,
+  Loader2
 } from "lucide-react";
 
 interface PersonalInfo {
@@ -71,8 +78,13 @@ interface Certificate {
 }
 
 const CVBuilder = () => {
+  const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [activeSection, setActiveSection] = useState("personal");
   const [showPreview, setShowPreview] = useState(false);
+  const [showUploadDialog, setShowUploadDialog] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isGenerating, setIsGenerating] = useState<string | null>(null);
 
   const [personalInfo, setPersonalInfo] = useState<PersonalInfo>({
     fullName: "",
@@ -89,6 +101,159 @@ const CVBuilder = () => {
   const [education, setEducation] = useState<Education[]>([]);
   const [skills, setSkills] = useState<Skill[]>([]);
   const [certificates, setCertificates] = useState<Certificate[]>([]);
+
+  // Handle CV file upload
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    
+    // Simulate parsing CV file
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    // Mock parsed data - in real implementation, this would come from a CV parsing service
+    setPersonalInfo({
+      fullName: "أحمد محمد علي",
+      jobTitle: "مطور برمجيات أول",
+      email: "ahmed.ali@email.com",
+      phone: "+966 55 123 4567",
+      location: "الرياض، المملكة العربية السعودية",
+      website: "www.ahmedali.dev",
+      linkedin: "linkedin.com/in/ahmedali",
+      summary: "مطور برمجيات ذو خبرة تزيد عن 5 سنوات في تطوير تطبيقات الويب والموبايل. متخصص في React وNode.js مع شغف بإنشاء تجارب مستخدم استثنائية."
+    });
+
+    setExperiences([
+      {
+        id: "1",
+        company: "شركة التقنية المتقدمة",
+        position: "مطور برمجيات أول",
+        startDate: "2021-01",
+        endDate: "",
+        current: true,
+        description: "قيادة فريق تطوير من 5 أشخاص، تطوير تطبيقات ويب باستخدام React وTypeScript، تحسين أداء التطبيقات بنسبة 40%"
+      },
+      {
+        id: "2",
+        company: "مؤسسة البرمجيات العربية",
+        position: "مطور برمجيات",
+        startDate: "2019-03",
+        endDate: "2020-12",
+        current: false,
+        description: "تطوير واجهات برمجية RESTful، بناء تطبيقات موبايل باستخدام React Native"
+      }
+    ]);
+
+    setEducation([
+      {
+        id: "1",
+        institution: "جامعة الملك سعود",
+        degree: "بكالوريوس",
+        field: "علوم الحاسب",
+        startDate: "2015-09",
+        endDate: "2019-06",
+        grade: "ممتاز مع مرتبة الشرف"
+      }
+    ]);
+
+    setSkills([
+      { id: "1", name: "React.js", level: "خبير" },
+      { id: "2", name: "TypeScript", level: "متقدم" },
+      { id: "3", name: "Node.js", level: "متقدم" },
+      { id: "4", name: "Python", level: "متوسط" }
+    ]);
+
+    setCertificates([
+      {
+        id: "1",
+        name: "AWS Certified Developer",
+        issuer: "Amazon Web Services",
+        date: "2023-05",
+        credentialId: "ABC123XYZ"
+      }
+    ]);
+
+    setIsUploading(false);
+    setShowUploadDialog(false);
+    
+    toast({
+      title: "تم تحليل السيرة الذاتية بنجاح!",
+      description: "تم استخراج البيانات وتعبئتها في النموذج. يمكنك تعديلها حسب الحاجة.",
+    });
+
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  // AI Generate content for fields
+  const generateSummary = async () => {
+    if (!personalInfo.jobTitle) {
+      toast({
+        title: "خطأ",
+        description: "الرجاء إدخال المسمى الوظيفي أولاً",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsGenerating("summary");
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    const summaries: Record<string, string> = {
+      "مطور": "مطور برمجيات محترف يتمتع بخبرة واسعة في تصميم وتطوير التطبيقات والأنظمة البرمجية. أسعى دائماً لتطبيق أفضل الممارسات وأحدث التقنيات لتقديم حلول برمجية عالية الجودة تلبي احتياجات العملاء وتتجاوز توقعاتهم.",
+      "مصمم": "مصمم مبدع يتمتع بعين فنية حادة وشغف بإنشاء تصاميم جذابة وعملية. أمتلك خبرة في تصميم واجهات المستخدم وتجربة المستخدم، مع القدرة على تحويل الأفكار إلى تصاميم بصرية مؤثرة.",
+      "محلل": "محلل بيانات ذو خبرة في تحليل البيانات المعقدة وتقديم رؤى قيمة تدعم اتخاذ القرارات الاستراتيجية. أمتلك مهارات قوية في استخدام أدوات التحليل والتصور البياني.",
+      "مدير": "قائد محترف يتمتع بخبرة في إدارة الفرق والمشاريع وتحقيق الأهداف التنظيمية. أمتلك مهارات قيادية قوية والقدرة على تحفيز الفرق وتطوير الموظفين.",
+    };
+
+    let generatedSummary = "محترف طموح يتمتع بخبرة متنوعة ومهارات متميزة. أسعى للتميز في مجال عملي وتقديم قيمة مضافة لأي فريق أنضم إليه.";
+    
+    for (const [key, value] of Object.entries(summaries)) {
+      if (personalInfo.jobTitle.includes(key)) {
+        generatedSummary = value;
+        break;
+      }
+    }
+
+    setPersonalInfo({ ...personalInfo, summary: generatedSummary });
+    setIsGenerating(null);
+    
+    toast({
+      title: "تم إنشاء النبذة الشخصية!",
+      description: "يمكنك تعديلها حسب الحاجة.",
+    });
+  };
+
+  const generateExperienceDescription = async (expId: string) => {
+    const exp = experiences.find(e => e.id === expId);
+    if (!exp?.position) {
+      toast({
+        title: "خطأ",
+        description: "الرجاء إدخال المسمى الوظيفي أولاً",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsGenerating(`exp-${expId}`);
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    const descriptions = [
+      "• قيادة وتنفيذ المشاريع بكفاءة عالية مع الالتزام بالمواعيد النهائية\n• التعاون مع الفرق المختلفة لتحقيق أهداف المؤسسة\n• تطوير وتحسين العمليات لزيادة الكفاءة والإنتاجية\n• تقديم حلول مبتكرة للتحديات التقنية والعملية",
+      "• إدارة المهام اليومية وضمان جودة العمل المقدم\n• المشاركة في اجتماعات الفريق وتقديم التقارير الدورية\n• تدريب وتوجيه أعضاء الفريق الجدد\n• تحسين تجربة العملاء وزيادة مستوى رضاهم",
+    ];
+    
+    const randomDescription = descriptions[Math.floor(Math.random() * descriptions.length)];
+    updateExperience(expId, "description", randomDescription);
+    setIsGenerating(null);
+    
+    toast({
+      title: "تم إنشاء الوصف!",
+    });
+  };
 
   const addExperience = () => {
     setExperiences([...experiences, {
@@ -190,13 +355,69 @@ const CVBuilder = () => {
   return (
     <DashboardLayout>
       <div className="space-y-6">
+        {/* Upload Dialog */}
+        <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
+          <DialogContent className="max-w-md" dir="rtl">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Upload className="w-5 h-5 text-primary" />
+                رفع سيرة ذاتية موجودة
+              </DialogTitle>
+              <DialogDescription>
+                قم برفع سيرتك الذاتية وسنقوم بتحليلها واستخراج البيانات تلقائياً
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-6">
+              <div 
+                className="border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-primary/50 transition-colors cursor-pointer"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                {isUploading ? (
+                  <div className="space-y-4">
+                    <Loader2 className="w-12 h-12 mx-auto text-primary animate-spin" />
+                    <p className="text-muted-foreground">جاري تحليل السيرة الذاتية...</p>
+                  </div>
+                ) : (
+                  <>
+                    <FileText className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                    <p className="font-medium">اضغط لرفع الملف</p>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      يدعم: PDF, DOCX, DOC
+                    </p>
+                  </>
+                )}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  className="hidden"
+                  onChange={handleFileUpload}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowUploadDialog(false)}>
+                إلغاء
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-foreground">منشئ السيرة الذاتية</h1>
-            <p className="text-muted-foreground mt-1">أنشئ سيرتك الذاتية الاحترافية خطوة بخطوة</p>
+            <p className="text-muted-foreground mt-1">أنشئ سيرتك الذاتية الاحترافية أو قم برفع سيرة موجودة</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowUploadDialog(true)}
+              className="gap-2"
+            >
+              <Upload className="w-4 h-4" />
+              رفع سيرة موجودة
+            </Button>
             <Button 
               variant="outline" 
               onClick={() => setShowPreview(!showPreview)}
@@ -315,7 +536,23 @@ const CVBuilder = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">نبذة شخصية</label>
+                    <div className="flex items-center justify-between">
+                      <label className="text-sm font-medium">نبذة شخصية</label>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={generateSummary}
+                        disabled={isGenerating === "summary"}
+                        className="gap-1 text-primary hover:text-primary"
+                      >
+                        {isGenerating === "summary" ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Wand2 className="w-4 h-4" />
+                        )}
+                        إنشاء بالذكاء الاصطناعي
+                      </Button>
+                    </div>
                     <Textarea
                       value={personalInfo.summary}
                       onChange={(e) => setPersonalInfo({...personalInfo, summary: e.target.value})}
@@ -411,7 +648,23 @@ const CVBuilder = () => {
                           </div>
                         </div>
                         <div className="space-y-2">
-                          <label className="text-sm font-medium">وصف المهام والإنجازات</label>
+                          <div className="flex items-center justify-between">
+                            <label className="text-sm font-medium">وصف المهام والإنجازات</label>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => generateExperienceDescription(exp.id)}
+                              disabled={isGenerating === `exp-${exp.id}`}
+                              className="gap-1 text-primary hover:text-primary"
+                            >
+                              {isGenerating === `exp-${exp.id}` ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              ) : (
+                                <Wand2 className="w-4 h-4" />
+                              )}
+                              إنشاء
+                            </Button>
+                          </div>
                           <Textarea
                             value={exp.description}
                             onChange={(e) => updateExperience(exp.id, "description", e.target.value)}
