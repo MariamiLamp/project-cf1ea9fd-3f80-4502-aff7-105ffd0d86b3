@@ -1,5 +1,5 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { Search, SlidersHorizontal, MapPin, Briefcase, Clock, Building2, Bookmark, ArrowLeft, X, Upload, Sparkles, Loader2, FileText, Copy, Check } from "lucide-react";
+import { Search, SlidersHorizontal, MapPin, Briefcase, Clock, Building2, Bookmark, ArrowLeft, X, Sparkles, Loader2, FileText, Copy, Check, Edit, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,8 +14,19 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+
+// Mock saved CV data - in production this would come from user profile/database
+const savedCV = {
+  fileName: "Ahmed_Mohamed_CV.pdf",
+  lastUpdated: "2024-03-15",
+  fullName: "أحمد محمد علي",
+  email: "ahmed.ali@email.com",
+  phone: "+966 55 123 4567",
+  jobTitle: "مطور برمجيات أول",
+};
 
 const jobs = [
   {
@@ -92,17 +103,17 @@ const filters = [
 
 const JobsPage = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [selectedJob, setSelectedJob] = useState<typeof jobs[0] | null>(null);
   const [isApplyDialogOpen, setIsApplyDialogOpen] = useState(false);
   
-  // Application form state
+  // Application form state - pre-filled with saved CV data
   const [applicationForm, setApplicationForm] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
-    experience: "",
-    cvFile: null as File | null,
+    fullName: savedCV.fullName,
+    email: savedCV.email,
+    phone: savedCV.phone,
+    experience: savedCV.jobTitle,
   });
   const [generatedCoverLetter, setGeneratedCoverLetter] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
@@ -112,12 +123,12 @@ const JobsPage = () => {
     setSelectedJob(job);
     setIsApplyDialogOpen(true);
     setGeneratedCoverLetter("");
+    // Pre-fill with saved CV data
     setApplicationForm({
-      fullName: "",
-      email: "",
-      phone: "",
-      experience: "",
-      cvFile: null,
+      fullName: savedCV.fullName,
+      email: savedCV.email,
+      phone: savedCV.phone,
+      experience: savedCV.jobTitle,
     });
   };
 
@@ -370,33 +381,48 @@ ${applicationForm.fullName || "[اسمك]"}`;
                 </div>
               </div>
 
-              {/* CV Upload */}
+              {/* Saved CV Display */}
               <div className="space-y-2">
                 <Label>السيرة الذاتية</Label>
-                <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary/50 transition-colors">
-                  <input
-                    type="file"
-                    accept=".pdf,.doc,.docx"
-                    onChange={(e) => setApplicationForm({ ...applicationForm, cvFile: e.target.files?.[0] || null })}
-                    className="hidden"
-                    id="cv-upload"
-                  />
-                  <label htmlFor="cv-upload" className="cursor-pointer">
-                    {applicationForm.cvFile ? (
-                      <div className="flex items-center justify-center gap-2 text-primary">
-                        <FileText className="w-8 h-8" />
-                        <span className="font-medium">{applicationForm.cvFile.name}</span>
+                <div className="border border-border rounded-lg p-4 bg-muted/30">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <FileText className="w-6 h-6 text-primary" />
                       </div>
-                    ) : (
-                      <>
-                        <Upload className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
-                        <p className="text-sm text-muted-foreground">
-                          اسحب ملف السيرة الذاتية هنا أو <span className="text-primary">اختر ملف</span>
+                      <div>
+                        <p className="font-medium text-foreground">{savedCV.fileName}</p>
+                        <p className="text-xs text-muted-foreground">
+                          آخر تحديث: {savedCV.lastUpdated}
                         </p>
-                        <p className="text-xs text-muted-foreground mt-1">PDF, DOC, DOCX (الحد الأقصى 5MB)</p>
-                      </>
-                    )}
-                  </label>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => navigate("/cv-builder")}
+                        className="gap-1"
+                      >
+                        <Edit className="w-4 h-4" />
+                        تعديل
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="gap-1"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        معاينة
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="mt-3 pt-3 border-t border-border">
+                    <p className="text-xs text-muted-foreground flex items-center gap-1">
+                      <Check className="w-3 h-3 text-success" />
+                      سيتم إرفاق هذه السيرة الذاتية مع طلبك تلقائياً
+                    </p>
+                  </div>
                 </div>
               </div>
 
