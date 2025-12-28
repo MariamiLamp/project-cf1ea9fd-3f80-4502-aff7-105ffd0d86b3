@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { 
   Target, 
   Sparkles, 
@@ -13,6 +14,8 @@ import {
   Code, 
   Trophy,
   ChevronLeft,
+  ChevronDown,
+  ChevronUp,
   Clock,
   CheckCircle2,
   Circle,
@@ -47,6 +50,8 @@ const CareerPath = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [roadmap, setRoadmap] = useState<RoadmapPhase[] | null>(null);
   const [completedItems, setCompletedItems] = useState<Set<string>>(new Set());
+  const [openPhases, setOpenPhases] = useState<Set<string>>(new Set(["phase-1"]));
+  const [openItems, setOpenItems] = useState<Set<string>>(new Set());
 
   const generateRoadmap = () => {
     if (!goal.trim()) return;
@@ -277,6 +282,32 @@ const CareerPath = () => {
   const resetRoadmap = () => {
     setRoadmap(null);
     setCompletedItems(new Set());
+    setOpenPhases(new Set(["phase-1"]));
+    setOpenItems(new Set());
+  };
+
+  const togglePhase = (phaseId: string) => {
+    setOpenPhases(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(phaseId)) {
+        newSet.delete(phaseId);
+      } else {
+        newSet.add(phaseId);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleItem = (itemId: string) => {
+    setOpenItems(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(itemId)) {
+        newSet.delete(itemId);
+      } else {
+        newSet.add(itemId);
+      }
+      return newSet;
+    });
   };
 
   return (
@@ -405,109 +436,150 @@ const CareerPath = () => {
             </Card>
 
             {/* Roadmap Phases */}
-            <div className="space-y-6">
+            <div className="space-y-4">
               {roadmap.map((phase, phaseIndex) => {
                 const phaseCompletedCount = phase.items.filter(item => 
                   completedItems.has(item.id)
                 ).length;
                 const phaseProgress = Math.round((phaseCompletedCount / phase.items.length) * 100);
+                const isPhaseOpen = openPhases.has(phase.id);
 
                 return (
-                  <Card key={phase.id} className="card-elevated overflow-hidden">
-                    {/* Phase Header */}
-                    <div className="bg-gradient-to-l from-primary/10 to-transparent p-4 border-b border-border/50">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold
-                            ${phaseProgress === 100 ? 'bg-success' : 'bg-gradient-to-br from-primary to-secondary'}`}
-                          >
-                            {phaseProgress === 100 ? (
-                              <CheckCircle2 className="h-5 w-5" />
-                            ) : (
-                              phaseIndex + 1
-                            )}
-                          </div>
-                          <div>
-                            <h3 className="font-bold text-foreground">{phase.title}</h3>
-                            <p className="text-sm text-muted-foreground">{phase.description}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-4">
-                          <Badge variant="outline" className="gap-1">
-                            <Clock className="h-3 w-3" />
-                            {phase.duration}
-                          </Badge>
-                          <div className="text-sm font-medium text-primary">
-                            {phaseCompletedCount}/{phase.items.length}
-                          </div>
-                        </div>
-                      </div>
-                      <Progress value={phaseProgress} className="h-1.5 mt-3" />
-                    </div>
-
-                    {/* Phase Items */}
-                    <CardContent className="p-4 space-y-3">
-                      {phase.items.map((item) => {
-                        const isCompleted = completedItems.has(item.id);
-                        
-                        return (
-                          <div 
-                            key={item.id}
-                            className={`p-4 rounded-xl border transition-all duration-200 ${
-                              isCompleted 
-                                ? 'bg-success/5 border-success/20' 
-                                : 'bg-card border-border hover:border-primary/30 hover:shadow-soft'
-                            }`}
-                          >
-                            <div className="flex items-start gap-3">
-                              <Checkbox
-                                checked={isCompleted}
-                                onCheckedChange={() => toggleItemCompletion(item.id)}
-                                className="mt-1"
-                              />
-                              <div className="flex-1 space-y-2">
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-2">
-                                    <h4 className={`font-medium ${isCompleted ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
-                                      {item.title}
-                                    </h4>
-                                    <Badge 
-                                      variant="outline" 
-                                      className={`text-xs gap-1 ${getItemTypeBadgeClass(item.type)}`}
-                                    >
-                                      {getItemIcon(item.type)}
-                                      {getItemTypeLabel(item.type)}
-                                    </Badge>
-                                  </div>
-                                  <Badge variant="secondary" className="gap-1 text-xs">
-                                    <Clock className="h-3 w-3" />
-                                    {item.duration}
-                                  </Badge>
-                                </div>
-                                <p className={`text-sm ${isCompleted ? 'text-muted-foreground/60' : 'text-muted-foreground'}`}>
-                                  {item.description}
-                                </p>
-                                {item.resources && item.resources.length > 0 && (
-                                  <div className="flex items-center gap-2 flex-wrap pt-1">
-                                    <BookOpen className="h-3.5 w-3.5 text-muted-foreground" />
-                                    {item.resources.map((resource, idx) => (
-                                      <Badge 
-                                        key={idx} 
-                                        variant="secondary" 
-                                        className="text-xs bg-muted/50"
-                                      >
-                                        {resource}
-                                      </Badge>
-                                    ))}
-                                  </div>
+                  <Collapsible 
+                    key={phase.id} 
+                    open={isPhaseOpen}
+                    onOpenChange={() => togglePhase(phase.id)}
+                  >
+                    <Card className="card-elevated overflow-hidden">
+                      {/* Phase Header - Collapsible Trigger */}
+                      <CollapsibleTrigger asChild>
+                        <div className="bg-gradient-to-l from-primary/10 to-transparent p-4 border-b border-border/50 cursor-pointer hover:bg-primary/5 transition-colors">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold
+                                ${phaseProgress === 100 ? 'bg-success' : 'bg-gradient-to-br from-primary to-secondary'}`}
+                              >
+                                {phaseProgress === 100 ? (
+                                  <CheckCircle2 className="h-5 w-5" />
+                                ) : (
+                                  phaseIndex + 1
                                 )}
                               </div>
+                              <div>
+                                <h3 className="font-bold text-foreground">{phase.title}</h3>
+                                <p className="text-sm text-muted-foreground">{phase.description}</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-4">
+                              <Badge variant="outline" className="gap-1">
+                                <Clock className="h-3 w-3" />
+                                {phase.duration}
+                              </Badge>
+                              <div className="text-sm font-medium text-primary">
+                                {phaseCompletedCount}/{phase.items.length}
+                              </div>
+                              {isPhaseOpen ? (
+                                <ChevronUp className="h-5 w-5 text-muted-foreground" />
+                              ) : (
+                                <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                              )}
                             </div>
                           </div>
-                        );
-                      })}
-                    </CardContent>
-                  </Card>
+                          <Progress value={phaseProgress} className="h-1.5 mt-3" />
+                        </div>
+                      </CollapsibleTrigger>
+
+                      {/* Phase Items - Collapsible Content */}
+                      <CollapsibleContent>
+                        <CardContent className="p-4 space-y-3">
+                          {phase.items.map((item) => {
+                            const isCompleted = completedItems.has(item.id);
+                            const isItemOpen = openItems.has(item.id);
+                            
+                            return (
+                              <Collapsible
+                                key={item.id}
+                                open={isItemOpen}
+                                onOpenChange={() => toggleItem(item.id)}
+                              >
+                                <div 
+                                  className={`rounded-xl border transition-all duration-200 ${
+                                    isCompleted 
+                                      ? 'bg-success/5 border-success/20' 
+                                      : 'bg-card border-border hover:border-primary/30 hover:shadow-soft'
+                                  }`}
+                                >
+                                  {/* Item Header - Collapsible Trigger */}
+                                  <CollapsibleTrigger asChild>
+                                    <div className="p-4 cursor-pointer">
+                                      <div className="flex items-center gap-3">
+                                        <Checkbox
+                                          checked={isCompleted}
+                                          onCheckedChange={() => toggleItemCompletion(item.id)}
+                                          onClick={(e) => e.stopPropagation()}
+                                          className="mt-0"
+                                        />
+                                        <div className="flex-1">
+                                          <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2">
+                                              <h4 className={`font-medium ${isCompleted ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
+                                                {item.title}
+                                              </h4>
+                                              <Badge 
+                                                variant="outline" 
+                                                className={`text-xs gap-1 ${getItemTypeBadgeClass(item.type)}`}
+                                              >
+                                                {getItemIcon(item.type)}
+                                                {getItemTypeLabel(item.type)}
+                                              </Badge>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                              <Badge variant="secondary" className="gap-1 text-xs">
+                                                <Clock className="h-3 w-3" />
+                                                {item.duration}
+                                              </Badge>
+                                              {isItemOpen ? (
+                                                <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                                              ) : (
+                                                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                                              )}
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </CollapsibleTrigger>
+
+                                  {/* Item Details - Collapsible Content */}
+                                  <CollapsibleContent>
+                                    <div className="px-4 pb-4 pr-12 space-y-2">
+                                      <p className={`text-sm ${isCompleted ? 'text-muted-foreground/60' : 'text-muted-foreground'}`}>
+                                        {item.description}
+                                      </p>
+                                      {item.resources && item.resources.length > 0 && (
+                                        <div className="flex items-center gap-2 flex-wrap pt-1">
+                                          <BookOpen className="h-3.5 w-3.5 text-muted-foreground" />
+                                          {item.resources.map((resource, idx) => (
+                                            <Badge 
+                                              key={idx} 
+                                              variant="secondary" 
+                                              className="text-xs bg-muted/50"
+                                            >
+                                              {resource}
+                                            </Badge>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
+                                  </CollapsibleContent>
+                                </div>
+                              </Collapsible>
+                            );
+                          })}
+                        </CardContent>
+                      </CollapsibleContent>
+                    </Card>
+                  </Collapsible>
                 );
               })}
             </div>
