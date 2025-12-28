@@ -1,5 +1,6 @@
 import { Bell, Search, User, ChevronDown } from "lucide-react";
 import { useState } from "react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export const Header = () => {
   const [notifications] = useState(3);
@@ -20,6 +21,9 @@ export const Header = () => {
 
       {/* Actions */}
       <div className="flex items-center gap-4">
+        {/* Theme Toggle */}
+        <ThemeToggle />
+
         {/* Notifications */}
         <button className="relative p-2 rounded-lg hover:bg-muted transition-colors">
           <Bell className="w-5 h-5 text-muted-foreground" />
