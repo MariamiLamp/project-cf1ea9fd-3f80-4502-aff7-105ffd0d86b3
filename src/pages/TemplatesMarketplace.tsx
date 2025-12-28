@@ -11,6 +11,16 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetFooter,
+} from "@/components/ui/sheet";
+import { Separator } from "@/components/ui/separator";
+import { Label } from "@/components/ui/label";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import {
   Search,
@@ -30,6 +40,12 @@ import {
   Grid3X3,
   List,
   Check,
+  X,
+  Trash2,
+  CreditCard,
+  Lock,
+  Minus,
+  Plus,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -220,6 +236,11 @@ const templatesData = [
   },
 ];
 
+type CartItem = {
+  template: typeof templatesData[0];
+  quantity: number;
+};
+
 const TemplatesMarketplace = () => {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
@@ -227,6 +248,20 @@ const TemplatesMarketplace = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [selectedTemplate, setSelectedTemplate] = useState<typeof templatesData[0] | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  
+  // Cart state
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  
+  // Payment form state
+  const [paymentForm, setPaymentForm] = useState({
+    cardNumber: "",
+    cardName: "",
+    expiry: "",
+    cvv: "",
+    email: "",
+  });
 
   // Filter templates
   const filteredTemplates = templatesData.filter(template => {
@@ -255,10 +290,48 @@ const TemplatesMarketplace = () => {
     }
   };
 
-  const handlePurchase = (template: typeof templatesData[0]) => {
+  const handleAddToCart = (template: typeof templatesData[0]) => {
+    const existingItem = cart.find(item => item.template.id === template.id);
+    if (existingItem) {
+      toast({
+        title: "موجود في السلة",
+        description: `${template.name} موجود بالفعل في سلة المشتريات`,
+      });
+    } else {
+      setCart([...cart, { template, quantity: 1 }]);
+      toast({
+        title: "تمت الإضافة للسلة",
+        description: `تم إضافة ${template.name} إلى سلة المشتريات`,
+      });
+    }
+  };
+
+  const handleRemoveFromCart = (templateId: number) => {
+    setCart(cart.filter(item => item.template.id !== templateId));
+  };
+
+  const cartTotal = cart.reduce((sum, item) => sum + item.template.price * item.quantity, 0);
+  const cartCount = cart.length;
+
+  const handleCheckout = () => {
+    setIsCartOpen(false);
+    setIsCheckoutOpen(true);
+  };
+
+  const handlePayment = () => {
+    // Mock payment processing
     toast({
-      title: "تمت الإضافة للسلة",
-      description: `تم إضافة ${template.name} إلى سلة المشتريات`,
+      title: "تمت عملية الدفع بنجاح!",
+      description: `تم شراء ${cart.length} قالب. سيتم إرسال روابط التحميل إلى بريدك الإلكتروني.`,
+    });
+    setCart([]);
+    setIsCheckoutOpen(false);
+    setPaymentForm({
+      cardNumber: "",
+      cardName: "",
+      expiry: "",
+      cvv: "",
+      email: "",
     });
   };
 
@@ -267,9 +340,25 @@ const TemplatesMarketplace = () => {
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col gap-4">
-          <div>
-            <h1 className="text-2xl font-bold">سوق القوالب</h1>
-            <p className="text-muted-foreground">اكتشف مجموعة واسعة من القوالب الاحترافية</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold">سوق القوالب</h1>
+              <p className="text-muted-foreground">اكتشف مجموعة واسعة من القوالب الاحترافية</p>
+            </div>
+            {/* Cart Button */}
+            <Button 
+              variant="outline" 
+              className="relative gap-2"
+              onClick={() => setIsCartOpen(true)}
+            >
+              <ShoppingCart className="w-5 h-5" />
+              السلة
+              {cartCount > 0 && (
+                <Badge className="absolute -top-2 -left-2 h-5 w-5 p-0 flex items-center justify-center text-xs">
+                  {cartCount}
+                </Badge>
+              )}
+            </Button>
           </div>
 
           {/* Search and Filters */}
@@ -375,7 +464,7 @@ const TemplatesMarketplace = () => {
                   <Button 
                     size="sm" 
                     variant={template.isPremium ? "default" : "outline"}
-                    onClick={() => template.isPremium ? handlePurchase(template) : handleDownload(template)}
+                    onClick={() => template.isPremium ? handleAddToCart(template) : handleDownload(template)}
                   >
                     {template.isPremium ? (
                       <>
@@ -446,7 +535,7 @@ const TemplatesMarketplace = () => {
                         </Button>
                         <Button 
                           size="sm"
-                          onClick={() => template.isPremium ? handlePurchase(template) : handleDownload(template)}
+                          onClick={() => template.isPremium ? handleAddToCart(template) : handleDownload(template)}
                         >
                           {template.isPremium ? (
                             <>
@@ -539,7 +628,7 @@ const TemplatesMarketplace = () => {
                     </div>
                     <div className="flex gap-2">
                       {selectedTemplate.isPremium ? (
-                        <Button className="flex-1 gap-2" onClick={() => handlePurchase(selectedTemplate)}>
+                        <Button className="flex-1 gap-2" onClick={() => { handleAddToCart(selectedTemplate); setIsPreviewOpen(false); }}>
                           <ShoppingCart className="w-4 h-4" />
                           إضافة للسلة
                         </Button>
@@ -555,6 +644,204 @@ const TemplatesMarketplace = () => {
               </div>
             </>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Cart Sheet */}
+      <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
+        <SheetContent side="left" className="w-full sm:max-w-lg" dir="rtl">
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-2">
+              <ShoppingCart className="w-5 h-5" />
+              سلة المشتريات
+            </SheetTitle>
+            <SheetDescription>
+              {cartCount === 0 ? "السلة فارغة" : `${cartCount} عناصر في السلة`}
+            </SheetDescription>
+          </SheetHeader>
+
+          <div className="flex flex-col h-full">
+            {/* Cart Items */}
+            <div className="flex-1 overflow-y-auto py-4 space-y-4">
+              {cart.length === 0 ? (
+                <div className="text-center py-12">
+                  <ShoppingCart className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground">لا توجد عناصر في السلة</p>
+                  <Button variant="outline" className="mt-4" onClick={() => setIsCartOpen(false)}>
+                    تصفح القوالب
+                  </Button>
+                </div>
+              ) : (
+                cart.map((item) => (
+                  <Card key={item.template.id} className="p-4">
+                    <div className="flex gap-4">
+                      <div className="w-20 h-24 bg-muted rounded-lg overflow-hidden shrink-0">
+                        <img 
+                          src={item.template.preview} 
+                          alt={item.template.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="flex-1 space-y-1">
+                        <h4 className="font-semibold text-sm">{item.template.name}</h4>
+                        <p className="text-xs text-muted-foreground line-clamp-2">
+                          {item.template.description}
+                        </p>
+                        <p className="font-bold text-primary">{item.template.price} ر.س</p>
+                      </div>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="shrink-0 text-destructive hover:text-destructive"
+                        onClick={() => handleRemoveFromCart(item.template.id)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </Card>
+                ))
+              )}
+            </div>
+
+            {/* Cart Footer */}
+            {cart.length > 0 && (
+              <div className="border-t border-border pt-4 space-y-4">
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">المجموع الفرعي</span>
+                    <span>{cartTotal} ر.س</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">الضريبة (15%)</span>
+                    <span>{(cartTotal * 0.15).toFixed(2)} ر.س</span>
+                  </div>
+                  <Separator />
+                  <div className="flex justify-between font-bold text-lg">
+                    <span>الإجمالي</span>
+                    <span>{(cartTotal * 1.15).toFixed(2)} ر.س</span>
+                  </div>
+                </div>
+                <Button className="w-full gap-2" size="lg" onClick={handleCheckout}>
+                  <CreditCard className="w-5 h-5" />
+                  إتمام الشراء
+                </Button>
+              </div>
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Checkout Dialog */}
+      <Dialog open={isCheckoutOpen} onOpenChange={setIsCheckoutOpen}>
+        <DialogContent className="max-w-lg" dir="rtl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Lock className="w-5 h-5" />
+              الدفع الآمن
+            </DialogTitle>
+            <DialogDescription>
+              أدخل بيانات بطاقتك لإتمام عملية الشراء
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6 mt-4">
+            {/* Order Summary */}
+            <Card className="p-4 bg-muted/50">
+              <h4 className="font-semibold mb-3">ملخص الطلب</h4>
+              <div className="space-y-2 text-sm">
+                {cart.map((item) => (
+                  <div key={item.template.id} className="flex justify-between">
+                    <span className="text-muted-foreground">{item.template.name}</span>
+                    <span>{item.template.price} ر.س</span>
+                  </div>
+                ))}
+                <Separator className="my-2" />
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">المجموع الفرعي</span>
+                  <span>{cartTotal} ر.س</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">الضريبة (15%)</span>
+                  <span>{(cartTotal * 0.15).toFixed(2)} ر.س</span>
+                </div>
+                <div className="flex justify-between font-bold text-base pt-2">
+                  <span>الإجمالي</span>
+                  <span className="text-primary">{(cartTotal * 1.15).toFixed(2)} ر.س</span>
+                </div>
+              </div>
+            </Card>
+
+            {/* Payment Form */}
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">البريد الإلكتروني</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="example@email.com"
+                  value={paymentForm.email}
+                  onChange={(e) => setPaymentForm({ ...paymentForm, email: e.target.value })}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="cardNumber">رقم البطاقة</Label>
+                <div className="relative">
+                  <Input
+                    id="cardNumber"
+                    placeholder="1234 5678 9012 3456"
+                    value={paymentForm.cardNumber}
+                    onChange={(e) => setPaymentForm({ ...paymentForm, cardNumber: e.target.value })}
+                    className="pl-12"
+                  />
+                  <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="cardName">الاسم على البطاقة</Label>
+                <Input
+                  id="cardName"
+                  placeholder="محمد أحمد"
+                  value={paymentForm.cardName}
+                  onChange={(e) => setPaymentForm({ ...paymentForm, cardName: e.target.value })}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="expiry">تاريخ الانتهاء</Label>
+                  <Input
+                    id="expiry"
+                    placeholder="MM/YY"
+                    value={paymentForm.expiry}
+                    onChange={(e) => setPaymentForm({ ...paymentForm, expiry: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="cvv">CVV</Label>
+                  <Input
+                    id="cvv"
+                    placeholder="123"
+                    type="password"
+                    maxLength={4}
+                    value={paymentForm.cvv}
+                    onChange={(e) => setPaymentForm({ ...paymentForm, cvv: e.target.value })}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Payment Button */}
+            <Button className="w-full gap-2" size="lg" onClick={handlePayment}>
+              <Lock className="w-4 h-4" />
+              ادفع {(cartTotal * 1.15).toFixed(2)} ر.س
+            </Button>
+
+            <p className="text-xs text-center text-muted-foreground">
+              بياناتك محمية بتشفير SSL 256-bit
+            </p>
+          </div>
         </DialogContent>
       </Dialog>
     </DashboardLayout>
