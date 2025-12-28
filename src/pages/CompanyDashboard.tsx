@@ -369,10 +369,6 @@ const CompanyDashboard = () => {
                 <FileText className="w-4 h-4" />
                 الطلبات
               </TabsTrigger>
-              <TabsTrigger value="generator" className="gap-2">
-                <Sparkles className="w-4 h-4" />
-                مولد الوصف
-              </TabsTrigger>
               <TabsTrigger value="promotion" className="gap-2">
                 <Megaphone className="w-4 h-4" />
                 الترويج
@@ -447,12 +443,68 @@ const CompanyDashboard = () => {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label>وصف الوظيفة</Label>
+                    <div className="flex items-center justify-between">
+                      <Label>وصف الوظيفة</Label>
+                      <Button 
+                        type="button"
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => {
+                          if (!newJob.title) {
+                            toast({
+                              title: "خطأ",
+                              description: "يرجى إدخال المسمى الوظيفي أولاً",
+                              variant: "destructive",
+                            });
+                            return;
+                          }
+                          setIsGenerating(true);
+                          setTimeout(() => {
+                            const mockDescription = `نبحث عن ${newJob.title} متميز للانضمام إلى فريقنا${newJob.department ? ` في قسم ${newJob.department}` : ""}.
+
+المسؤوليات الرئيسية:
+• تطوير وصيانة التطبيقات والأنظمة
+• التعاون مع الفريق لتحقيق أهداف المشروع
+• المشاركة في مراجعة الكود وتحسين الأداء
+
+المتطلبات:
+• خبرة لا تقل عن 3 سنوات في المجال
+• مهارات تواصل ممتازة
+• القدرة على العمل ضمن فريق
+
+المزايا:
+• راتب تنافسي
+• تأمين صحي شامل
+• بيئة عمل محفزة`;
+                            setNewJob({ ...newJob, description: mockDescription });
+                            setIsGenerating(false);
+                            toast({
+                              title: "تم التوليد",
+                              description: "تم إنشاء وصف الوظيفة بنجاح",
+                            });
+                          }, 1500);
+                        }}
+                        disabled={isGenerating}
+                        className="gap-1 h-7 text-xs"
+                      >
+                        {isGenerating ? (
+                          <>
+                            <Loader2 className="w-3 h-3 animate-spin" />
+                            جاري التوليد...
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="w-3 h-3" />
+                            توليد بالذكاء الاصطناعي
+                          </>
+                        )}
+                      </Button>
+                    </div>
                     <Textarea
-                      placeholder="اكتب وصفاً تفصيلياً للوظيفة..."
+                      placeholder="اكتب وصفاً تفصيلياً للوظيفة أو استخدم الذكاء الاصطناعي..."
                       value={newJob.description}
                       onChange={(e) => setNewJob({ ...newJob, description: e.target.value })}
-                      rows={3}
+                      rows={6}
                     />
                   </div>
                   <div className="space-y-2">
@@ -656,108 +708,6 @@ const CompanyDashboard = () => {
                 </Table>
               </CardContent>
             </Card>
-          </TabsContent>
-
-          {/* Job Description Generator Tab */}
-          <TabsContent value="generator">
-            <div className="grid md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-primary" />
-                    مولد وصف الوظائف بالذكاء الاصطناعي
-                  </CardTitle>
-                  <CardDescription>أدخل معلومات الوظيفة وسيقوم النظام بإنشاء وصف احترافي</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label>المسمى الوظيفي *</Label>
-                    <Input
-                      placeholder="مثال: مطور واجهات أمامية"
-                      value={jobGenTitle}
-                      onChange={(e) => setJobGenTitle(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>القسم</Label>
-                    <Select onValueChange={setJobGenDepartment}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="اختر القسم" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="التقنية">التقنية</SelectItem>
-                        <SelectItem value="التسويق">التسويق</SelectItem>
-                        <SelectItem value="المالية">المالية</SelectItem>
-                        <SelectItem value="الإدارة">الإدارة</SelectItem>
-                        <SelectItem value="الموارد البشرية">الموارد البشرية</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>سنوات الخبرة المطلوبة</Label>
-                    <Select onValueChange={setJobGenExperience}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="اختر الخبرة" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="0-1">0-1 سنة</SelectItem>
-                        <SelectItem value="2-3">2-3 سنوات</SelectItem>
-                        <SelectItem value="3-5">3-5 سنوات</SelectItem>
-                        <SelectItem value="5+">5+ سنوات</SelectItem>
-                        <SelectItem value="7+">7+ سنوات</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <Button 
-                    onClick={handleGenerateDescription} 
-                    disabled={isGenerating}
-                    className="w-full gap-2"
-                  >
-                    {isGenerating ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        جاري التوليد...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="w-4 h-4" />
-                        توليد الوصف
-                      </>
-                    )}
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    <span className="flex items-center gap-2">
-                      <FileText className="w-5 h-5 text-primary" />
-                      الوصف المُولّد
-                    </span>
-                    {generatedDescription && (
-                      <Button variant="outline" size="sm" onClick={handleCopyDescription} className="gap-2">
-                        <Copy className="w-4 h-4" />
-                        نسخ
-                      </Button>
-                    )}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {generatedDescription ? (
-                    <div className="p-4 bg-muted/30 rounded-lg border border-border whitespace-pre-wrap text-sm leading-relaxed">
-                      {generatedDescription}
-                    </div>
-                  ) : (
-                    <div className="p-8 bg-muted/30 rounded-lg border border-dashed border-border text-center">
-                      <Sparkles className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-                      <p className="text-muted-foreground">سيظهر الوصف المُولّد هنا</p>
-                      <p className="text-xs text-muted-foreground mt-1">أدخل بيانات الوظيفة واضغط على زر التوليد</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
           </TabsContent>
 
           {/* Promotion Tab */}
