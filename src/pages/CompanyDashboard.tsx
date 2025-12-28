@@ -495,16 +495,10 @@ const CompanyDashboard = () => {
                         <TableCell>{candidate.experience}</TableCell>
                         <TableCell>{candidate.appliedFor}</TableCell>
                         <TableCell>
-                          <div className="flex gap-1">
-                            <Button variant="outline" size="sm" onClick={() => handleViewCandidate(candidate)}>
-                              <Eye className="w-4 h-4 mr-1" />
-                              عرض
-                            </Button>
-                            <Button variant="default" size="sm" onClick={() => handleInviteCandidate(candidate)}>
-                              <UserPlus className="w-4 h-4 mr-1" />
-                              دعوة
-                            </Button>
-                          </div>
+                          <Button variant="outline" size="sm" onClick={() => handleViewCandidate(candidate)}>
+                            <Eye className="w-4 h-4 mr-1" />
+                            عرض
+                          </Button>
                         </TableCell>
                       </TableRow>
                     ))}
