@@ -11,6 +11,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { 
   Calendar as CalendarIcon, 
@@ -26,9 +27,11 @@ import {
   Edit,
   Bell,
   CheckCircle,
-  Target
+  Target,
+  Repeat,
+  ListPlus
 } from "lucide-react";
-import { format, isSameDay } from "date-fns";
+import { format, isSameDay, addDays, addWeeks } from "date-fns";
 import { ar } from "date-fns/locale";
 
 interface ScheduledPost {
@@ -39,6 +42,13 @@ interface ScheduledPost {
   time: string;
   status: "scheduled" | "posted" | "draft";
   topic?: string;
+}
+
+interface GeneratedPost {
+  id: string;
+  content: string;
+  platform: string;
+  selected: boolean;
 }
 
 const platformIcons: Record<string, React.ReactNode> = {
@@ -55,11 +65,22 @@ const platformColors: Record<string, string> = {
   instagram: "bg-gradient-to-r from-purple-500 to-pink-500",
 };
 
+const weekDays = [
+  { id: "sunday", label: "الأحد" },
+  { id: "monday", label: "الإثنين" },
+  { id: "tuesday", label: "الثلاثاء" },
+  { id: "wednesday", label: "الأربعاء" },
+  { id: "thursday", label: "الخميس" },
+  { id: "friday", label: "الجمعة" },
+  { id: "saturday", label: "السبت" },
+];
+
 const PostsPlanner = () => {
   const { toast } = useToast();
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [isGenerating, setIsGenerating] = useState(false);
   const [isAddPostOpen, setIsAddPostOpen] = useState(false);
+  const [isScheduleDialogOpen, setIsScheduleDialogOpen] = useState(false);
   
   // Post Generator State
   const [generatorForm, setGeneratorForm] = useState({
@@ -68,8 +89,18 @@ const PostsPlanner = () => {
     tone: "professional",
     includeHashtags: true,
     includeEmojis: true,
+    postCount: 1,
   });
-  const [generatedPost, setGeneratedPost] = useState("");
+  const [generatedPosts, setGeneratedPosts] = useState<GeneratedPost[]>([]);
+  
+  // Scheduling State
+  const [scheduleMode, setScheduleMode] = useState<"single" | "recurring">("single");
+  const [recurringSettings, setRecurringSettings] = useState({
+    selectedDays: ["sunday", "tuesday", "thursday"] as string[],
+    time: "09:00",
+    weeksCount: 4,
+    startDate: new Date(),
+  });
   
   // New Post State
   const [newPost, setNewPost] = useState({
@@ -110,6 +141,83 @@ const PostsPlanner = () => {
     },
   ]);
 
+  const generatePostContent = (topic: string, platform: string, tone: string, includeHashtags: boolean, includeEmojis: boolean, variation: number): string => {
+    const variations = {
+      professional: {
+        linkedin: [
+          `📊 ${topic}\n\nفي عالم الأعمال المتسارع، يعتبر ${topic} من أهم المهارات التي يجب إتقانها.\n\nإليك 3 نصائح عملية:\n1️⃣ ابدأ بتحديد أهدافك بوضوح\n2️⃣ طور مهاراتك باستمرار\n3️⃣ ابنِ شبكة علاقات قوية\n\n${includeHashtags ? "#تطوير_مهني #نصائح_عملية #تطوير_الذات #مهارات_القيادة" : ""}`,
+          `💼 ${topic}\n\nالنجاح في سوق العمل يتطلب التميز في ${topic}.\n\nخطوات أساسية:\n• البحث المستمر عن التطوير\n• بناء سمعة مهنية قوية\n• التواصل الفعال مع الآخرين\n\n${includeHashtags ? "#مهارات_مهنية #تطوير_الذات #نجاح" : ""}`,
+          `🎯 ${topic}\n\nكيف تتميز في مجالك؟\n\n✅ تعلم باستمرار\n✅ شارك خبراتك\n✅ ابنِ علاقات مهنية\n\nالتميز في ${topic} ليس صعباً!\n\n${includeHashtags ? "#تميز #نجاح_مهني #تطوير" : ""}`,
+        ],
+        twitter: [
+          `💡 ${topic}\n\nهل تعلم أن 80% من النجاح يعتمد على المثابرة والتعلم المستمر؟\n\n${includeEmojis ? "🎯" : ""} ابدأ اليوم ولا تؤجل!\n\n${includeHashtags ? "#تطوير_مهني #نجاح" : ""}`,
+          `🚀 ${topic}\n\n3 مفاتيح للنجاح:\n1. التعلم المستمر\n2. التطبيق العملي\n3. المثابرة\n\n${includeHashtags ? "#تحفيز #نجاح" : ""}`,
+          `✨ ${topic}\n\nالنجاح = موهبة + عمل شاق + صبر\n\nهل أنت مستعد للرحلة؟\n\n${includeHashtags ? "#تطوير #نجاح_مهني" : ""}`,
+        ],
+        facebook: [
+          `مرحباً أصدقائي! ${includeEmojis ? "👋" : ""}\n\nأردت أن أشارككم تجربتي في ${topic}...\n\nالنجاح ليس صدفة، بل نتيجة عمل دؤوب وتخطيط سليم. ${includeEmojis ? "💪" : ""}\n\nما هي تجربتكم؟ شاركوني في التعليقات! ${includeEmojis ? "⬇️" : ""}\n\n${includeHashtags ? "#نصائح #تطوير_الذات #نجاح" : ""}`,
+          `صباح الخير ${includeEmojis ? "☀️" : ""}\n\nاليوم نتكلم عن ${topic}\n\nتجربتي الشخصية علمتني أن النجاح يحتاج:\n• صبر\n• إصرار\n• تعلم مستمر\n\nشاركونا تجاربكم!\n\n${includeHashtags ? "#تجارب #تعلم" : ""}`,
+          `${includeEmojis ? "💡" : ""} نصيحة اليوم عن ${topic}\n\nلا تستسلم أبداً! كل خطوة صغيرة تقربك من هدفك.\n\nمن معي؟ ${includeEmojis ? "✋" : ""}\n\n${includeHashtags ? "#نصائح #تحفيز" : ""}`,
+        ],
+        instagram: [
+          `${includeEmojis ? "✨" : ""} ${topic} ${includeEmojis ? "✨" : ""}\n\n.\n.\n.\n${includeEmojis ? "💡" : ""} اكتشف أسرار النجاح\n${includeEmojis ? "🎯" : ""} حدد أهدافك بوضوح\n${includeEmojis ? "💪" : ""} اعمل بجد واستمرارية\n\n${includeHashtags ? "#تطوير_الذات #نجاح #تحفيز #اقتباسات #motivation #success" : ""}`,
+          `${includeEmojis ? "🌟" : ""} ${topic}\n\n.\n.\n.\nالنجاح رحلة وليس وجهة ${includeEmojis ? "🚀" : ""}\n\n${includeHashtags ? "#تحفيز #نجاح #إلهام" : ""}`,
+          `${topic} ${includeEmojis ? "💫" : ""}\n\n.\n.\n.\n${includeEmojis ? "✅" : ""} خطوة بخطوة نحو القمة\n\n${includeHashtags ? "#نجاح #تطوير #تحفيز" : ""}`,
+        ],
+      },
+      casual: {
+        linkedin: [
+          `يا جماعة! ${includeEmojis ? "😊" : ""}\n\nخلونا نحكي عن ${topic}...\n\nالموضوع بسيط: اشتغل صح، وتعلم كل يوم شي جديد ${includeEmojis ? "📚" : ""}\n\nشو رأيكم؟\n\n${includeHashtags ? "#تطوير_مهني #نصائح" : ""}`,
+          `مين جرب ${topic}؟ ${includeEmojis ? "🤔" : ""}\n\nأنا من تجربتي، الموضوع محتاج:\n- وقت\n- صبر\n- تركيز\n\nشاركوني!\n\n${includeHashtags ? "#تجارب #تعلم" : ""}`,
+          `هلا! ${includeEmojis ? "👋" : ""}\n\n${topic} موضوع مهم جداً\n\nخلوني أقول لكم شي: التعلم ما له نهاية!\n\n${includeHashtags ? "#تطوير #نصائح" : ""}`,
+        ],
+        twitter: [
+          `${topic} ${includeEmojis ? "🔥" : ""}\n\nبكل بساطة: لازم نتعلم ونتطور كل يوم!\n\nمين معي؟ ${includeEmojis ? "✋" : ""}\n\n${includeHashtags ? "#تحفيز #نجاح" : ""}`,
+          `يا ناس! ${topic} مهم جداً ${includeEmojis ? "💪" : ""}\n\nخلوا التعلم عادة يومية\n\n${includeHashtags ? "#تعلم #نجاح" : ""}`,
+          `${includeEmojis ? "🎯" : ""} ${topic}\n\nالسر؟ المحاولة مرة ومرتين وعشر مرات!\n\n${includeHashtags ? "#إصرار #نجاح" : ""}`,
+        ],
+        facebook: [
+          `السلام عليكم! ${includeEmojis ? "👋😄" : ""}\n\nاليوم بدي أحكيكم عن ${topic}...\n\nالموضوع سهل بس محتاج تركيز ${includeEmojis ? "🎯" : ""}\n\nشو رأيكم؟ شاركونا تجاربكم! ${includeEmojis ? "💬" : ""}\n\n${includeHashtags ? "#نصائح #تجارب #تعلم" : ""}`,
+          `أهلاً فيكم ${includeEmojis ? "😊" : ""}\n\n${topic} - موضوع اليوم!\n\nتجربتي: الصبر + العمل = النجاح\n\nمين معي؟\n\n${includeHashtags ? "#تجارب #نصائح" : ""}`,
+          `كيفكم؟ ${includeEmojis ? "👋" : ""}\n\nخلونا نحكي عن ${topic}\n\nأنا شايف إنه مهم جداً!\n\nشو رأيكم؟\n\n${includeHashtags ? "#حوار #نقاش" : ""}`,
+        ],
+        instagram: [
+          `${topic} ${includeEmojis ? "💫" : ""}\n\n.\n.\n.\nبكل بساطة، النجاح = عمل + صبر ${includeEmojis ? "💪✨" : ""}\n\n${includeHashtags ? "#تحفيز #نجاح #تطوير_الذات #quotes" : ""}`,
+          `${includeEmojis ? "🌈" : ""} ${topic}\n\n.\n.\n.\nخليك إيجابي وامشي للأمام!\n\n${includeHashtags ? "#إيجابية #نجاح" : ""}`,
+          `${topic} ${includeEmojis ? "✨" : ""}\n\n.\n.\n.\nالحياة قصيرة، استثمرها صح!\n\n${includeHashtags ? "#حياة #نجاح #تحفيز" : ""}`,
+        ],
+      },
+      motivational: {
+        linkedin: [
+          `${includeEmojis ? "🌟" : ""} ${topic} ${includeEmojis ? "🌟" : ""}\n\nلا تستسلم أبداً! كل خطوة تقربك من هدفك.\n\n${includeEmojis ? "💪" : ""} الفشل ليس النهاية، بل بداية جديدة\n${includeEmojis ? "🎯" : ""} حدد هدفك واعمل بلا توقف\n${includeEmojis ? "🚀" : ""} النجاح قريب لمن يسعى إليه\n\nابدأ اليوم، ولا تنتظر الغد!\n\n${includeHashtags ? "#تحفيز #إلهام #نجاح #لا_تستسلم #motivation" : ""}`,
+          `${includeEmojis ? "🔥" : ""} ${topic}\n\nالطريق للنجاح مليء بالتحديات\n\nلكن تذكر:\n• كل عقبة درس\n• كل فشل خطوة للأمام\n• كل يوم فرصة جديدة\n\n${includeHashtags ? "#تحفيز #قوة #نجاح" : ""}`,
+          `${topic} ${includeEmojis ? "⭐" : ""}\n\nاليوم هو أول يوم في بقية حياتك\n\nاصنع الفرق!\n\n${includeHashtags ? "#إلهام #تحفيز #نجاح" : ""}`,
+        ],
+        twitter: [
+          `${includeEmojis ? "🔥" : ""} ${topic}\n\nلا تستسلم! كل يوم هو فرصة جديدة للنجاح ${includeEmojis ? "💪" : ""}\n\n${includeHashtags ? "#تحفيز #إلهام #نجاح" : ""}`,
+          `${topic} ${includeEmojis ? "🚀" : ""}\n\nالنجاح ليس للمحظوظين، بل للمثابرين!\n\n${includeHashtags ? "#إصرار #نجاح" : ""}`,
+          `${includeEmojis ? "⭐" : ""} ${topic}\n\nأنت أقوى مما تعتقد!\n\nصدق بنفسك ${includeEmojis ? "💪" : ""}\n\n${includeHashtags ? "#تحفيز #قوة" : ""}`,
+        ],
+        facebook: [
+          `${includeEmojis ? "✨🌟" : ""} ${topic} ${includeEmojis ? "🌟✨" : ""}\n\nرسالة اليوم:\n\n"لا يهم كم مرة سقطت، المهم كم مرة نهضت"\n\n${includeEmojis ? "💪" : ""} أنت أقوى مما تعتقد\n${includeEmojis ? "🎯" : ""} أحلامك تستحق المحاولة\n${includeEmojis ? "🚀" : ""} ابدأ الآن!\n\nشارك المنشور لتحفيز غيرك! ${includeEmojis ? "❤️" : ""}\n\n${includeHashtags ? "#تحفيز #إلهام #نجاح #أقوال #حكم" : ""}`,
+          `صباح الإلهام ${includeEmojis ? "🌅" : ""}\n\n${topic}\n\nتذكر: النجاح رحلة وليس وجهة!\n\nكل خطوة مهمة ${includeEmojis ? "👣" : ""}\n\n${includeHashtags ? "#تحفيز #إلهام" : ""}`,
+          `${includeEmojis ? "🔥" : ""} ${topic}\n\nاليوم قرر أن تكون أفضل نسخة من نفسك!\n\nمين معي؟ ${includeEmojis ? "✋💪" : ""}\n\n${includeHashtags ? "#تحفيز #تطوير_الذات" : ""}`,
+        ],
+        instagram: [
+          `${includeEmojis ? "🔥" : ""} ${topic} ${includeEmojis ? "🔥" : ""}\n\n.\n.\n.\n${includeEmojis ? "💪" : ""} لا تستسلم أبداً\n${includeEmojis ? "🌟" : ""} أنت قادر على تحقيق المستحيل\n${includeEmojis ? "🚀" : ""} ابدأ اليوم!\n\n${includeHashtags ? "#تحفيز #إلهام #نجاح #motivation #success #quotes #اقتباسات" : ""}`,
+          `${topic} ${includeEmojis ? "⭐" : ""}\n\n.\n.\n.\nالنجاح يبدأ بخطوة واحدة ${includeEmojis ? "👣" : ""}\n\n${includeHashtags ? "#تحفيز #نجاح #إلهام" : ""}`,
+          `${includeEmojis ? "✨" : ""} ${topic}\n\n.\n.\n.\nصدق بنفسك وانطلق! ${includeEmojis ? "🚀" : ""}\n\n${includeHashtags ? "#ثقة #نجاح #تحفيز" : ""}`,
+        ],
+      },
+    };
+    
+    const toneVariations = variations[tone as keyof typeof variations] || variations.professional;
+    const platformVariations = toneVariations[platform as keyof typeof toneVariations] || toneVariations.linkedin;
+    const index = variation % platformVariations.length;
+    
+    return platformVariations[index];
+  };
+
   const handleGeneratePost = async () => {
     if (!generatorForm.topic) {
       toast({
@@ -125,162 +233,147 @@ const PostsPlanner = () => {
     // Simulate AI generation
     await new Promise(resolve => setTimeout(resolve, 1500));
     
-    const posts: Record<string, Record<string, string>> = {
-      professional: {
-        linkedin: `📊 ${generatorForm.topic}
-
-في عالم الأعمال المتسارع، يعتبر ${generatorForm.topic} من أهم المهارات التي يجب إتقانها.
-
-إليك 3 نصائح عملية:
-1️⃣ ابدأ بتحديد أهدافك بوضوح
-2️⃣ طور مهاراتك باستمرار
-3️⃣ ابنِ شبكة علاقات قوية
-
-${generatorForm.includeHashtags ? "#تطوير_مهني #نصائح_عملية #تطوير_الذات #مهارات_القيادة" : ""}`,
-        twitter: `💡 ${generatorForm.topic}
-
-هل تعلم أن 80% من النجاح يعتمد على المثابرة والتعلم المستمر؟
-
-${generatorForm.includeEmojis ? "🎯" : ""} ابدأ اليوم ولا تؤجل!
-
-${generatorForm.includeHashtags ? "#تطوير_مهني #نجاح" : ""}`,
-        facebook: `مرحباً أصدقائي! ${generatorForm.includeEmojis ? "👋" : ""}
-
-أردت أن أشارككم تجربتي في ${generatorForm.topic}...
-
-النجاح ليس صدفة، بل نتيجة عمل دؤوب وتخطيط سليم. ${generatorForm.includeEmojis ? "💪" : ""}
-
-ما هي تجربتكم؟ شاركوني في التعليقات! ${generatorForm.includeEmojis ? "⬇️" : ""}
-
-${generatorForm.includeHashtags ? "#نصائح #تطوير_الذات #نجاح" : ""}`,
-        instagram: `${generatorForm.includeEmojis ? "✨" : ""} ${generatorForm.topic} ${generatorForm.includeEmojis ? "✨" : ""}
-
-.
-.
-.
-${generatorForm.includeEmojis ? "💡" : ""} اكتشف أسرار النجاح
-${generatorForm.includeEmojis ? "🎯" : ""} حدد أهدافك بوضوح  
-${generatorForm.includeEmojis ? "💪" : ""} اعمل بجد واستمرارية
-
-${generatorForm.includeHashtags ? "#تطوير_الذات #نجاح #تحفيز #اقتباسات #motivation #success" : ""}`,
-      },
-      casual: {
-        linkedin: `يا جماعة! ${generatorForm.includeEmojis ? "😊" : ""}
-
-خلونا نحكي عن ${generatorForm.topic}...
-
-الموضوع بسيط: اشتغل صح، وتعلم كل يوم شي جديد ${generatorForm.includeEmojis ? "📚" : ""}
-
-شو رأيكم؟
-
-${generatorForm.includeHashtags ? "#تطوير_مهني #نصائح" : ""}`,
-        twitter: `${generatorForm.topic} ${generatorForm.includeEmojis ? "🔥" : ""}
-
-بكل بساطة: لازم نتعلم ونتطور كل يوم!
-
-مين معي؟ ${generatorForm.includeEmojis ? "✋" : ""}
-
-${generatorForm.includeHashtags ? "#تحفيز #نجاح" : ""}`,
-        facebook: `السلام عليكم! ${generatorForm.includeEmojis ? "👋😄" : ""}
-
-اليوم بدي أحكيكم عن ${generatorForm.topic}...
-
-الموضوع سهل بس محتاج تركيز ${generatorForm.includeEmojis ? "🎯" : ""}
-
-شو رأيكم؟ شاركونا تجاربكم! ${generatorForm.includeEmojis ? "💬" : ""}
-
-${generatorForm.includeHashtags ? "#نصائح #تجارب #تعلم" : ""}`,
-        instagram: `${generatorForm.topic} ${generatorForm.includeEmojis ? "💫" : ""}
-
-.
-.
-.
-بكل بساطة، النجاح = عمل + صبر ${generatorForm.includeEmojis ? "💪✨" : ""}
-
-${generatorForm.includeHashtags ? "#تحفيز #نجاح #تطوير_الذات #quotes" : ""}`,
-      },
-      motivational: {
-        linkedin: `${generatorForm.includeEmojis ? "🌟" : ""} ${generatorForm.topic} ${generatorForm.includeEmojis ? "🌟" : ""}
-
-لا تستسلم أبداً! كل خطوة تقربك من هدفك.
-
-${generatorForm.includeEmojis ? "💪" : ""} الفشل ليس النهاية، بل بداية جديدة
-${generatorForm.includeEmojis ? "🎯" : ""} حدد هدفك واعمل بلا توقف
-${generatorForm.includeEmojis ? "🚀" : ""} النجاح قريب لمن يسعى إليه
-
-ابدأ اليوم، ولا تنتظر الغد!
-
-${generatorForm.includeHashtags ? "#تحفيز #إلهام #نجاح #لا_تستسلم #motivation" : ""}`,
-        twitter: `${generatorForm.includeEmojis ? "🔥" : ""} ${generatorForm.topic}
-
-لا تستسلم! كل يوم هو فرصة جديدة للنجاح ${generatorForm.includeEmojis ? "💪" : ""}
-
-${generatorForm.includeHashtags ? "#تحفيز #إلهام #نجاح" : ""}`,
-        facebook: `${generatorForm.includeEmojis ? "✨🌟" : ""} ${generatorForm.topic} ${generatorForm.includeEmojis ? "🌟✨" : ""}
-
-رسالة اليوم:
-
-"لا يهم كم مرة سقطت، المهم كم مرة نهضت"
-
-${generatorForm.includeEmojis ? "💪" : ""} أنت أقوى مما تعتقد
-${generatorForm.includeEmojis ? "🎯" : ""} أحلامك تستحق المحاولة
-${generatorForm.includeEmojis ? "🚀" : ""} ابدأ الآن!
-
-شارك المنشور لتحفيز غيرك! ${generatorForm.includeEmojis ? "❤️" : ""}
-
-${generatorForm.includeHashtags ? "#تحفيز #إلهام #نجاح #أقوال #حكم" : ""}`,
-        instagram: `${generatorForm.includeEmojis ? "🔥" : ""} ${generatorForm.topic} ${generatorForm.includeEmojis ? "🔥" : ""}
-
-.
-.
-.
-${generatorForm.includeEmojis ? "💪" : ""} لا تستسلم أبداً
-${generatorForm.includeEmojis ? "🌟" : ""} أنت قادر على تحقيق المستحيل
-${generatorForm.includeEmojis ? "🚀" : ""} ابدأ اليوم!
-
-${generatorForm.includeHashtags ? "#تحفيز #إلهام #نجاح #motivation #success #quotes #اقتباسات" : ""}`,
-      },
-    };
+    const posts: GeneratedPost[] = [];
+    for (let i = 0; i < generatorForm.postCount; i++) {
+      posts.push({
+        id: `gen-${Date.now()}-${i}`,
+        content: generatePostContent(
+          generatorForm.topic,
+          generatorForm.platform,
+          generatorForm.tone,
+          generatorForm.includeHashtags,
+          generatorForm.includeEmojis,
+          i
+        ),
+        platform: generatorForm.platform,
+        selected: true,
+      });
+    }
     
-    const post = posts[generatorForm.tone]?.[generatorForm.platform] || posts.professional.linkedin;
-    setGeneratedPost(post);
+    setGeneratedPosts(posts);
     setIsGenerating(false);
     
     toast({
-      title: "تم إنشاء المنشور!",
-      description: "يمكنك نسخه أو جدولته الآن",
+      title: `تم إنشاء ${posts.length} منشور!`,
+      description: "يمكنك نسخها أو جدولتها الآن",
     });
   };
 
-  const handleCopyPost = () => {
-    navigator.clipboard.writeText(generatedPost);
+  const handleCopyPost = (content: string) => {
+    navigator.clipboard.writeText(content);
     toast({
       title: "تم النسخ!",
       description: "تم نسخ المنشور إلى الحافظة",
     });
   };
 
-  const handleScheduleGeneratedPost = () => {
-    if (!generatedPost) return;
+  const handleTogglePostSelection = (id: string) => {
+    setGeneratedPosts(posts => 
+      posts.map(p => p.id === id ? { ...p, selected: !p.selected } : p)
+    );
+  };
+
+  const handleUpdatePostContent = (id: string, content: string) => {
+    setGeneratedPosts(posts =>
+      posts.map(p => p.id === id ? { ...p, content } : p)
+    );
+  };
+
+  const handleDeleteGeneratedPost = (id: string) => {
+    setGeneratedPosts(posts => posts.filter(p => p.id !== id));
+  };
+
+  const getRecurringDates = (): Date[] => {
+    const dates: Date[] = [];
+    const startDate = recurringSettings.startDate;
     
-    const newScheduledPost: ScheduledPost = {
-      id: Date.now().toString(),
-      content: generatedPost,
-      platform: generatorForm.platform,
-      date: selectedDate,
-      time: "09:00",
-      status: "scheduled",
-      topic: generatorForm.topic,
-    };
+    for (let week = 0; week < recurringSettings.weeksCount; week++) {
+      const weekStart = addWeeks(startDate, week);
+      
+      recurringSettings.selectedDays.forEach(day => {
+        const dayIndex = weekDays.findIndex(d => d.id === day);
+        const currentDayIndex = weekStart.getDay();
+        let daysToAdd = dayIndex - currentDayIndex;
+        if (daysToAdd < 0) daysToAdd += 7;
+        
+        const targetDate = addDays(weekStart, daysToAdd);
+        if (targetDate >= startDate) {
+          dates.push(targetDate);
+        }
+      });
+    }
     
-    setScheduledPosts([...scheduledPosts, newScheduledPost]);
-    setGeneratedPost("");
+    return dates.sort((a, b) => a.getTime() - b.getTime());
+  };
+
+  const handleScheduleSelectedPosts = () => {
+    const selectedPosts = generatedPosts.filter(p => p.selected);
+    if (selectedPosts.length === 0) {
+      toast({
+        title: "خطأ",
+        description: "الرجاء اختيار منشور واحد على الأقل",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsScheduleDialogOpen(true);
+  };
+
+  const handleConfirmSchedule = () => {
+    const selectedPosts = generatedPosts.filter(p => p.selected);
+    
+    if (scheduleMode === "single") {
+      // Schedule all posts on selected date
+      const newPosts: ScheduledPost[] = selectedPosts.map((post, index) => ({
+        id: `${Date.now()}-${index}`,
+        content: post.content,
+        platform: post.platform,
+        date: selectedDate,
+        time: `${9 + index}:00`.padStart(5, '0'),
+        status: "scheduled" as const,
+        topic: generatorForm.topic,
+      }));
+      
+      setScheduledPosts(prev => [...prev, ...newPosts]);
+      
+      toast({
+        title: "تمت الجدولة!",
+        description: `تم جدولة ${newPosts.length} منشور في ${format(selectedDate, "dd MMMM yyyy", { locale: ar })}`,
+      });
+    } else {
+      // Recurring schedule
+      const recurringDates = getRecurringDates();
+      const newPosts: ScheduledPost[] = [];
+      
+      selectedPosts.forEach((post, postIndex) => {
+        recurringDates.forEach((date, dateIndex) => {
+          // Distribute posts across dates
+          if ((dateIndex + postIndex) % selectedPosts.length === postIndex) {
+            newPosts.push({
+              id: `${Date.now()}-${postIndex}-${dateIndex}`,
+              content: post.content,
+              platform: post.platform,
+              date: date,
+              time: recurringSettings.time,
+              status: "scheduled" as const,
+              topic: generatorForm.topic,
+            });
+          }
+        });
+      });
+      
+      setScheduledPosts(prev => [...prev, ...newPosts]);
+      
+      toast({
+        title: "تمت الجدولة!",
+        description: `تم جدولة ${newPosts.length} منشور على مدار ${recurringSettings.weeksCount} أسابيع`,
+      });
+    }
+    
+    setGeneratedPosts([]);
     setGeneratorForm({ ...generatorForm, topic: "" });
-    
-    toast({
-      title: "تمت الجدولة!",
-      description: `سيتم نشر المنشور في ${format(selectedDate, "dd MMMM yyyy", { locale: ar })}`,
-    });
+    setIsScheduleDialogOpen(false);
   };
 
   const handleAddPost = () => {
@@ -336,6 +429,15 @@ ${generatorForm.includeHashtags ? "#تحفيز #إلهام #نجاح #motivation
 
   const getDatesWithPosts = () => {
     return scheduledPosts.map(p => p.date);
+  };
+
+  const toggleDaySelection = (dayId: string) => {
+    setRecurringSettings(prev => ({
+      ...prev,
+      selectedDays: prev.selectedDays.includes(dayId)
+        ? prev.selectedDays.filter(d => d !== dayId)
+        : [...prev.selectedDays, dayId],
+    }));
   };
 
   return (
@@ -490,7 +592,7 @@ ${generatorForm.includeHashtags ? "#تحفيز #إلهام #نجاح #motivation
                     مولد المنشورات بالذكاء الاصطناعي
                   </CardTitle>
                   <CardDescription>
-                    أدخل الموضوع واختر المنصة لإنشاء منشور احترافي
+                    أدخل الموضوع واختر عدد المنشورات لإنشائها
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -560,6 +662,28 @@ ${generatorForm.includeHashtags ? "#تحفيز #إلهام #نجاح #motivation
                     </div>
                   </div>
 
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-2">
+                      <ListPlus className="w-4 h-4" />
+                      عدد المنشورات
+                    </Label>
+                    <Select 
+                      value={generatorForm.postCount.toString()} 
+                      onValueChange={(v) => setGeneratorForm({ ...generatorForm, postCount: parseInt(v) })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">منشور واحد</SelectItem>
+                        <SelectItem value="3">3 منشورات</SelectItem>
+                        <SelectItem value="5">5 منشورات</SelectItem>
+                        <SelectItem value="7">7 منشورات (أسبوع)</SelectItem>
+                        <SelectItem value="10">10 منشورات</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
                   <div className="flex gap-4">
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
@@ -594,55 +718,94 @@ ${generatorForm.includeHashtags ? "#تحفيز #إلهام #نجاح #motivation
                     ) : (
                       <>
                         <Sparkles className="w-4 h-4 ml-2" />
-                        إنشاء المنشور
+                        إنشاء {generatorForm.postCount > 1 ? `${generatorForm.postCount} منشورات` : "المنشور"}
                       </>
                     )}
                   </Button>
                 </CardContent>
               </Card>
 
-              {/* Generated Post Preview */}
+              {/* Generated Posts Preview */}
               <Card className="bg-card border-border">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Edit className="w-5 h-5 text-primary" />
-                    معاينة المنشور
+                  <CardTitle className="flex items-center justify-between">
+                    <span className="flex items-center gap-2">
+                      <Edit className="w-5 h-5 text-primary" />
+                      المنشورات المُنشأة
+                    </span>
+                    {generatedPosts.length > 0 && (
+                      <Badge variant="secondary">{generatedPosts.filter(p => p.selected).length} مختار</Badge>
+                    )}
                   </CardTitle>
                   <CardDescription>
-                    يمكنك تعديل المنشور قبل النسخ أو الجدولة
+                    اختر المنشورات وجدولها بتواريخ مختلفة
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {generatedPost ? (
+                  {generatedPosts.length > 0 ? (
                     <>
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className={`w-8 h-8 rounded-full ${platformColors[generatorForm.platform]} flex items-center justify-center text-white`}>
-                          {platformIcons[generatorForm.platform]}
+                      <ScrollArea className="h-[400px] pr-4">
+                        <div className="space-y-4">
+                          {generatedPosts.map((post, index) => (
+                            <div 
+                              key={post.id} 
+                              className={`p-4 rounded-lg border transition-all ${
+                                post.selected ? 'border-primary bg-primary/5' : 'border-border bg-muted/30'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between mb-3">
+                                <div className="flex items-center gap-3">
+                                  <Checkbox
+                                    checked={post.selected}
+                                    onCheckedChange={() => handleTogglePostSelection(post.id)}
+                                  />
+                                  <div className={`w-8 h-8 rounded-full ${platformColors[post.platform]} flex items-center justify-center text-white`}>
+                                    {platformIcons[post.platform]}
+                                  </div>
+                                  <span className="font-medium">منشور {index + 1}</span>
+                                </div>
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon"
+                                  onClick={() => handleDeleteGeneratedPost(post.id)}
+                                  className="text-destructive hover:text-destructive"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </div>
+                              <Textarea
+                                value={post.content}
+                                onChange={(e) => handleUpdatePostContent(post.id, e.target.value)}
+                                rows={6}
+                                className="font-medium text-sm"
+                              />
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                onClick={() => handleCopyPost(post.content)}
+                                className="mt-2"
+                              >
+                                <Copy className="w-3 h-3 ml-1" />
+                                نسخ
+                              </Button>
+                            </div>
+                          ))}
                         </div>
-                        <span className="font-medium capitalize">{generatorForm.platform}</span>
-                      </div>
-                      <Textarea
-                        value={generatedPost}
-                        onChange={(e) => setGeneratedPost(e.target.value)}
-                        rows={10}
-                        className="font-medium"
-                      />
-                      <div className="flex gap-2">
-                        <Button onClick={handleCopyPost} variant="outline" className="flex-1">
-                          <Copy className="w-4 h-4 ml-2" />
-                          نسخ
-                        </Button>
-                        <Button onClick={handleScheduleGeneratedPost} className="flex-1">
-                          <CalendarIcon className="w-4 h-4 ml-2" />
-                          جدولة
-                        </Button>
-                      </div>
+                      </ScrollArea>
+                      <Button 
+                        onClick={handleScheduleSelectedPosts} 
+                        className="w-full"
+                        disabled={generatedPosts.filter(p => p.selected).length === 0}
+                      >
+                        <CalendarIcon className="w-4 h-4 ml-2" />
+                        جدولة المنشورات المختارة ({generatedPosts.filter(p => p.selected).length})
+                      </Button>
                     </>
                   ) : (
                     <div className="h-64 flex items-center justify-center text-muted-foreground">
                       <div className="text-center">
                         <Sparkles className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                        <p>أدخل موضوعاً واضغط على "إنشاء المنشور"</p>
+                        <p>أدخل موضوعاً واضغط على "إنشاء المنشورات"</p>
                       </div>
                     </div>
                   )}
@@ -817,24 +980,30 @@ ${generatorForm.includeHashtags ? "#تحفيز #إلهام #نجاح #motivation
                               {platformIcons[post.platform]}
                             </div>
                             <div>
-                              <p className="text-sm font-medium line-clamp-1">{post.content.slice(0, 50)}...</p>
+                              <p className="text-sm font-medium line-clamp-1">{post.content.substring(0, 50)}...</p>
                               <p className="text-xs text-muted-foreground">
-                                {format(post.date, "dd MMMM", { locale: ar })} - {post.time}
+                                {format(post.date, "dd MMMM yyyy", { locale: ar })} - {post.time}
                               </p>
                             </div>
                           </div>
                           <Button 
-                            size="sm" 
-                            variant="ghost"
+                            variant="ghost" 
+                            size="icon"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleDeletePost(post.id);
                             }}
+                            className="text-destructive hover:text-destructive"
                           >
-                            <Trash2 className="w-4 h-4 text-muted-foreground" />
+                            <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
                       ))}
+                    {scheduledPosts.filter(p => p.status === "scheduled").length === 0 && (
+                      <div className="text-center text-muted-foreground py-8">
+                        لا توجد منشورات مجدولة
+                      </div>
+                    )}
                   </div>
                 </ScrollArea>
               </CardContent>
@@ -842,6 +1011,122 @@ ${generatorForm.includeHashtags ? "#تحفيز #إلهام #نجاح #motivation
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Schedule Dialog */}
+      <Dialog open={isScheduleDialogOpen} onOpenChange={setIsScheduleDialogOpen}>
+        <DialogContent className="max-w-lg" dir="rtl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CalendarIcon className="w-5 h-5 text-primary" />
+              جدولة المنشورات
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6 py-4">
+            {/* Schedule Mode Toggle */}
+            <div className="flex gap-2">
+              <Button
+                variant={scheduleMode === "single" ? "default" : "outline"}
+                onClick={() => setScheduleMode("single")}
+                className="flex-1"
+              >
+                <CalendarIcon className="w-4 h-4 ml-2" />
+                تاريخ واحد
+              </Button>
+              <Button
+                variant={scheduleMode === "recurring" ? "default" : "outline"}
+                onClick={() => setScheduleMode("recurring")}
+                className="flex-1"
+              >
+                <Repeat className="w-4 h-4 ml-2" />
+                جدولة متكررة
+              </Button>
+            </div>
+
+            {scheduleMode === "single" ? (
+              <div className="space-y-4">
+                <Label>اختر التاريخ</Label>
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={(date) => date && setSelectedDate(date)}
+                  className="rounded-md border pointer-events-auto mx-auto"
+                  locale={ar}
+                />
+                <p className="text-sm text-muted-foreground text-center">
+                  سيتم جدولة {generatedPosts.filter(p => p.selected).length} منشور في {format(selectedDate, "dd MMMM yyyy", { locale: ar })}
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>أيام النشر</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {weekDays.map((day) => (
+                      <Button
+                        key={day.id}
+                        variant={recurringSettings.selectedDays.includes(day.id) ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => toggleDaySelection(day.id)}
+                      >
+                        {day.label}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>وقت النشر</Label>
+                    <Input
+                      type="time"
+                      value={recurringSettings.time}
+                      onChange={(e) => setRecurringSettings({ ...recurringSettings, time: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>عدد الأسابيع</Label>
+                    <Select 
+                      value={recurringSettings.weeksCount.toString()} 
+                      onValueChange={(v) => setRecurringSettings({ ...recurringSettings, weeksCount: parseInt(v) })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">أسبوع واحد</SelectItem>
+                        <SelectItem value="2">أسبوعين</SelectItem>
+                        <SelectItem value="4">شهر (4 أسابيع)</SelectItem>
+                        <SelectItem value="8">شهرين (8 أسابيع)</SelectItem>
+                        <SelectItem value="12">3 أشهر (12 أسبوع)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="p-3 bg-muted/50 rounded-lg">
+                  <p className="text-sm text-muted-foreground">
+                    سيتم جدولة المنشورات على مدار {recurringSettings.weeksCount} أسابيع، 
+                    كل {recurringSettings.selectedDays.map(d => weekDays.find(w => w.id === d)?.label).join(" و")} 
+                    الساعة {recurringSettings.time}
+                  </p>
+                  <p className="text-sm font-medium mt-1">
+                    إجمالي المنشورات: ~{Math.ceil(getRecurringDates().length * generatedPosts.filter(p => p.selected).length / generatedPosts.filter(p => p.selected).length) || 0} منشور
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsScheduleDialogOpen(false)}>
+              إلغاء
+            </Button>
+            <Button onClick={handleConfirmSchedule}>
+              <CheckCircle className="w-4 h-4 ml-2" />
+              تأكيد الجدولة
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 };
