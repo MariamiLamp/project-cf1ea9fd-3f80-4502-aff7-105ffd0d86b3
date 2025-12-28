@@ -460,13 +460,19 @@ const CompanyDashboard = () => {
                       <TableHead>المهارات</TableHead>
                       <TableHead>الخبرة</TableHead>
                       <TableHead>الوظيفة المناسبة</TableHead>
-                      <TableHead>الإجراءات</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {candidates.map((candidate) => (
                       <TableRow key={candidate.id}>
-                        <TableCell className="font-medium">{candidate.name}</TableCell>
+                        <TableCell className="font-medium">
+                          <button
+                            onClick={() => handleViewCandidate(candidate)}
+                            className="text-primary hover:underline cursor-pointer font-medium"
+                          >
+                            {candidate.name}
+                          </button>
+                        </TableCell>
                         <TableCell className="text-muted-foreground">{candidate.email}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
@@ -494,12 +500,6 @@ const CompanyDashboard = () => {
                         </TableCell>
                         <TableCell>{candidate.experience}</TableCell>
                         <TableCell>{candidate.appliedFor}</TableCell>
-                        <TableCell>
-                          <Button variant="outline" size="sm" onClick={() => handleViewCandidate(candidate)}>
-                            <Eye className="w-4 h-4 mr-1" />
-                            عرض
-                          </Button>
-                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
