@@ -1167,13 +1167,13 @@ const CVBuilder = () => {
 
                 {/* Template: Tech */}
                 {selectedTemplate === "tech" && (
-                  <div className="bg-slate-900 border border-border rounded-lg overflow-hidden min-h-[600px] text-white">
+                  <div className="bg-slate-900 border border-border rounded-lg overflow-hidden min-h-[600px] text-white" dir="ltr">
                     <div className="p-6 border-b border-slate-700">
                       <div className="flex items-center gap-2 text-cyan-400 text-xs mb-4 font-mono">
                         <span className="w-3 h-3 rounded-full bg-red-500" />
                         <span className="w-3 h-3 rounded-full bg-yellow-500" />
                         <span className="w-3 h-3 rounded-full bg-green-500" />
-                        <span className="mr-4">portfolio.tsx</span>
+                        <span className="ml-4">portfolio.tsx</span>
                       </div>
                       <h2 className="text-2xl font-mono">
                         <span className="text-pink-400">const</span>{" "}
@@ -1181,16 +1181,16 @@ const CVBuilder = () => {
                         <span className="text-white">=</span>{" "}
                         <span className="text-yellow-400">{`{`}</span>
                       </h2>
-                      <div className="pr-6 mt-2 text-sm font-mono space-y-1">
-                        <p><span className="text-purple-400">role</span>: <span className="text-green-400">"{personalInfo.jobTitle || "مطور"}"</span>,</p>
+                      <div className="pl-6 mt-2 text-sm font-mono space-y-1">
+                        <p><span className="text-purple-400">role</span>: <span className="text-green-400">"{personalInfo.jobTitle || "Developer"}"</span>,</p>
                         <p><span className="text-purple-400">email</span>: <span className="text-green-400">"{personalInfo.email || "email@example.com"}"</span>,</p>
-                        <p><span className="text-purple-400">location</span>: <span className="text-green-400">"{personalInfo.location || "الموقع"}"</span></p>
+                        <p><span className="text-purple-400">location</span>: <span className="text-green-400">"{personalInfo.location || "Location"}"</span></p>
                       </div>
                       <p className="text-yellow-400 font-mono">{`}`}</p>
                     </div>
                     {personalInfo.summary && (
                       <div className="p-6">
-                        <p className="text-sm text-slate-300 leading-relaxed font-mono">
+                        <p className="text-sm text-slate-300 leading-relaxed font-mono" dir="rtl">
                           <span className="text-gray-500">// </span>{personalInfo.summary}
                         </p>
                       </div>
