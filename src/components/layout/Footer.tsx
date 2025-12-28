@@ -3,7 +3,7 @@ import { Briefcase, Mail, Phone, MapPin } from "lucide-react";
 
 export const Footer = () => {
   return (
-    <footer className="bg-sidebar text-sidebar-foreground mt-12">
+    <footer className="bg-sidebar text-sidebar-foreground mt-12 mx-6 mb-6 rounded-2xl">
       <div className="px-6 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand */}
