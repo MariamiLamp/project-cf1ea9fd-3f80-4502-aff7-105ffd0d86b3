@@ -100,10 +100,13 @@ export const Sidebar = () => {
             {!collapsed && <span>{item.label}</span>}
           </Link>
         ))}
-        <button className="nav-item w-full text-right">
+        <Link
+          to="/auth"
+          className="nav-item w-full text-right"
+        >
           <LogOut className="w-5 h-5 text-sidebar-foreground/70" />
-          {!collapsed && <span>تسجيل الخروج</span>}
-        </button>
+          {!collapsed && <span>تسجيل الدخول</span>}
+        </Link>
       </div>
 
       {/* Collapse Button */}
