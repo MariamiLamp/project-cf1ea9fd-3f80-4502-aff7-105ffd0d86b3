@@ -16,6 +16,11 @@ import {
   Target,
   Download,
   Eye,
+  Clock,
+  CheckCircle,
+  XCircle,
+  FileEdit,
+  Building,
 } from "lucide-react";
 
 // Mock candidates data (should be shared or fetched from API)
@@ -42,6 +47,12 @@ const candidatesData = [
     certifications: ["AWS Certified Developer", "React Professional Certificate"],
     languages: ["العربية (اللغة الأم)", "الإنجليزية (متقدم)"],
     cvFile: { name: "Ahmed_Mohamed_CV.pdf", size: "245 KB", uploadDate: "2024-01-15" },
+    appliedJobs: [
+      { id: 1, title: "مطور واجهات أمامية", company: "شركة التقنية المتقدمة", status: "pending", appliedDate: "2024-03-10" },
+      { id: 2, title: "مطور React أول", company: "شركة الحلول الرقمية", status: "accepted", appliedDate: "2024-02-28" },
+      { id: 3, title: "مهندس برمجيات", company: "شركة البرمجيات العربية", status: "rejected", appliedDate: "2024-02-15" },
+    ],
+    coverLetter: "أنا مطور واجهات أمامية متحمس ولدي خبرة تزيد عن 5 سنوات في بناء تطبيقات ويب حديثة وقابلة للتطوير. أتقن React و TypeScript وأسعى دائماً لتقديم تجارب مستخدم استثنائية. أبحث عن فرصة للانضمام إلى فريق مبتكر حيث يمكنني المساهمة بمهاراتي وتطوير قدراتي المهنية.",
   },
   { 
     id: 2, 
@@ -66,6 +77,10 @@ const candidatesData = [
     certifications: ["Google Data Analytics Certificate", "Tableau Desktop Specialist"],
     languages: ["العربية (اللغة الأم)", "الإنجليزية (متقدم)"],
     cvFile: { name: "Sara_Ali_CV.pdf", size: "312 KB", uploadDate: "2024-02-20" },
+    appliedJobs: [
+      { id: 4, title: "محلل بيانات", company: "شركة البيانات الذكية", status: "accepted", appliedDate: "2024-03-05" },
+    ],
+    coverLetter: "محللة بيانات شغوفة بتحويل البيانات إلى رؤى قابلة للتنفيذ. لدي خبرة في التعلم الآلي وتصور البيانات وأسعى للمساهمة في نجاح مؤسستكم.",
   },
   { 
     id: 3, 
@@ -89,6 +104,11 @@ const candidatesData = [
     certifications: ["Meta Front-End Developer Certificate"],
     languages: ["العربية (اللغة الأم)", "الإنجليزية (متوسط)"],
     cvFile: { name: "Mohamed_Khaled_CV.docx", size: "189 KB", uploadDate: "2024-03-05" },
+    appliedJobs: [
+      { id: 5, title: "مطور واجهات أمامية", company: "وكالة ديجيتال", status: "pending", appliedDate: "2024-03-12" },
+      { id: 6, title: "مطور Vue.js", company: "شركة الإبداع التقني", status: "pending", appliedDate: "2024-03-08" },
+    ],
+    coverLetter: "مطور واجهات متحمس لبناء تجارب مستخدم رائعة. أتطلع للعمل مع فريق مبدع ومبتكر.",
   },
   { 
     id: 4, 
@@ -113,6 +133,11 @@ const candidatesData = [
     certifications: ["PMP Certified", "Certified Scrum Master", "PRINCE2 Practitioner"],
     languages: ["العربية (اللغة الأم)", "الإنجليزية (متقدم)", "الفرنسية (مبتدئ)"],
     cvFile: { name: "Fatima_Ahmed_CV.pdf", size: "278 KB", uploadDate: "2024-01-28" },
+    appliedJobs: [
+      { id: 7, title: "مدير مشاريع", company: "شركة الاتصالات السعودية", status: "accepted", appliedDate: "2024-02-20" },
+      { id: 8, title: "مدير برنامج", company: "شركة أرامكو الرقمية", status: "pending", appliedDate: "2024-03-01" },
+    ],
+    coverLetter: "مديرة مشاريع معتمدة PMP مع خبرة واسعة في قيادة الفرق وإدارة المشاريع التقنية المعقدة. أسعى لتحقيق أهداف المنظمة من خلال التخطيط الاستراتيجي والتنفيذ الفعال.",
   },
 ];
 
@@ -251,6 +276,62 @@ const CandidateProfile = () => {
                     </div>
                   </div>
                 ))}
+              </CardContent>
+            </Card>
+
+            {/* Applied Jobs */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Briefcase className="w-5 h-5 text-primary" />
+                  الوظائف المتقدم عليها
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {candidate.appliedJobs.map((job, index) => (
+                  <div 
+                    key={job.id} 
+                    className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-border/50"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                        <Building className="w-5 h-5 text-muted-foreground" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-sm">{job.title}</h4>
+                        <p className="text-xs text-muted-foreground">{job.company}</p>
+                        <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                          <Calendar className="w-3 h-3" />
+                          {job.appliedDate}
+                        </p>
+                      </div>
+                    </div>
+                    <Badge 
+                      variant={job.status === "accepted" ? "default" : job.status === "rejected" ? "destructive" : "secondary"}
+                      className={`flex items-center gap-1 ${job.status === "accepted" ? "bg-emerald-500" : ""}`}
+                    >
+                      {job.status === "pending" && <Clock className="w-3 h-3" />}
+                      {job.status === "accepted" && <CheckCircle className="w-3 h-3" />}
+                      {job.status === "rejected" && <XCircle className="w-3 h-3" />}
+                      {job.status === "pending" ? "قيد المراجعة" : job.status === "accepted" ? "مقبول" : "مرفوض"}
+                    </Badge>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            {/* Cover Letter */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileEdit className="w-5 h-5 text-primary" />
+                  خطاب التقديم العام
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="p-4 bg-muted/30 rounded-lg border border-border/50">
+                  <p className="text-sm leading-relaxed">{candidate.coverLetter}</p>
+                </div>
               </CardContent>
             </Card>
           </div>

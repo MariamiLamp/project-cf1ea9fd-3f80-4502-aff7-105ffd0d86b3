@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { icon: LayoutDashboard, label: "لوحة التحكم", path: "/" },
+  { icon: User, label: "الملف الشخصي", path: "/candidate/1" },
   { icon: FileText, label: "فحص السيرة الذاتية", path: "/cv-check" },
   { icon: Sparkles, label: "خطاب التقديم", path: "/cover-letter" },
   { icon: Briefcase, label: "فرص العمل", path: "/jobs" },
