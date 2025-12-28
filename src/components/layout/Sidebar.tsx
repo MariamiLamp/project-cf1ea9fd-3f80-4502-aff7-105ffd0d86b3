@@ -9,13 +9,13 @@ import {
   FileEdit,
   Settings,
   User,
-  Bell,
   ChevronLeft,
   ChevronRight,
   Sparkles,
   LogOut,
   Crown,
   ShoppingBag,
+  CalendarDays,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -26,6 +26,7 @@ const navItems = [
   { icon: Sparkles, label: "خطاب التقديم", path: "/cover-letter" },
   { icon: Briefcase, label: "فرص العمل", path: "/jobs" },
   { icon: ShoppingBag, label: "سوق القوالب", path: "/templates" },
+  { icon: CalendarDays, label: "مخطط المنشورات", path: "/posts-planner" },
   { icon: TrendingUp, label: "المسار المهني", path: "/career-path" },
   { icon: MessageSquare, label: "أسئلة المقابلات", path: "/interview" },
   { icon: FileEdit, label: "منشئ السيرة الذاتية", path: "/cv-builder" },
