@@ -47,6 +47,12 @@ import {
   TrendingUp,
   Edit,
   Trash2,
+  Sparkles,
+  Image,
+  Star,
+  Megaphone,
+  Loader2,
+  Copy,
 } from "lucide-react";
 
 // Mock data
@@ -94,6 +100,24 @@ const CompanyDashboard = () => {
     location: "",
     description: "",
     requirements: "",
+  });
+
+  // Job Description Generator state
+  const [jobGenTitle, setJobGenTitle] = useState("");
+  const [jobGenDepartment, setJobGenDepartment] = useState("");
+  const [jobGenExperience, setJobGenExperience] = useState("");
+  const [generatedDescription, setGeneratedDescription] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  // Featured jobs & banners state
+  const [featuredJobs, setFeaturedJobs] = useState([
+    { id: 1, title: "مطور واجهات أمامية", featured: true, featuredUntil: "2024-04-15" },
+  ]);
+  const [companyBanner, setCompanyBanner] = useState({
+    enabled: false,
+    title: "",
+    description: "",
+    imageUrl: "",
   });
   
   const [editJob, setEditJob] = useState({
@@ -193,6 +217,79 @@ const CompanyDashboard = () => {
     });
   };
 
+  // Mock AI Job Description Generator
+  const handleGenerateDescription = async () => {
+    if (!jobGenTitle) {
+      toast({
+        title: "خطأ",
+        description: "يرجى إدخال المسمى الوظيفي",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsGenerating(true);
+    // Simulate AI generation delay
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    const mockDescription = `نبحث عن ${jobGenTitle} متميز للانضمام إلى فريقنا في قسم ${jobGenDepartment || "التقنية"}.
+
+المسؤوليات الرئيسية:
+• تطوير وصيانة التطبيقات والأنظمة
+• التعاون مع الفريق لتحقيق أهداف المشروع
+• المشاركة في مراجعة الكود وتحسين الأداء
+• توثيق العمل وإعداد التقارير الفنية
+
+المتطلبات:
+• خبرة ${jobGenExperience || "3+"} سنوات في المجال
+• مهارات تواصل ممتازة
+• القدرة على العمل ضمن فريق
+• إتقان اللغة العربية والإنجليزية
+
+المزايا:
+• راتب تنافسي
+• تأمين صحي شامل
+• بيئة عمل محفزة
+• فرص للتطوير المهني`;
+
+    setGeneratedDescription(mockDescription);
+    setIsGenerating(false);
+    toast({
+      title: "تم التوليد",
+      description: "تم إنشاء وصف الوظيفة بنجاح",
+    });
+  };
+
+  const handleCopyDescription = () => {
+    navigator.clipboard.writeText(generatedDescription);
+    toast({
+      title: "تم النسخ",
+      description: "تم نسخ الوصف إلى الحافظة",
+    });
+  };
+
+  const handleToggleFeatured = (jobId: number) => {
+    const job = jobs.find(j => j.id === jobId);
+    if (job) {
+      const isFeatured = featuredJobs.some(f => f.id === jobId);
+      if (isFeatured) {
+        setFeaturedJobs(featuredJobs.filter(f => f.id !== jobId));
+        toast({ title: "تم إلغاء التمييز", description: "تم إزالة الوظيفة من القائمة المميزة" });
+      } else {
+        setFeaturedJobs([...featuredJobs, { id: jobId, title: job.title, featured: true, featuredUntil: "2024-05-01" }]);
+        toast({ title: "تم التمييز", description: "تم إضافة الوظيفة للقائمة المميزة" });
+      }
+    }
+  };
+
+  const handleSaveBanner = () => {
+    setCompanyBanner({ ...companyBanner, enabled: true });
+    toast({
+      title: "تم الحفظ",
+      description: "تم حفظ إعدادات البانر بنجاح",
+    });
+  };
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "pending":
@@ -259,18 +356,26 @@ const CompanyDashboard = () => {
         {/* Tabs */}
         <Tabs defaultValue="jobs" className="space-y-4">
           <div className="flex items-center justify-between">
-            <TabsList className="bg-muted/50">
+            <TabsList className="bg-muted/50 flex-wrap h-auto gap-1">
               <TabsTrigger value="jobs" className="gap-2">
                 <Briefcase className="w-4 h-4" />
                 الوظائف
               </TabsTrigger>
               <TabsTrigger value="candidates" className="gap-2">
                 <Users className="w-4 h-4" />
-                المرشحون المتوافقون
+                المرشحون
               </TabsTrigger>
               <TabsTrigger value="applications" className="gap-2">
                 <FileText className="w-4 h-4" />
-                طلبات التوظيف
+                الطلبات
+              </TabsTrigger>
+              <TabsTrigger value="generator" className="gap-2">
+                <Sparkles className="w-4 h-4" />
+                مولد الوصف
+              </TabsTrigger>
+              <TabsTrigger value="promotion" className="gap-2">
+                <Megaphone className="w-4 h-4" />
+                الترويج
               </TabsTrigger>
             </TabsList>
 
@@ -551,6 +656,229 @@ const CompanyDashboard = () => {
                 </Table>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Job Description Generator Tab */}
+          <TabsContent value="generator">
+            <div className="grid md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-primary" />
+                    مولد وصف الوظائف بالذكاء الاصطناعي
+                  </CardTitle>
+                  <CardDescription>أدخل معلومات الوظيفة وسيقوم النظام بإنشاء وصف احترافي</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>المسمى الوظيفي *</Label>
+                    <Input
+                      placeholder="مثال: مطور واجهات أمامية"
+                      value={jobGenTitle}
+                      onChange={(e) => setJobGenTitle(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>القسم</Label>
+                    <Select onValueChange={setJobGenDepartment}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="اختر القسم" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="التقنية">التقنية</SelectItem>
+                        <SelectItem value="التسويق">التسويق</SelectItem>
+                        <SelectItem value="المالية">المالية</SelectItem>
+                        <SelectItem value="الإدارة">الإدارة</SelectItem>
+                        <SelectItem value="الموارد البشرية">الموارد البشرية</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>سنوات الخبرة المطلوبة</Label>
+                    <Select onValueChange={setJobGenExperience}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="اختر الخبرة" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="0-1">0-1 سنة</SelectItem>
+                        <SelectItem value="2-3">2-3 سنوات</SelectItem>
+                        <SelectItem value="3-5">3-5 سنوات</SelectItem>
+                        <SelectItem value="5+">5+ سنوات</SelectItem>
+                        <SelectItem value="7+">7+ سنوات</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button 
+                    onClick={handleGenerateDescription} 
+                    disabled={isGenerating}
+                    className="w-full gap-2"
+                  >
+                    {isGenerating ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        جاري التوليد...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4" />
+                        توليد الوصف
+                      </>
+                    )}
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <span className="flex items-center gap-2">
+                      <FileText className="w-5 h-5 text-primary" />
+                      الوصف المُولّد
+                    </span>
+                    {generatedDescription && (
+                      <Button variant="outline" size="sm" onClick={handleCopyDescription} className="gap-2">
+                        <Copy className="w-4 h-4" />
+                        نسخ
+                      </Button>
+                    )}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {generatedDescription ? (
+                    <div className="p-4 bg-muted/30 rounded-lg border border-border whitespace-pre-wrap text-sm leading-relaxed">
+                      {generatedDescription}
+                    </div>
+                  ) : (
+                    <div className="p-8 bg-muted/30 rounded-lg border border-dashed border-border text-center">
+                      <Sparkles className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+                      <p className="text-muted-foreground">سيظهر الوصف المُولّد هنا</p>
+                      <p className="text-xs text-muted-foreground mt-1">أدخل بيانات الوظيفة واضغط على زر التوليد</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Promotion Tab */}
+          <TabsContent value="promotion">
+            <div className="space-y-6">
+              {/* Company Banner */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Image className="w-5 h-5 text-primary" />
+                    بانر الشركة
+                  </CardTitle>
+                  <CardDescription>قم بإنشاء بانر ترويجي لشركتك يظهر في صفحة الوظائف الرئيسية</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label>عنوان البانر</Label>
+                        <Input
+                          placeholder="مثال: انضم لفريقنا المميز"
+                          value={companyBanner.title}
+                          onChange={(e) => setCompanyBanner({ ...companyBanner, title: e.target.value })}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>وصف البانر</Label>
+                        <Textarea
+                          placeholder="اكتب وصفاً جذاباً لشركتك..."
+                          value={companyBanner.description}
+                          onChange={(e) => setCompanyBanner({ ...companyBanner, description: e.target.value })}
+                          rows={3}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>رابط صورة البانر</Label>
+                        <Input
+                          placeholder="https://example.com/banner.jpg"
+                          value={companyBanner.imageUrl}
+                          onChange={(e) => setCompanyBanner({ ...companyBanner, imageUrl: e.target.value })}
+                        />
+                      </div>
+                      <Button onClick={handleSaveBanner} className="gap-2">
+                        <Megaphone className="w-4 h-4" />
+                        حفظ البانر
+                      </Button>
+                    </div>
+                    <div className="border border-dashed border-border rounded-lg p-4 bg-muted/20">
+                      <p className="text-xs text-muted-foreground mb-2">معاينة البانر</p>
+                      <div className="bg-gradient-to-r from-primary/20 to-accent/20 rounded-lg p-6 text-center">
+                        <h3 className="font-bold text-lg">{companyBanner.title || "عنوان البانر"}</h3>
+                        <p className="text-sm text-muted-foreground mt-2">
+                          {companyBanner.description || "وصف البانر سيظهر هنا..."}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Featured Jobs */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Star className="w-5 h-5 text-amber-500" />
+                    الوظائف المميزة
+                  </CardTitle>
+                  <CardDescription>اختر الوظائف التي تريد إبرازها في أعلى قائمة البحث</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>الوظيفة</TableHead>
+                        <TableHead>القسم</TableHead>
+                        <TableHead>الحالة</TableHead>
+                        <TableHead>مميزة</TableHead>
+                        <TableHead></TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {jobs.filter(j => j.status === "active").map((job) => {
+                        const isFeatured = featuredJobs.some(f => f.id === job.id);
+                        return (
+                          <TableRow key={job.id}>
+                            <TableCell className="font-medium">{job.title}</TableCell>
+                            <TableCell>{job.department}</TableCell>
+                            <TableCell>
+                              <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30">
+                                نشطة
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              {isFeatured ? (
+                                <Badge className="gap-1 bg-amber-500">
+                                  <Star className="w-3 h-3" />
+                                  مميزة
+                                </Badge>
+                              ) : (
+                                <Badge variant="outline">عادية</Badge>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              <Button
+                                variant={isFeatured ? "outline" : "default"}
+                                size="sm"
+                                onClick={() => handleToggleFeatured(job.id)}
+                                className="gap-1"
+                              >
+                                <Star className={`w-4 h-4 ${isFeatured ? "" : "fill-current"}`} />
+                                {isFeatured ? "إلغاء التمييز" : "تمييز"}
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
 
