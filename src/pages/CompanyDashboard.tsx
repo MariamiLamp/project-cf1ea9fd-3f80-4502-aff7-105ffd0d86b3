@@ -175,7 +175,7 @@ const CompanyDashboard = () => {
   };
 
   const handleViewCandidate = (candidateId: number) => {
-    navigate(`/candidate/${candidateId}`);
+    navigate(`/candidate/${candidateId}?view=company`);
   };
 
   const handleViewApplication = (app: typeof initialApplications[0]) => {
