@@ -46,23 +46,27 @@ import {
   Building2,
   TrendingUp,
   Search,
+  Edit,
+  Trash2,
+  Mail,
+  UserPlus,
 } from "lucide-react";
 
 // Mock data
-const mockJobs = [
+const initialJobs = [
   { id: 1, title: "مطور واجهات أمامية", department: "التقنية", type: "دوام كامل", location: "الرياض", applications: 24, status: "active", postedDate: "2024-01-10" },
   { id: 2, title: "محلل بيانات", department: "البيانات", type: "دوام كامل", location: "جدة", applications: 18, status: "active", postedDate: "2024-01-15" },
   { id: 3, title: "مدير مشاريع", department: "الإدارة", type: "دوام كامل", location: "الرياض", applications: 12, status: "closed", postedDate: "2024-01-05" },
 ];
 
-const mockCandidates = [
-  { id: 1, name: "أحمد محمد", email: "ahmed@email.com", matchScore: 95, skills: ["React", "TypeScript", "Node.js"], experience: "5 سنوات", appliedFor: "مطور واجهات أمامية" },
-  { id: 2, name: "سارة علي", email: "sara@email.com", matchScore: 88, skills: ["Python", "SQL", "Tableau"], experience: "3 سنوات", appliedFor: "محلل بيانات" },
-  { id: 3, name: "محمد خالد", email: "mohamed@email.com", matchScore: 82, skills: ["React", "Vue", "CSS"], experience: "4 سنوات", appliedFor: "مطور واجهات أمامية" },
-  { id: 4, name: "فاطمة أحمد", email: "fatima@email.com", matchScore: 78, skills: ["Project Management", "Agile"], experience: "6 سنوات", appliedFor: "مدير مشاريع" },
+const initialCandidates = [
+  { id: 1, name: "أحمد محمد", email: "ahmed@email.com", phone: "0501234567", matchScore: 95, skills: ["React", "TypeScript", "Node.js"], experience: "5 سنوات", appliedFor: "مطور واجهات أمامية", education: "بكالوريوس علوم حاسب", summary: "مطور واجهات أمامية متمرس مع خبرة في بناء تطبيقات ويب حديثة" },
+  { id: 2, name: "سارة علي", email: "sara@email.com", phone: "0509876543", matchScore: 88, skills: ["Python", "SQL", "Tableau"], experience: "3 سنوات", appliedFor: "محلل بيانات", education: "ماجستير تحليل بيانات", summary: "محللة بيانات مع خبرة في استخراج الرؤى من البيانات الضخمة" },
+  { id: 3, name: "محمد خالد", email: "mohamed@email.com", phone: "0551112233", matchScore: 82, skills: ["React", "Vue", "CSS"], experience: "4 سنوات", appliedFor: "مطور واجهات أمامية", education: "بكالوريوس هندسة برمجيات", summary: "مطور واجهات مع شغف لتصميم تجارب مستخدم متميزة" },
+  { id: 4, name: "فاطمة أحمد", email: "fatima@email.com", phone: "0544455566", matchScore: 78, skills: ["Project Management", "Agile"], experience: "6 سنوات", appliedFor: "مدير مشاريع", education: "ماجستير إدارة أعمال", summary: "مديرة مشاريع معتمدة PMP مع خبرة في قيادة فرق تقنية" },
 ];
 
-const mockApplications = [
+const initialApplications = [
   { id: 1, candidateName: "أحمد محمد", jobTitle: "مطور واجهات أمامية", status: "pending", appliedDate: "2024-01-20", matchScore: 95 },
   { id: 2, candidateName: "سارة علي", jobTitle: "محلل بيانات", status: "reviewed", appliedDate: "2024-01-19", matchScore: 88 },
   { id: 3, candidateName: "محمد خالد", jobTitle: "مطور واجهات أمامية", status: "accepted", appliedDate: "2024-01-18", matchScore: 82 },
@@ -74,7 +78,20 @@ const CompanyDashboard = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  
+  // State management
+  const [jobs, setJobs] = useState(initialJobs);
+  const [candidates] = useState(initialCandidates);
+  const [applications, setApplications] = useState(initialApplications);
+  
   const [isAddJobOpen, setIsAddJobOpen] = useState(false);
+  const [isEditJobOpen, setIsEditJobOpen] = useState(false);
+  const [isViewCandidateOpen, setIsViewCandidateOpen] = useState(false);
+  const [isViewApplicationOpen, setIsViewApplicationOpen] = useState(false);
+  const [selectedJob, setSelectedJob] = useState<typeof initialJobs[0] | null>(null);
+  const [selectedCandidate, setSelectedCandidate] = useState<typeof initialCandidates[0] | null>(null);
+  const [selectedApplication, setSelectedApplication] = useState<typeof initialApplications[0] | null>(null);
+  
   const [newJob, setNewJob] = useState({
     title: "",
     department: "",
@@ -82,6 +99,15 @@ const CompanyDashboard = () => {
     location: "",
     description: "",
     requirements: "",
+  });
+  
+  const [editJob, setEditJob] = useState({
+    id: 0,
+    title: "",
+    department: "",
+    type: "",
+    location: "",
+    status: "",
   });
 
   const handleLogout = () => {
@@ -99,12 +125,85 @@ const CompanyDashboard = () => {
       return;
     }
 
+    const job = {
+      id: jobs.length + 1,
+      title: newJob.title,
+      department: newJob.department,
+      type: newJob.type,
+      location: newJob.location,
+      applications: 0,
+      status: "active",
+      postedDate: new Date().toISOString().split('T')[0],
+    };
+    
+    setJobs([...jobs, job]);
     toast({
       title: "تم إضافة الوظيفة",
       description: "تم نشر الوظيفة بنجاح",
     });
     setIsAddJobOpen(false);
     setNewJob({ title: "", department: "", type: "", location: "", description: "", requirements: "" });
+  };
+
+  const handleEditJob = (job: typeof initialJobs[0]) => {
+    setSelectedJob(job);
+    setEditJob({
+      id: job.id,
+      title: job.title,
+      department: job.department,
+      type: job.type,
+      location: job.location,
+      status: job.status,
+    });
+    setIsEditJobOpen(true);
+  };
+
+  const handleSaveEdit = () => {
+    setJobs(jobs.map(job => 
+      job.id === editJob.id 
+        ? { ...job, title: editJob.title, department: editJob.department, type: editJob.type, location: editJob.location, status: editJob.status }
+        : job
+    ));
+    toast({
+      title: "تم التحديث",
+      description: "تم تحديث بيانات الوظيفة بنجاح",
+    });
+    setIsEditJobOpen(false);
+  };
+
+  const handleDeleteJob = (jobId: number) => {
+    setJobs(jobs.filter(job => job.id !== jobId));
+    toast({
+      title: "تم الحذف",
+      description: "تم حذف الوظيفة بنجاح",
+    });
+  };
+
+  const handleViewCandidate = (candidate: typeof initialCandidates[0]) => {
+    setSelectedCandidate(candidate);
+    setIsViewCandidateOpen(true);
+  };
+
+  const handleInviteCandidate = (candidate: typeof initialCandidates[0]) => {
+    toast({
+      title: "تم إرسال الدعوة",
+      description: `تم إرسال دعوة للمقابلة إلى ${candidate.name}`,
+    });
+  };
+
+  const handleViewApplication = (app: typeof initialApplications[0]) => {
+    setSelectedApplication(app);
+    setIsViewApplicationOpen(true);
+  };
+
+  const handleUpdateApplicationStatus = (appId: number, status: string) => {
+    setApplications(applications.map(app => 
+      app.id === appId ? { ...app, status } : app
+    ));
+    toast({
+      title: status === "accepted" ? "تم القبول" : "تم الرفض",
+      description: status === "accepted" ? "تم قبول طلب التوظيف" : "تم رفض طلب التوظيف",
+    });
   };
 
   const getStatusBadge = (status: string) => {
@@ -301,10 +400,11 @@ const CompanyDashboard = () => {
                       <TableHead>عدد الطلبات</TableHead>
                       <TableHead>الحالة</TableHead>
                       <TableHead>تاريخ النشر</TableHead>
+                      <TableHead>الإجراءات</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {mockJobs.map((job) => (
+                    {jobs.map((job) => (
                       <TableRow key={job.id}>
                         <TableCell className="font-medium">{job.title}</TableCell>
                         <TableCell>{job.department}</TableCell>
@@ -322,6 +422,16 @@ const CompanyDashboard = () => {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-muted-foreground">{job.postedDate}</TableCell>
+                        <TableCell>
+                          <div className="flex gap-1">
+                            <Button variant="ghost" size="icon" onClick={() => handleEditJob(job)}>
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => handleDeleteJob(job.id)}>
+                              <Trash2 className="w-4 h-4 text-destructive" />
+                            </Button>
+                          </div>
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -354,7 +464,7 @@ const CompanyDashboard = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {mockCandidates.map((candidate) => (
+                    {candidates.map((candidate) => (
                       <TableRow key={candidate.id}>
                         <TableCell className="font-medium">{candidate.name}</TableCell>
                         <TableCell className="text-muted-foreground">{candidate.email}</TableCell>
@@ -385,9 +495,16 @@ const CompanyDashboard = () => {
                         <TableCell>{candidate.experience}</TableCell>
                         <TableCell>{candidate.appliedFor}</TableCell>
                         <TableCell>
-                          <Button variant="outline" size="sm">
-                            عرض الملف
-                          </Button>
+                          <div className="flex gap-1">
+                            <Button variant="outline" size="sm" onClick={() => handleViewCandidate(candidate)}>
+                              <Eye className="w-4 h-4 mr-1" />
+                              عرض
+                            </Button>
+                            <Button variant="default" size="sm" onClick={() => handleInviteCandidate(candidate)}>
+                              <UserPlus className="w-4 h-4 mr-1" />
+                              دعوة
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -419,7 +536,7 @@ const CompanyDashboard = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {mockApplications.map((app) => (
+                    {applications.map((app) => (
                       <TableRow key={app.id}>
                         <TableCell className="font-medium">{app.candidateName}</TableCell>
                         <TableCell>{app.jobTitle}</TableCell>
@@ -431,16 +548,16 @@ const CompanyDashboard = () => {
                         <TableCell className="text-muted-foreground">{app.appliedDate}</TableCell>
                         <TableCell>{getStatusBadge(app.status)}</TableCell>
                         <TableCell>
-                          <div className="flex gap-2">
-                            <Button variant="ghost" size="icon">
+                          <div className="flex gap-1">
+                            <Button variant="ghost" size="icon" onClick={() => handleViewApplication(app)}>
                               <Eye className="w-4 h-4" />
                             </Button>
-                            {app.status === "pending" && (
+                            {(app.status === "pending" || app.status === "reviewed") && (
                               <>
-                                <Button variant="ghost" size="icon">
+                                <Button variant="ghost" size="icon" onClick={() => handleUpdateApplicationStatus(app.id, "accepted")}>
                                   <CheckCircle className="w-4 h-4 text-emerald-500" />
                                 </Button>
-                                <Button variant="ghost" size="icon">
+                                <Button variant="ghost" size="icon" onClick={() => handleUpdateApplicationStatus(app.id, "rejected")}>
                                   <XCircle className="w-4 h-4 text-destructive" />
                                 </Button>
                               </>
@@ -455,6 +572,220 @@ const CompanyDashboard = () => {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Edit Job Dialog */}
+        <Dialog open={isEditJobOpen} onOpenChange={setIsEditJobOpen}>
+          <DialogContent className="max-w-lg" dir="rtl">
+            <DialogHeader>
+              <DialogTitle>تعديل الوظيفة</DialogTitle>
+              <DialogDescription>قم بتحديث بيانات الوظيفة</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 mt-4">
+              <div className="space-y-2">
+                <Label>المسمى الوظيفي</Label>
+                <Input
+                  value={editJob.title}
+                  onChange={(e) => setEditJob({ ...editJob, title: e.target.value })}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>القسم</Label>
+                  <Select value={editJob.department} onValueChange={(value) => setEditJob({ ...editJob, department: value })}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="التقنية">التقنية</SelectItem>
+                      <SelectItem value="التسويق">التسويق</SelectItem>
+                      <SelectItem value="المالية">المالية</SelectItem>
+                      <SelectItem value="الإدارة">الإدارة</SelectItem>
+                      <SelectItem value="البيانات">البيانات</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>نوع الدوام</Label>
+                  <Select value={editJob.type} onValueChange={(value) => setEditJob({ ...editJob, type: value })}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="دوام كامل">دوام كامل</SelectItem>
+                      <SelectItem value="دوام جزئي">دوام جزئي</SelectItem>
+                      <SelectItem value="عن بعد">عن بعد</SelectItem>
+                      <SelectItem value="عقد">عقد</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>الموقع</Label>
+                  <Select value={editJob.location} onValueChange={(value) => setEditJob({ ...editJob, location: value })}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="الرياض">الرياض</SelectItem>
+                      <SelectItem value="جدة">جدة</SelectItem>
+                      <SelectItem value="الدمام">الدمام</SelectItem>
+                      <SelectItem value="مكة">مكة</SelectItem>
+                      <SelectItem value="المدينة">المدينة</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>الحالة</Label>
+                  <Select value={editJob.status} onValueChange={(value) => setEditJob({ ...editJob, status: value })}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="active">نشطة</SelectItem>
+                      <SelectItem value="closed">مغلقة</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <Button onClick={handleSaveEdit} className="w-full">
+                حفظ التغييرات
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* View Candidate Dialog */}
+        <Dialog open={isViewCandidateOpen} onOpenChange={setIsViewCandidateOpen}>
+          <DialogContent className="max-w-lg" dir="rtl">
+            <DialogHeader>
+              <DialogTitle>الملف الشخصي للمرشح</DialogTitle>
+            </DialogHeader>
+            {selectedCandidate && (
+              <div className="space-y-4 mt-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Users className="w-8 h-8 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg">{selectedCandidate.name}</h3>
+                    <p className="text-muted-foreground">{selectedCandidate.appliedFor}</p>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">البريد الإلكتروني</p>
+                    <p className="font-medium flex items-center gap-1">
+                      <Mail className="w-4 h-4" />
+                      {selectedCandidate.email}
+                    </p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">رقم الهاتف</p>
+                    <p className="font-medium">{selectedCandidate.phone}</p>
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">التعليم</p>
+                  <p className="font-medium">{selectedCandidate.education}</p>
+                </div>
+
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">الخبرة</p>
+                  <p className="font-medium">{selectedCandidate.experience}</p>
+                </div>
+
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">نبذة</p>
+                  <p className="text-sm">{selectedCandidate.summary}</p>
+                </div>
+
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">المهارات</p>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedCandidate.skills.map((skill, i) => (
+                      <Badge key={i} variant="secondary">{skill}</Badge>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                  <span className="text-sm font-medium">نسبة التوافق</span>
+                  <Badge className={`${selectedCandidate.matchScore >= 90 ? "bg-emerald-500" : "bg-primary"}`}>
+                    {selectedCandidate.matchScore}%
+                  </Badge>
+                </div>
+
+                <Button onClick={() => {
+                  handleInviteCandidate(selectedCandidate);
+                  setIsViewCandidateOpen(false);
+                }} className="w-full gap-2">
+                  <UserPlus className="w-4 h-4" />
+                  إرسال دعوة للمقابلة
+                </Button>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        {/* View Application Dialog */}
+        <Dialog open={isViewApplicationOpen} onOpenChange={setIsViewApplicationOpen}>
+          <DialogContent className="max-w-lg" dir="rtl">
+            <DialogHeader>
+              <DialogTitle>تفاصيل طلب التوظيف</DialogTitle>
+            </DialogHeader>
+            {selectedApplication && (
+              <div className="space-y-4 mt-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-bold text-lg">{selectedApplication.candidateName}</h3>
+                    <p className="text-muted-foreground">{selectedApplication.jobTitle}</p>
+                  </div>
+                  {getStatusBadge(selectedApplication.status)}
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-3 bg-muted/50 rounded-lg">
+                    <p className="text-sm text-muted-foreground">تاريخ التقديم</p>
+                    <p className="font-medium">{selectedApplication.appliedDate}</p>
+                  </div>
+                  <div className="p-3 bg-muted/50 rounded-lg">
+                    <p className="text-sm text-muted-foreground">نسبة التوافق</p>
+                    <p className="font-bold text-lg">{selectedApplication.matchScore}%</p>
+                  </div>
+                </div>
+
+                {(selectedApplication.status === "pending" || selectedApplication.status === "reviewed") && (
+                  <div className="flex gap-2">
+                    <Button 
+                      onClick={() => {
+                        handleUpdateApplicationStatus(selectedApplication.id, "accepted");
+                        setIsViewApplicationOpen(false);
+                      }} 
+                      className="flex-1 gap-2 bg-emerald-500 hover:bg-emerald-600"
+                    >
+                      <CheckCircle className="w-4 h-4" />
+                      قبول الطلب
+                    </Button>
+                    <Button 
+                      variant="destructive"
+                      onClick={() => {
+                        handleUpdateApplicationStatus(selectedApplication.id, "rejected");
+                        setIsViewApplicationOpen(false);
+                      }} 
+                      className="flex-1 gap-2"
+                    >
+                      <XCircle className="w-4 h-4" />
+                      رفض الطلب
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
