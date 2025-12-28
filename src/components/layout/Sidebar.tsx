@@ -15,6 +15,7 @@ import {
   Sparkles,
   LogOut,
   Crown,
+  ShoppingBag,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -24,6 +25,7 @@ const navItems = [
   { icon: FileText, label: "فحص السيرة الذاتية", path: "/cv-check" },
   { icon: Sparkles, label: "خطاب التقديم", path: "/cover-letter" },
   { icon: Briefcase, label: "فرص العمل", path: "/jobs" },
+  { icon: ShoppingBag, label: "سوق القوالب", path: "/templates" },
   { icon: TrendingUp, label: "المسار المهني", path: "/career-path" },
   { icon: MessageSquare, label: "أسئلة المقابلات", path: "/interview" },
   { icon: FileEdit, label: "منشئ السيرة الذاتية", path: "/cv-builder" },
