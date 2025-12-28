@@ -1,5 +1,5 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { Search, SlidersHorizontal, MapPin, Briefcase, Clock, Building2, Bookmark, ArrowLeft, X, Sparkles, Loader2, FileText, Copy, Check, Edit, ExternalLink } from "lucide-react";
+import { Search, SlidersHorizontal, MapPin, Briefcase, Clock, Building2, Bookmark, ArrowLeft, X, Sparkles, Loader2, FileText, Copy, Check, Eye, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -401,19 +401,18 @@ ${applicationForm.fullName || "[اسمك]"}`;
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => navigate("/cv-builder")}
                         className="gap-1"
                       >
-                        <Edit className="w-4 h-4" />
-                        تعديل
+                        <Eye className="w-4 h-4" />
+                        عرض
                       </Button>
                       <Button
-                        variant="ghost"
+                        variant="outline"
                         size="sm"
                         className="gap-1"
                       >
-                        <ExternalLink className="w-4 h-4" />
-                        معاينة
+                        <Upload className="w-4 h-4" />
+                        رفع سيرة أخرى
                       </Button>
                     </div>
                   </div>
