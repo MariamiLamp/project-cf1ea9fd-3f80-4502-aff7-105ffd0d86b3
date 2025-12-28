@@ -1,5 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import { WelcomeCard } from "@/components/dashboard/WelcomeCard";
+import { StatCard } from "@/components/dashboard/StatCard";
+import { QuickActions } from "@/components/dashboard/QuickActions";
+import { CVScoreCard } from "@/components/dashboard/CVScoreCard";
+import { RecentActivity } from "@/components/dashboard/RecentActivity";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,610 +20,346 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
 import {
   Users,
   Search,
   FileText,
   Briefcase,
-  GraduationCap,
-  Mail,
-  Phone,
-  MapPin,
-  Calendar,
-  Download,
   Eye,
-  Filter,
-  UserCheck,
-  Clock,
   TrendingUp,
-  Award,
-  Languages,
-  LogOut,
+  Plus,
+  Edit,
+  Trash2,
+  Download,
+  User,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
-// Mock applicants data
-const applicantsData = [
-  { 
-    id: 1, 
-    name: "أحمد محمد", 
-    email: "ahmed@email.com", 
-    phone: "0501234567", 
-    location: "الرياض",
-    appliedFor: "مطور واجهات أمامية",
-    appliedDate: "2024-03-10",
-    status: "pending",
-    experience: "5 سنوات", 
-    education: "بكالوريوس علوم حاسب", 
-    skills: ["React", "TypeScript", "Node.js", "MongoDB", "Git"], 
-    summary: "مطور واجهات أمامية متمرس مع خبرة في بناء تطبيقات ويب حديثة باستخدام React و TypeScript.",
-    workHistory: [
-      { title: "مطور واجهات أمامية أول", company: "شركة التقنية المتقدمة", period: "2021 - الحالي" },
-      { title: "مطور واجهات أمامية", company: "شركة الحلول الرقمية", period: "2019 - 2021" },
-    ],
-    educationHistory: [
-      { degree: "بكالوريوس علوم حاسب", institution: "جامعة الملك سعود", year: "2019" },
-    ],
-    certifications: ["AWS Certified Developer", "React Professional Certificate"],
-    languages: ["العربية (اللغة الأم)", "الإنجليزية (متقدم)"],
-    cvFile: { name: "Ahmed_Mohamed_CV.pdf", size: "245 KB" },
+// Mock CVs created by HR
+interface CreatedCV {
+  id: string;
+  candidateName: string;
+  jobTitle: string;
+  createdAt: string;
+  lastModified: string;
+  status: "draft" | "completed" | "sent";
+}
+
+const initialCreatedCVs: CreatedCV[] = [
+  {
+    id: "1",
+    candidateName: "أحمد محمد علي",
+    jobTitle: "مطور واجهات أمامية",
+    createdAt: "2024-03-10",
+    lastModified: "2024-03-12",
+    status: "completed",
   },
-  { 
-    id: 2, 
-    name: "سارة علي", 
-    email: "sara@email.com", 
-    phone: "0509876543",
-    location: "جدة", 
-    appliedFor: "محلل بيانات",
-    appliedDate: "2024-03-08",
-    status: "reviewed",
-    experience: "3 سنوات", 
-    education: "ماجستير تحليل بيانات", 
-    skills: ["Python", "SQL", "Tableau", "Power BI", "Machine Learning"], 
-    summary: "محللة بيانات مع خبرة في استخراج الرؤى من البيانات الضخمة وتقديم توصيات استراتيجية للأعمال.",
-    workHistory: [
-      { title: "محللة بيانات", company: "شركة البيانات الذكية", period: "2021 - الحالي" },
-      { title: "محللة بيانات مبتدئة", company: "بنك الرياض", period: "2020 - 2021" },
-    ],
-    educationHistory: [
-      { degree: "ماجستير تحليل بيانات", institution: "جامعة الملك عبدالعزيز", year: "2020" },
-      { degree: "بكالوريوس إحصاء", institution: "جامعة الملك عبدالعزيز", year: "2018" },
-    ],
-    certifications: ["Google Data Analytics Certificate", "Tableau Desktop Specialist"],
-    languages: ["العربية (اللغة الأم)", "الإنجليزية (متقدم)"],
-    cvFile: { name: "Sara_Ali_CV.pdf", size: "312 KB" },
+  {
+    id: "2",
+    candidateName: "سارة أحمد",
+    jobTitle: "محللة بيانات",
+    createdAt: "2024-03-08",
+    lastModified: "2024-03-08",
+    status: "draft",
   },
-  { 
-    id: 3, 
-    name: "محمد خالد", 
-    email: "mohamed@email.com", 
-    phone: "0551112233",
-    location: "الرياض", 
-    appliedFor: "مطور واجهات أمامية",
-    appliedDate: "2024-03-05",
-    status: "shortlisted",
-    experience: "4 سنوات", 
-    education: "بكالوريوس هندسة برمجيات", 
-    skills: ["React", "Vue", "CSS", "SASS", "JavaScript"], 
-    summary: "مطور واجهات مع شغف لتصميم تجارب مستخدم متميزة وبناء مواقع وتطبيقات سريعة ومتجاوبة.",
-    workHistory: [
-      { title: "مطور واجهات أمامية", company: "وكالة ديجيتال", period: "2020 - الحالي" },
-      { title: "مطور ويب", company: "شركة ناشئة", period: "2019 - 2020" },
-    ],
-    educationHistory: [
-      { degree: "بكالوريوس هندسة برمجيات", institution: "جامعة الأمير سلطان", year: "2019" },
-    ],
-    certifications: ["Meta Front-End Developer Certificate"],
-    languages: ["العربية (اللغة الأم)", "الإنجليزية (متوسط)"],
-    cvFile: { name: "Mohamed_Khaled_CV.docx", size: "189 KB" },
+  {
+    id: "3",
+    candidateName: "خالد العمري",
+    jobTitle: "مدير مشاريع",
+    createdAt: "2024-03-05",
+    lastModified: "2024-03-07",
+    status: "sent",
   },
-  { 
-    id: 4, 
-    name: "فاطمة أحمد", 
-    email: "fatima@email.com", 
-    phone: "0544455566",
-    location: "الدمام", 
-    appliedFor: "مدير مشاريع",
-    appliedDate: "2024-03-01",
-    status: "interviewed",
-    experience: "6 سنوات", 
-    education: "ماجستير إدارة أعمال", 
-    skills: ["Project Management", "Agile", "Scrum", "JIRA", "Leadership"], 
-    summary: "مديرة مشاريع معتمدة PMP مع خبرة في قيادة فرق تقنية وإدارة مشاريع معقدة بنجاح.",
-    workHistory: [
-      { title: "مديرة مشاريع أولى", company: "شركة الاتصالات السعودية", period: "2020 - الحالي" },
-      { title: "مديرة مشاريع", company: "شركة أرامكو للخدمات", period: "2018 - 2020" },
-    ],
-    educationHistory: [
-      { degree: "ماجستير إدارة أعمال", institution: "جامعة الملك فهد للبترول", year: "2018" },
-      { degree: "بكالوريوس نظم معلومات", institution: "جامعة الدمام", year: "2015" },
-    ],
-    certifications: ["PMP Certified", "Certified Scrum Master", "PRINCE2 Practitioner"],
-    languages: ["العربية (اللغة الأم)", "الإنجليزية (متقدم)", "الفرنسية (مبتدئ)"],
-    cvFile: { name: "Fatima_Ahmed_CV.pdf", size: "278 KB" },
+];
+
+const stats = [
+  {
+    title: "السير الذاتية المنشأة",
+    value: "٤٧",
+    subtitle: "هذا الشهر",
+    icon: FileText,
+    trend: {
+      value: 15,
+      isPositive: true,
+    },
+    variant: "primary" as const,
   },
-  { 
-    id: 5, 
-    name: "عمر حسن", 
-    email: "omar@email.com", 
-    phone: "0555667788",
-    location: "الرياض", 
-    appliedFor: "مهندس DevOps",
-    appliedDate: "2024-03-12",
-    status: "pending",
-    experience: "4 سنوات", 
-    education: "بكالوريوس هندسة حاسب", 
-    skills: ["Docker", "Kubernetes", "AWS", "CI/CD", "Linux"], 
-    summary: "مهندس DevOps مع خبرة في بناء وإدارة البنية التحتية السحابية وأتمتة عمليات التطوير.",
-    workHistory: [
-      { title: "مهندس DevOps", company: "شركة الحوسبة السحابية", period: "2021 - الحالي" },
-      { title: "مهندس نظم", company: "شركة التقنية", period: "2019 - 2021" },
-    ],
-    educationHistory: [
-      { degree: "بكالوريوس هندسة حاسب", institution: "جامعة الملك فهد", year: "2019" },
-    ],
-    certifications: ["AWS Solutions Architect", "Kubernetes Administrator"],
-    languages: ["العربية (اللغة الأم)", "الإنجليزية (متقدم)"],
-    cvFile: { name: "Omar_Hassan_CV.pdf", size: "234 KB" },
+  {
+    title: "المرشحين النشطين",
+    value: "٣٢",
+    subtitle: "قيد المتابعة",
+    icon: Users,
+    variant: "default" as const,
+  },
+  {
+    title: "السير المرسلة",
+    value: "٢٤",
+    subtitle: "للشركات",
+    icon: Briefcase,
+    trend: {
+      value: 8,
+      isPositive: true,
+    },
+    variant: "success" as const,
+  },
+  {
+    title: "نسبة القبول",
+    value: "٦٥٪",
+    subtitle: "فوق المعدل",
+    icon: TrendingUp,
+    trend: {
+      value: 12,
+      isPositive: true,
+    },
+    variant: "warning" as const,
   },
 ];
 
 const HRDashboard = () => {
-  const { logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState("overview");
+  const [createdCVs, setCreatedCVs] = useState<CreatedCV[]>(initialCreatedCVs);
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [jobFilter, setJobFilter] = useState("all");
-  const [selectedApplicant, setSelectedApplicant] = useState<typeof applicantsData[0] | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [showNewCVDialog, setShowNewCVDialog] = useState(false);
+  const [newCandidateName, setNewCandidateName] = useState("");
+  const [newJobTitle, setNewJobTitle] = useState("");
 
-  const handleLogout = () => {
-    logout();
-    navigate("/auth");
+  const handleCreateNewCV = () => {
+    if (!newCandidateName.trim() || !newJobTitle.trim()) {
+      toast({
+        title: "خطأ",
+        description: "الرجاء إدخال اسم المرشح والمسمى الوظيفي",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Navigate to CV builder with candidate info
+    navigate(`/cv-builder?mode=hr&name=${encodeURIComponent(newCandidateName)}&title=${encodeURIComponent(newJobTitle)}`);
+    setShowNewCVDialog(false);
+    setNewCandidateName("");
+    setNewJobTitle("");
   };
 
-  const handleViewApplicant = (applicant: typeof applicantsData[0]) => {
-    setSelectedApplicant(applicant);
-    setIsDialogOpen(true);
+  const handleEditCV = (cv: CreatedCV) => {
+    navigate(`/cv-builder?mode=hr&id=${cv.id}&name=${encodeURIComponent(cv.candidateName)}&title=${encodeURIComponent(cv.jobTitle)}`);
   };
 
-  const handleViewFullProfile = (applicantId: number) => {
-    setIsDialogOpen(false);
-    navigate(`/candidate/${applicantId}?view=company`);
+  const handleDeleteCV = (id: string) => {
+    setCreatedCVs(createdCVs.filter(cv => cv.id !== id));
+    toast({
+      title: "تم الحذف",
+      description: "تم حذف السيرة الذاتية بنجاح",
+    });
   };
 
-  // Get unique job titles for filter
-  const jobTitles = [...new Set(applicantsData.map(a => a.appliedFor))];
-
-  // Filter applicants
-  const filteredApplicants = applicantsData.filter(applicant => {
-    const matchesSearch = applicant.name.includes(searchQuery) || 
-                         applicant.email.includes(searchQuery) ||
-                         applicant.appliedFor.includes(searchQuery);
-    const matchesStatus = statusFilter === "all" || applicant.status === statusFilter;
-    const matchesJob = jobFilter === "all" || applicant.appliedFor === jobFilter;
-    return matchesSearch && matchesStatus && matchesJob;
-  });
-
-  // Stats
-  const stats = {
-    total: applicantsData.length,
-    pending: applicantsData.filter(a => a.status === "pending").length,
-    reviewed: applicantsData.filter(a => a.status === "reviewed").length,
-    shortlisted: applicantsData.filter(a => a.status === "shortlisted").length,
-    interviewed: applicantsData.filter(a => a.status === "interviewed").length,
-  };
-
-  const getStatusBadge = (status: string) => {
-    const statusConfig: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline"; className: string }> = {
-      pending: { label: "قيد المراجعة", variant: "secondary", className: "" },
-      reviewed: { label: "تمت المراجعة", variant: "outline", className: "border-blue-500 text-blue-500" },
-      shortlisted: { label: "قائمة مختصرة", variant: "default", className: "bg-amber-500" },
-      interviewed: { label: "تم المقابلة", variant: "default", className: "bg-emerald-500" },
+  const getStatusBadge = (status: CreatedCV["status"]) => {
+    const config = {
+      draft: { label: "مسودة", className: "bg-muted text-muted-foreground" },
+      completed: { label: "مكتملة", className: "bg-primary/20 text-primary" },
+      sent: { label: "تم الإرسال", className: "bg-success/20 text-success" },
     };
-    const config = statusConfig[status] || statusConfig.pending;
-    return <Badge variant={config.variant} className={config.className}>{config.label}</Badge>;
+    const { label, className } = config[status];
+    return <Badge className={className}>{label}</Badge>;
   };
+
+  const filteredCVs = createdCVs.filter(
+    cv =>
+      cv.candidateName.includes(searchQuery) ||
+      cv.jobTitle.includes(searchQuery)
+  );
 
   return (
-    <div className="min-h-screen bg-background" dir="rtl">
-      {/* Header */}
-      <header className="bg-card border-b border-border px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-              <Users className="w-5 h-5 text-primary-foreground" />
+    <DashboardLayout>
+      {/* Welcome Section */}
+      <div className="mb-8">
+        <WelcomeCard userName={user?.name || "مسؤول الموارد البشرية"} />
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {stats.map((stat, index) => (
+          <StatCard key={stat.title} {...stat} delay={index * 100} />
+        ))}
+      </div>
+
+      {/* Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6" dir="rtl">
+        <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsTrigger value="overview">نظرة عامة</TabsTrigger>
+          <TabsTrigger value="cvs">إدارة السير الذاتية</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview" className="space-y-6">
+          {/* Quick Actions */}
+          <div>
+            <div className="section-header">
+              <h2 className="section-title">إجراءات سريعة</h2>
             </div>
-            <div>
-              <h1 className="font-bold text-lg">لوحة تحكم الموارد البشرية</h1>
-              <p className="text-sm text-muted-foreground">إدارة طلبات التوظيف والمتقدمين</p>
+            <QuickActions />
+          </div>
+
+          {/* Main Content Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left Column */}
+            <div className="lg:col-span-2 space-y-6">
+              <RecentActivity />
+            </div>
+
+            {/* Right Column */}
+            <div className="space-y-6">
+              <CVScoreCard />
             </div>
           </div>
-          <Button variant="outline" onClick={handleLogout} className="gap-2">
-            <LogOut className="w-4 h-4" />
-            تسجيل الخروج
-          </Button>
-        </div>
-      </header>
+        </TabsContent>
 
-      <main className="p-6 space-y-6">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <TabsContent value="cvs" className="space-y-6">
+          {/* CV Management Header */}
           <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <Users className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">{stats.total}</p>
-                  <p className="text-xs text-muted-foreground">إجمالي المتقدمين</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
-                  <Clock className="w-5 h-5 text-amber-500" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">{stats.pending}</p>
-                  <p className="text-xs text-muted-foreground">قيد المراجعة</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                  <Eye className="w-5 h-5 text-blue-500" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">{stats.reviewed}</p>
-                  <p className="text-xs text-muted-foreground">تمت المراجعة</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center">
-                  <TrendingUp className="w-5 h-5 text-orange-500" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">{stats.shortlisted}</p>
-                  <p className="text-xs text-muted-foreground">قائمة مختصرة</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-                  <UserCheck className="w-5 h-5 text-emerald-500" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">{stats.interviewed}</p>
-                  <p className="text-xs text-muted-foreground">تم المقابلة</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Filters */}
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="relative flex-1">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="w-5 h-5 text-primary" />
+                السير الذاتية المنشأة
+              </CardTitle>
+              <Button onClick={() => setShowNewCVDialog(true)} className="gap-2">
+                <Plus className="w-4 h-4" />
+                إنشاء سيرة ذاتية جديدة
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {/* Search */}
+              <div className="relative mb-4">
                 <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
-                  placeholder="البحث بالاسم أو البريد الإلكتروني أو الوظيفة..."
+                  placeholder="البحث بالاسم أو المسمى الوظيفي..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pr-10"
                 />
               </div>
-              <div className="flex gap-2">
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-40">
-                    <Filter className="w-4 h-4 ml-2" />
-                    <SelectValue placeholder="الحالة" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">جميع الحالات</SelectItem>
-                    <SelectItem value="pending">قيد المراجعة</SelectItem>
-                    <SelectItem value="reviewed">تمت المراجعة</SelectItem>
-                    <SelectItem value="shortlisted">قائمة مختصرة</SelectItem>
-                    <SelectItem value="interviewed">تم المقابلة</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Select value={jobFilter} onValueChange={setJobFilter}>
-                  <SelectTrigger className="w-48">
-                    <Briefcase className="w-4 h-4 ml-2" />
-                    <SelectValue placeholder="الوظيفة" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">جميع الوظائف</SelectItem>
-                    {jobTitles.map(job => (
-                      <SelectItem key={job} value={job}>{job}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
 
-        {/* Applicants Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="w-5 h-5 text-primary" />
-              قائمة المتقدمين ({filteredApplicants.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>المتقدم</TableHead>
-                  <TableHead>الوظيفة</TableHead>
-                  <TableHead>الخبرة</TableHead>
-                  <TableHead>التعليم</TableHead>
-                  <TableHead>تاريخ التقديم</TableHead>
-                  <TableHead>الحالة</TableHead>
-                  <TableHead>السيرة الذاتية</TableHead>
-                  <TableHead></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredApplicants.map((applicant) => (
-                  <TableRow key={applicant.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar>
-                          <AvatarFallback className="bg-primary/10 text-primary">
-                            {applicant.name.charAt(0)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-medium">{applicant.name}</p>
-                          <p className="text-xs text-muted-foreground">{applicant.email}</p>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>{applicant.appliedFor}</TableCell>
-                    <TableCell>{applicant.experience}</TableCell>
-                    <TableCell className="text-sm">{applicant.education}</TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{applicant.appliedDate}</TableCell>
-                    <TableCell>{getStatusBadge(applicant.status)}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <Download className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => handleViewApplicant(applicant)}
-                      >
-                        عرض التفاصيل
-                      </Button>
-                    </TableCell>
+              {/* CVs Table */}
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>المرشح</TableHead>
+                    <TableHead>المسمى الوظيفي</TableHead>
+                    <TableHead>تاريخ الإنشاء</TableHead>
+                    <TableHead>آخر تعديل</TableHead>
+                    <TableHead>الحالة</TableHead>
+                    <TableHead></TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      </main>
-
-      {/* Applicant Details Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto" dir="rtl">
-          {selectedApplicant && (
-            <>
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-3">
-                  <Avatar className="w-12 h-12">
-                    <AvatarFallback className="bg-primary/10 text-primary text-lg">
-                      {selectedApplicant.name.charAt(0)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <h2 className="text-xl font-bold">{selectedApplicant.name}</h2>
-                    <p className="text-sm text-muted-foreground font-normal">{selectedApplicant.appliedFor}</p>
-                  </div>
-                </DialogTitle>
-              </DialogHeader>
-
-              <Tabs defaultValue="info" className="mt-4">
-                <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger value="info">المعلومات</TabsTrigger>
-                  <TabsTrigger value="experience">الخبرات</TabsTrigger>
-                  <TabsTrigger value="cv">السيرة الذاتية</TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="info" className="space-y-4 mt-4">
-                  {/* Contact Info */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="flex items-center gap-2 text-sm">
-                      <Mail className="w-4 h-4 text-muted-foreground" />
-                      <span>{selectedApplicant.email}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <Phone className="w-4 h-4 text-muted-foreground" />
-                      <span>{selectedApplicant.phone}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <MapPin className="w-4 h-4 text-muted-foreground" />
-                      <span>{selectedApplicant.location}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <Calendar className="w-4 h-4 text-muted-foreground" />
-                      <span>تقدم في: {selectedApplicant.appliedDate}</span>
-                    </div>
-                  </div>
-
-                  <Separator />
-
-                  {/* Summary */}
-                  <div>
-                    <h4 className="font-semibold mb-2">نبذة</h4>
-                    <p className="text-sm text-muted-foreground">{selectedApplicant.summary}</p>
-                  </div>
-
-                  <Separator />
-
-                  {/* Skills */}
-                  <div>
-                    <h4 className="font-semibold mb-2">المهارات</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedApplicant.skills.map((skill, index) => (
-                        <Badge key={index} variant="secondary">{skill}</Badge>
-                      ))}
-                    </div>
-                  </div>
-
-                  <Separator />
-
-                  {/* Languages */}
-                  <div>
-                    <h4 className="font-semibold mb-2 flex items-center gap-2">
-                      <Languages className="w-4 h-4" />
-                      اللغات
-                    </h4>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedApplicant.languages.map((lang, index) => (
-                        <Badge key={index} variant="outline">{lang}</Badge>
-                      ))}
-                    </div>
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="experience" className="space-y-4 mt-4">
-                  {/* Work History */}
-                  <div>
-                    <h4 className="font-semibold mb-3 flex items-center gap-2">
-                      <Briefcase className="w-4 h-4 text-primary" />
-                      الخبرة العملية
-                    </h4>
-                    <div className="space-y-3">
-                      {selectedApplicant.workHistory.map((job, index) => (
-                        <div key={index} className="p-3 bg-muted/30 rounded-lg">
-                          <p className="font-medium">{job.title}</p>
-                          <p className="text-sm text-muted-foreground">{job.company}</p>
-                          <p className="text-xs text-muted-foreground">{job.period}</p>
+                </TableHeader>
+                <TableBody>
+                  {filteredCVs.map((cv) => (
+                    <TableRow key={cv.id}>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-8 w-8">
+                            <AvatarFallback className="bg-primary/10 text-primary text-sm">
+                              {cv.candidateName.charAt(0)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="font-medium">{cv.candidateName}</span>
                         </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <Separator />
-
-                  {/* Education */}
-                  <div>
-                    <h4 className="font-semibold mb-3 flex items-center gap-2">
-                      <GraduationCap className="w-4 h-4 text-primary" />
-                      التعليم
-                    </h4>
-                    <div className="space-y-3">
-                      {selectedApplicant.educationHistory.map((edu, index) => (
-                        <div key={index} className="p-3 bg-muted/30 rounded-lg">
-                          <p className="font-medium">{edu.degree}</p>
-                          <p className="text-sm text-muted-foreground">{edu.institution}</p>
-                          <p className="text-xs text-muted-foreground">{edu.year}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <Separator />
-
-                  {/* Certifications */}
-                  <div>
-                    <h4 className="font-semibold mb-3 flex items-center gap-2">
-                      <Award className="w-4 h-4 text-primary" />
-                      الشهادات
-                    </h4>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedApplicant.certifications.map((cert, index) => (
-                        <Badge key={index} variant="secondary">{cert}</Badge>
-                      ))}
-                    </div>
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="cv" className="mt-4">
-                  <Card className="border-primary/20 bg-primary/5">
-                    <CardContent className="p-6">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                          <div className="w-14 h-14 rounded-lg bg-primary/10 flex items-center justify-center">
-                            <FileText className="w-7 h-7 text-primary" />
-                          </div>
-                          <div>
-                            <p className="font-medium">{selectedApplicant.cvFile.name}</p>
-                            <p className="text-sm text-muted-foreground">{selectedApplicant.cvFile.size}</p>
-                          </div>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button variant="outline" className="gap-2">
-                            <Eye className="w-4 h-4" />
-                            عرض
+                      </TableCell>
+                      <TableCell>{cv.jobTitle}</TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {cv.createdAt}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {cv.lastModified}
+                      </TableCell>
+                      <TableCell>{getStatusBadge(cv.status)}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleEditCV(cv)}
+                          >
+                            <Edit className="w-4 h-4" />
                           </Button>
-                          <Button className="gap-2">
+                          <Button variant="ghost" size="icon">
                             <Download className="w-4 h-4" />
-                            تحميل
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDeleteCV(cv.id)}
+                          >
+                            <Trash2 className="w-4 h-4 text-destructive" />
                           </Button>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {filteredCVs.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                        لا توجد سير ذاتية
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
 
-                  <div className="mt-4">
-                    <Button 
-                      className="w-full gap-2" 
-                      variant="outline"
-                      onClick={() => handleViewFullProfile(selectedApplicant.id)}
-                    >
-                      <Eye className="w-4 h-4" />
-                      عرض الملف الشخصي الكامل
-                    </Button>
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </>
-          )}
+      {/* New CV Dialog */}
+      <Dialog open={showNewCVDialog} onOpenChange={setShowNewCVDialog}>
+        <DialogContent dir="rtl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <User className="w-5 h-5 text-primary" />
+              إنشاء سيرة ذاتية جديدة
+            </DialogTitle>
+            <DialogDescription>
+              أدخل بيانات المرشح لبدء إنشاء السيرة الذاتية
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">اسم المرشح</label>
+              <Input
+                placeholder="أدخل اسم المرشح الكامل..."
+                value={newCandidateName}
+                onChange={(e) => setNewCandidateName(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">المسمى الوظيفي</label>
+              <Input
+                placeholder="مثال: مطور برمجيات، محلل بيانات..."
+                value={newJobTitle}
+                onChange={(e) => setNewJobTitle(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setShowNewCVDialog(false)}>
+              إلغاء
+            </Button>
+            <Button onClick={handleCreateNewCV}>
+              بدء الإنشاء
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </DashboardLayout>
   );
 };
 
