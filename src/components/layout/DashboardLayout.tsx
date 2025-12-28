@@ -16,8 +16,8 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         <main className="p-6 flex-1">
           {children}
         </main>
-        <Footer />
       </div>
+      <Footer />
     </div>
   );
 };
