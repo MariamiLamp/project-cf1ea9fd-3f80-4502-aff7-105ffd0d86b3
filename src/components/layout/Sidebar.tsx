@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -18,6 +17,7 @@ import {
   CalendarDays,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useSidebarState } from "@/contexts/SidebarContext";
 
 const navItems = [
   { icon: LayoutDashboard, label: "لوحة التحكم", path: "/" },
@@ -38,7 +38,7 @@ const bottomNavItems = [
 ];
 
 export const Sidebar = () => {
-  const [collapsed, setCollapsed] = useState(false);
+  const { collapsed, toggle } = useSidebarState();
   const location = useLocation();
 
   return (
@@ -51,7 +51,7 @@ export const Sidebar = () => {
       {/* Logo */}
       <div className="p-6 border-b border-sidebar-border">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sidebar-primary to-accent flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sidebar-primary to-accent flex items-center justify-center shrink-0">
             <Briefcase className="w-5 h-5 text-white" />
           </div>
           {!collapsed && (
@@ -73,11 +73,12 @@ export const Sidebar = () => {
               to={item.path}
               className={cn(
                 "nav-item group",
-                isActive && "active"
+                isActive && "active",
+                collapsed && "justify-center px-2"
               )}
             >
               <item.icon className={cn(
-                "w-5 h-5 transition-colors",
+                "w-5 h-5 transition-colors shrink-0",
                 isActive ? "text-sidebar-primary" : "text-sidebar-foreground/70 group-hover:text-sidebar-foreground"
               )} />
               {!collapsed && (
@@ -98,24 +99,24 @@ export const Sidebar = () => {
           <Link
             key={item.path}
             to={item.path}
-            className="nav-item"
+            className={cn("nav-item", collapsed && "justify-center px-2")}
           >
-            <item.icon className="w-5 h-5 text-sidebar-foreground/70" />
+            <item.icon className="w-5 h-5 text-sidebar-foreground/70 shrink-0" />
             {!collapsed && <span>{item.label}</span>}
           </Link>
         ))}
         <Link
           to="/auth"
-          className="nav-item w-full text-right"
+          className={cn("nav-item w-full", collapsed && "justify-center px-2")}
         >
-          <LogOut className="w-5 h-5 text-sidebar-foreground/70" />
+          <LogOut className="w-5 h-5 text-sidebar-foreground/70 shrink-0" />
           {!collapsed && <span>تسجيل الدخول</span>}
         </Link>
       </div>
 
       {/* Collapse Button */}
       <button
-        onClick={() => setCollapsed(!collapsed)}
+        onClick={toggle}
         className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-sidebar-accent border border-sidebar-border flex items-center justify-center text-sidebar-foreground hover:bg-sidebar-primary hover:text-white transition-colors"
       >
         {collapsed ? (
