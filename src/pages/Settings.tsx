@@ -1,139 +1,220 @@
+import { useState } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Bell, Moon, Globe, Shield, User } from "lucide-react";
+import { Bell, Moon, Globe, Shield, User, Save, Key, Mail, Smartphone } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const Settings = () => {
+  const { toast } = useToast();
+  
+  const [notifications, setNotifications] = useState({
+    newJobs: true,
+    applicationUpdates: true,
+    weeklyTips: false,
+  });
+  
+  const [darkMode, setDarkMode] = useState(false);
+  const [twoFactor, setTwoFactor] = useState(false);
+
+  const handleSaveProfile = () => {
+    toast({
+      title: "تم الحفظ",
+      description: "تم حفظ التغييرات بنجاح",
+    });
+  };
+
   return (
     <DashboardLayout>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-foreground mb-2">الإعدادات</h1>
+      <div className="mb-8 text-right">
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">الإعدادات</h1>
         <p className="text-muted-foreground">إدارة حسابك وتفضيلاتك</p>
       </div>
 
-      <div className="grid gap-6 max-w-2xl">
+      <div className="grid gap-6 max-w-3xl">
         {/* Profile Settings */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="w-5 h-5" />
-              الملف الشخصي
+        <Card className="border-border">
+          <CardHeader className="text-right">
+            <CardTitle className="flex items-center justify-end gap-2">
+              <span>الملف الشخصي</span>
+              <User className="w-5 h-5 text-primary" />
             </CardTitle>
-            <CardDescription>إدارة معلومات حسابك الشخصية</CardDescription>
+            <CardDescription className="text-right">إدارة معلومات حسابك الشخصية</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">الاسم الكامل</Label>
-              <Input id="name" placeholder="أحمد محمد" />
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="space-y-2 text-right">
+                <Label htmlFor="name">الاسم الكامل</Label>
+                <Input id="name" placeholder="أحمد محمد" className="text-right" />
+              </div>
+              <div className="space-y-2 text-right">
+                <Label htmlFor="email">البريد الإلكتروني</Label>
+                <Input id="email" type="email" placeholder="ahmed@example.com" className="text-right" dir="ltr" />
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">البريد الإلكتروني</Label>
-              <Input id="email" type="email" placeholder="ahmed@example.com" />
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="space-y-2 text-right">
+                <Label htmlFor="phone">رقم الهاتف</Label>
+                <Input id="phone" type="tel" placeholder="+966 5XX XXX XXXX" className="text-right" dir="ltr" />
+              </div>
+              <div className="space-y-2 text-right">
+                <Label htmlFor="job-title">المسمى الوظيفي</Label>
+                <Input id="job-title" placeholder="مطور برمجيات" className="text-right" />
+              </div>
             </div>
-            <Button>حفظ التغييرات</Button>
+            <div className="flex justify-end pt-2">
+              <Button onClick={handleSaveProfile} className="gap-2">
+                <Save className="w-4 h-4" />
+                حفظ التغييرات
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
         {/* Notifications */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Bell className="w-5 h-5" />
-              الإشعارات
+        <Card className="border-border">
+          <CardHeader className="text-right">
+            <CardTitle className="flex items-center justify-end gap-2">
+              <span>الإشعارات</span>
+              <Bell className="w-5 h-5 text-primary" />
             </CardTitle>
-            <CardDescription>تخصيص إشعارات البريد الإلكتروني والتطبيق</CardDescription>
+            <CardDescription className="text-right">تخصيص إشعارات البريد الإلكتروني والتطبيق</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <Label>إشعارات الوظائف الجديدة</Label>
-                <p className="text-sm text-muted-foreground">احصل على إشعار عند توفر وظائف جديدة</p>
+          <CardContent className="space-y-1">
+            <div className="flex items-center justify-between p-4 rounded-lg hover:bg-muted/50 transition-colors">
+              <Switch 
+                checked={notifications.newJobs}
+                onCheckedChange={(checked) => setNotifications({ ...notifications, newJobs: checked })}
+              />
+              <div className="text-right flex-1 mr-4">
+                <Label className="text-base font-medium flex items-center justify-end gap-2">
+                  <span>إشعارات الوظائف الجديدة</span>
+                  <Mail className="w-4 h-4 text-muted-foreground" />
+                </Label>
+                <p className="text-sm text-muted-foreground mt-1">احصل على إشعار عند توفر وظائف جديدة تناسب ملفك</p>
               </div>
-              <Switch defaultChecked />
             </div>
-            <div className="flex items-center justify-between">
-              <div>
-                <Label>تحديثات الطلبات</Label>
-                <p className="text-sm text-muted-foreground">إشعارات عند تغير حالة طلباتك</p>
+            <div className="flex items-center justify-between p-4 rounded-lg hover:bg-muted/50 transition-colors">
+              <Switch 
+                checked={notifications.applicationUpdates}
+                onCheckedChange={(checked) => setNotifications({ ...notifications, applicationUpdates: checked })}
+              />
+              <div className="text-right flex-1 mr-4">
+                <Label className="text-base font-medium flex items-center justify-end gap-2">
+                  <span>تحديثات الطلبات</span>
+                  <Smartphone className="w-4 h-4 text-muted-foreground" />
+                </Label>
+                <p className="text-sm text-muted-foreground mt-1">إشعارات فورية عند تغير حالة طلباتك</p>
               </div>
-              <Switch defaultChecked />
             </div>
-            <div className="flex items-center justify-between">
-              <div>
-                <Label>نصائح أسبوعية</Label>
-                <p className="text-sm text-muted-foreground">نصائح لتحسين سيرتك الذاتية</p>
+            <div className="flex items-center justify-between p-4 rounded-lg hover:bg-muted/50 transition-colors">
+              <Switch 
+                checked={notifications.weeklyTips}
+                onCheckedChange={(checked) => setNotifications({ ...notifications, weeklyTips: checked })}
+              />
+              <div className="text-right flex-1 mr-4">
+                <Label className="text-base font-medium">نصائح أسبوعية</Label>
+                <p className="text-sm text-muted-foreground mt-1">نصائح مفيدة لتحسين سيرتك الذاتية وفرصك</p>
               </div>
-              <Switch />
             </div>
           </CardContent>
         </Card>
 
         {/* Appearance */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Moon className="w-5 h-5" />
-              المظهر
+        <Card className="border-border">
+          <CardHeader className="text-right">
+            <CardTitle className="flex items-center justify-end gap-2">
+              <span>المظهر</span>
+              <Moon className="w-5 h-5 text-primary" />
             </CardTitle>
-            <CardDescription>تخصيص مظهر التطبيق</CardDescription>
+            <CardDescription className="text-right">تخصيص مظهر التطبيق حسب تفضيلاتك</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <Label>الوضع الداكن</Label>
-                <p className="text-sm text-muted-foreground">تفعيل المظهر الداكن</p>
+          <CardContent>
+            <div className="flex items-center justify-between p-4 rounded-lg hover:bg-muted/50 transition-colors">
+              <Switch 
+                checked={darkMode}
+                onCheckedChange={setDarkMode}
+              />
+              <div className="text-right flex-1 mr-4">
+                <Label className="text-base font-medium">الوضع الداكن</Label>
+                <p className="text-sm text-muted-foreground mt-1">تفعيل المظهر الداكن لراحة العين</p>
               </div>
-              <Switch />
             </div>
           </CardContent>
         </Card>
 
         {/* Language */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Globe className="w-5 h-5" />
-              اللغة
+        <Card className="border-border">
+          <CardHeader className="text-right">
+            <CardTitle className="flex items-center justify-end gap-2">
+              <span>اللغة</span>
+              <Globe className="w-5 h-5 text-primary" />
             </CardTitle>
-            <CardDescription>اختر لغة التطبيق المفضلة</CardDescription>
+            <CardDescription className="text-right">اختر لغة التطبيق المفضلة</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
-                <Label>اللغة الحالية</Label>
-                <p className="text-sm text-muted-foreground">العربية</p>
+            <div className="flex items-center justify-between p-4 rounded-lg bg-muted/30">
+              <Button variant="outline" size="sm">تغيير اللغة</Button>
+              <div className="text-right">
+                <Label className="text-base font-medium">اللغة الحالية</Label>
+                <p className="text-sm text-muted-foreground mt-1">العربية (Arabic)</p>
               </div>
-              <Button variant="outline">تغيير</Button>
             </div>
           </CardContent>
         </Card>
 
         {/* Security */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="w-5 h-5" />
-              الأمان
+        <Card className="border-border">
+          <CardHeader className="text-right">
+            <CardTitle className="flex items-center justify-end gap-2">
+              <span>الأمان</span>
+              <Shield className="w-5 h-5 text-primary" />
             </CardTitle>
-            <CardDescription>إعدادات الأمان وكلمة المرور</CardDescription>
+            <CardDescription className="text-right">إعدادات الأمان وحماية حسابك</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <Label>كلمة المرور</Label>
-                <p className="text-sm text-muted-foreground">آخر تحديث منذ 30 يوماً</p>
+          <CardContent className="space-y-1">
+            <div className="flex items-center justify-between p-4 rounded-lg hover:bg-muted/50 transition-colors">
+              <Button variant="outline" size="sm" className="gap-2">
+                <Key className="w-4 h-4" />
+                تغيير
+              </Button>
+              <div className="text-right flex-1 mr-4">
+                <Label className="text-base font-medium">كلمة المرور</Label>
+                <p className="text-sm text-muted-foreground mt-1">آخر تحديث منذ 30 يوماً</p>
               </div>
-              <Button variant="outline">تغيير</Button>
             </div>
-            <div className="flex items-center justify-between">
-              <div>
-                <Label>المصادقة الثنائية</Label>
-                <p className="text-sm text-muted-foreground">أضف طبقة حماية إضافية</p>
+            <div className="flex items-center justify-between p-4 rounded-lg hover:bg-muted/50 transition-colors">
+              <Switch 
+                checked={twoFactor}
+                onCheckedChange={setTwoFactor}
+              />
+              <div className="text-right flex-1 mr-4">
+                <Label className="text-base font-medium">المصادقة الثنائية</Label>
+                <p className="text-sm text-muted-foreground mt-1">أضف طبقة حماية إضافية لحسابك</p>
               </div>
-              <Switch />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Danger Zone */}
+        <Card className="border-destructive/50">
+          <CardHeader className="text-right">
+            <CardTitle className="flex items-center justify-end gap-2 text-destructive">
+              <span>منطقة الخطر</span>
+              <Shield className="w-5 h-5" />
+            </CardTitle>
+            <CardDescription className="text-right">إجراءات لا يمكن التراجع عنها</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between p-4 rounded-lg bg-destructive/5">
+              <Button variant="destructive" size="sm">حذف الحساب</Button>
+              <div className="text-right flex-1 mr-4">
+                <Label className="text-base font-medium">حذف الحساب نهائياً</Label>
+                <p className="text-sm text-muted-foreground mt-1">سيتم حذف جميع بياناتك بشكل نهائي</p>
+              </div>
             </div>
           </CardContent>
         </Card>
