@@ -29,7 +29,7 @@ const Settings = () => {
 
   return (
     <DashboardLayout>
-      <div className="mb-8 text-right">
+      <div className="mb-8 text-right max-w-3xl mx-auto w-full">
         <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">الإعدادات</h1>
         <p className="text-muted-foreground">إدارة حسابك وتفضيلاتك</p>
       </div>
