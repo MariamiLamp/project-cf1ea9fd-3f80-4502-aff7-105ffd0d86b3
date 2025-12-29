@@ -358,7 +358,7 @@ const AdminDashboard = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Table dir="rtl">
+                <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>الإجراءات</TableHead>
@@ -428,7 +428,7 @@ const AdminDashboard = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Table dir="rtl">
+                <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>الإجراءات</TableHead>
@@ -490,7 +490,7 @@ const AdminDashboard = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Table dir="rtl">
+                <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>الإجراءات</TableHead>
@@ -593,7 +593,7 @@ const AdminDashboard = () => {
                   </Button>
                 </CardHeader>
                 <CardContent>
-                  <Table dir="rtl">
+                  <Table>
                     <TableHeader>
                       <TableRow>
                         <TableHead>الإجراءات</TableHead>
@@ -720,7 +720,7 @@ const AdminDashboard = () => {
                   </Button>
                 </CardHeader>
                 <CardContent>
-                  <Table dir="rtl">
+                  <Table>
                     <TableHeader>
                       <TableRow>
                         <TableHead>الإجراءات</TableHead>
