@@ -356,35 +356,34 @@ const AdminDashboard = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Table>
+                <Table dir="rtl">
                   <TableHeader>
                     <TableRow>
-                      <TableHead>الاسم</TableHead>
-                      <TableHead>البريد الإلكتروني</TableHead>
-                      <TableHead>الحالة</TableHead>
-                      <TableHead>الاشتراك</TableHead>
-                      <TableHead>نقاط السيرة</TableHead>
-                      <TableHead>الوظائف المتقدم لها</TableHead>
-                      <TableHead>تاريخ الانضمام</TableHead>
                       <TableHead>الإجراءات</TableHead>
+                      <TableHead>تاريخ الانضمام</TableHead>
+                      <TableHead>الوظائف المتقدم لها</TableHead>
+                      <TableHead>نقاط السيرة</TableHead>
+                      <TableHead>الاشتراك</TableHead>
+                      <TableHead>الحالة</TableHead>
+                      <TableHead>البريد الإلكتروني</TableHead>
+                      <TableHead>الاسم</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {mockUsers.filter(u => u.name.includes(searchTerm) || u.email.includes(searchTerm)).map((user) => (
                       <TableRow key={user.id}>
-                        <TableCell className="font-medium">{user.name}</TableCell>
-                        <TableCell className="text-muted-foreground">{user.email}</TableCell>
                         <TableCell>
-                          <Badge variant={user.status === "active" ? "default" : "secondary"}>
-                            {user.status === "active" ? "نشط" : "غير نشط"}
-                          </Badge>
+                          <div className="flex gap-2">
+                            <Button variant="ghost" size="icon">
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon">
+                              <Ban className="w-4 h-4 text-destructive" />
+                            </Button>
+                          </div>
                         </TableCell>
-                        <TableCell>
-                          <Badge variant="outline" className="gap-1">
-                            {user.subscription === "مميز" && <Crown className="w-3 h-3 text-amber-500" />}
-                            {user.subscription}
-                          </Badge>
-                        </TableCell>
+                        <TableCell className="text-muted-foreground">{user.joinDate}</TableCell>
+                        <TableCell>{user.appliedJobs}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
                             <div className="w-16 h-2 bg-muted rounded-full overflow-hidden">
@@ -396,18 +395,19 @@ const AdminDashboard = () => {
                             <span className="text-sm">{user.cvScore}%</span>
                           </div>
                         </TableCell>
-                        <TableCell>{user.appliedJobs}</TableCell>
-                        <TableCell className="text-muted-foreground">{user.joinDate}</TableCell>
                         <TableCell>
-                          <div className="flex gap-2">
-                            <Button variant="ghost" size="icon">
-                              <Eye className="w-4 h-4" />
-                            </Button>
-                            <Button variant="ghost" size="icon">
-                              <Ban className="w-4 h-4 text-destructive" />
-                            </Button>
-                          </div>
+                          <Badge variant="outline" className="gap-1">
+                            {user.subscription === "مميز" && <Crown className="w-3 h-3 text-amber-500" />}
+                            {user.subscription}
+                          </Badge>
                         </TableCell>
+                        <TableCell>
+                          <Badge variant={user.status === "active" ? "default" : "secondary"}>
+                            {user.status === "active" ? "نشط" : "غير نشط"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">{user.email}</TableCell>
+                        <TableCell className="font-medium">{user.name}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -426,38 +426,22 @@ const AdminDashboard = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Table>
+                <Table dir="rtl">
                   <TableHeader>
                     <TableRow>
-                      <TableHead>اسم الشركة</TableHead>
-                      <TableHead>البريد الإلكتروني</TableHead>
-                      <TableHead>الحالة</TableHead>
-                      <TableHead>الاشتراك</TableHead>
-                      <TableHead>القطاع</TableHead>
-                      <TableHead>عدد الموظفين</TableHead>
-                      <TableHead>الوظائف المنشورة</TableHead>
                       <TableHead>الإجراءات</TableHead>
+                      <TableHead>الوظائف المنشورة</TableHead>
+                      <TableHead>عدد الموظفين</TableHead>
+                      <TableHead>القطاع</TableHead>
+                      <TableHead>الاشتراك</TableHead>
+                      <TableHead>الحالة</TableHead>
+                      <TableHead>البريد الإلكتروني</TableHead>
+                      <TableHead>اسم الشركة</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {mockCompanies.filter(c => c.name.includes(searchTerm) || c.email.includes(searchTerm)).map((company) => (
                       <TableRow key={company.id}>
-                        <TableCell className="font-medium">{company.name}</TableCell>
-                        <TableCell className="text-muted-foreground">{company.email}</TableCell>
-                        <TableCell>
-                          <Badge variant={company.status === "verified" ? "default" : "outline"}>
-                            {company.status === "verified" ? "موثقة" : "قيد المراجعة"}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline" className="gap-1">
-                            {company.subscription === "شركات+" && <Crown className="w-3 h-3 text-amber-500" />}
-                            {company.subscription}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>{company.industry}</TableCell>
-                        <TableCell>{company.employees}</TableCell>
-                        <TableCell>{company.jobs}</TableCell>
                         <TableCell>
                           <div className="flex gap-2">
                             <Button variant="ghost" size="icon">
@@ -470,6 +454,22 @@ const AdminDashboard = () => {
                             )}
                           </div>
                         </TableCell>
+                        <TableCell>{company.jobs}</TableCell>
+                        <TableCell>{company.employees}</TableCell>
+                        <TableCell>{company.industry}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="gap-1">
+                            {company.subscription === "شركات+" && <Crown className="w-3 h-3 text-amber-500" />}
+                            {company.subscription}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={company.status === "verified" ? "default" : "outline"}>
+                            {company.status === "verified" ? "موثقة" : "قيد المراجعة"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">{company.email}</TableCell>
+                        <TableCell className="font-medium">{company.name}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -488,33 +488,21 @@ const AdminDashboard = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Table>
+                <Table dir="rtl">
                   <TableHeader>
                     <TableRow>
-                      <TableHead>الاسم</TableHead>
-                      <TableHead>البريد الإلكتروني</TableHead>
-                      <TableHead>الشركة</TableHead>
-                      <TableHead>المسمى الوظيفي</TableHead>
-                      <TableHead>الحالة</TableHead>
-                      <TableHead>عدد التوظيفات</TableHead>
                       <TableHead>الإجراءات</TableHead>
+                      <TableHead>عدد التوظيفات</TableHead>
+                      <TableHead>الحالة</TableHead>
+                      <TableHead>المسمى الوظيفي</TableHead>
+                      <TableHead>الشركة</TableHead>
+                      <TableHead>البريد الإلكتروني</TableHead>
+                      <TableHead>الاسم</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {mockHRProfiles.filter(h => h.name.includes(searchTerm) || h.email.includes(searchTerm)).map((hr) => (
                       <TableRow key={hr.id}>
-                        <TableCell className="font-medium">{hr.name}</TableCell>
-                        <TableCell className="text-muted-foreground">{hr.email}</TableCell>
-                        <TableCell>{hr.company}</TableCell>
-                        <TableCell>{hr.role}</TableCell>
-                        <TableCell>
-                          <Badge variant={hr.status === "active" ? "default" : "secondary"}>
-                            {hr.status === "active" ? "نشط" : "غير نشط"}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="secondary">{hr.hiredCount} موظف</Badge>
-                        </TableCell>
                         <TableCell>
                           <div className="flex gap-2">
                             <Button variant="ghost" size="icon">
@@ -525,6 +513,18 @@ const AdminDashboard = () => {
                             </Button>
                           </div>
                         </TableCell>
+                        <TableCell>
+                          <Badge variant="secondary">{hr.hiredCount} موظف</Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={hr.status === "active" ? "default" : "secondary"}>
+                            {hr.status === "active" ? "نشط" : "غير نشط"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{hr.role}</TableCell>
+                        <TableCell>{hr.company}</TableCell>
+                        <TableCell className="text-muted-foreground">{hr.email}</TableCell>
+                        <TableCell className="font-medium">{hr.name}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -591,53 +591,22 @@ const AdminDashboard = () => {
                   </Button>
                 </CardHeader>
                 <CardContent>
-                  <Table>
+                  <Table dir="rtl">
                     <TableHeader>
                       <TableRow>
-                        <TableHead>اسم الخطة</TableHead>
-                        <TableHead>النوع</TableHead>
-                        <TableHead>السعر</TableHead>
-                        <TableHead>المميزات</TableHead>
-                        <TableHead>عدد المشتركين</TableHead>
-                        <TableHead>الإيرادات</TableHead>
-                        <TableHead>الحالة</TableHead>
                         <TableHead>الإجراءات</TableHead>
+                        <TableHead>الحالة</TableHead>
+                        <TableHead>الإيرادات</TableHead>
+                        <TableHead>عدد المشتركين</TableHead>
+                        <TableHead>المميزات</TableHead>
+                        <TableHead>السعر</TableHead>
+                        <TableHead>النوع</TableHead>
+                        <TableHead>اسم الخطة</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {plans.map((plan) => (
                         <TableRow key={plan.id}>
-                          <TableCell className="font-medium">
-                            <div className="flex items-center gap-2">
-                              {plan.price > 50 && <Crown className="w-4 h-4 text-amber-500" />}
-                              {plan.name}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="outline">
-                              {plan.type === "jobseeker" ? "أفراد" : "شركات"}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            {plan.price === 0 ? "مجاني" : `${plan.price} ر.س/${plan.period}`}
-                          </TableCell>
-                          <TableCell>
-                            <div className="max-w-xs">
-                              <p className="text-sm text-muted-foreground truncate">
-                                {plan.features.slice(0, 2).join("، ")}
-                                {plan.features.length > 2 && "..."}
-                              </p>
-                            </div>
-                          </TableCell>
-                          <TableCell>{plan.usersCount}</TableCell>
-                          <TableCell className="font-medium">
-                            {(plan.price * plan.usersCount).toLocaleString()} ر.س
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant={plan.isActive ? "default" : "secondary"}>
-                              {plan.isActive ? "نشطة" : "معطلة"}
-                            </Badge>
-                          </TableCell>
                           <TableCell>
                             <div className="flex gap-1">
                               <Button variant="ghost" size="icon" onClick={() => handleEditPlan(plan)}>
@@ -649,6 +618,37 @@ const AdminDashboard = () => {
                               <Button variant="ghost" size="icon" onClick={() => handleDeletePlan(plan.id)}>
                                 <Trash2 className="w-4 h-4 text-destructive" />
                               </Button>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={plan.isActive ? "default" : "secondary"}>
+                              {plan.isActive ? "نشطة" : "معطلة"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="font-medium">
+                            {(plan.price * plan.usersCount).toLocaleString()} ر.س
+                          </TableCell>
+                          <TableCell>{plan.usersCount}</TableCell>
+                          <TableCell>
+                            <div className="max-w-xs">
+                              <p className="text-sm text-muted-foreground truncate">
+                                {plan.features.slice(0, 2).join("، ")}
+                                {plan.features.length > 2 && "..."}
+                              </p>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {plan.price === 0 ? "مجاني" : `${plan.price} ر.س/${plan.period}`}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline">
+                              {plan.type === "jobseeker" ? "أفراد" : "شركات"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="font-medium">
+                            <div className="flex items-center gap-2">
+                              {plan.price > 50 && <Crown className="w-4 h-4 text-amber-500" />}
+                              {plan.name}
                             </div>
                           </TableCell>
                         </TableRow>
@@ -718,49 +718,21 @@ const AdminDashboard = () => {
                   </Button>
                 </CardHeader>
                 <CardContent>
-                  <Table>
+                  <Table dir="rtl">
                     <TableHeader>
                       <TableRow>
-                        <TableHead>اسم القالب</TableHead>
-                        <TableHead>الفئة</TableHead>
-                        <TableHead>السعر</TableHead>
-                        <TableHead>التقييم</TableHead>
-                        <TableHead>التحميلات</TableHead>
-                        <TableHead>الحالة</TableHead>
                         <TableHead>الإجراءات</TableHead>
+                        <TableHead>الحالة</TableHead>
+                        <TableHead>التحميلات</TableHead>
+                        <TableHead>التقييم</TableHead>
+                        <TableHead>السعر</TableHead>
+                        <TableHead>الفئة</TableHead>
+                        <TableHead>اسم القالب</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {templates.filter(t => t.name.includes(searchTerm)).map((template) => (
                         <TableRow key={template.id}>
-                          <TableCell className="font-medium">
-                            <div className="flex items-center gap-2">
-                              {template.isPremium && <Crown className="w-4 h-4 text-amber-500" />}
-                              {template.name}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="outline">{categoryLabels[template.category]}</Badge>
-                          </TableCell>
-                          <TableCell>
-                            {template.price === 0 ? (
-                              <Badge variant="secondary">مجاني</Badge>
-                            ) : (
-                              `${template.price} ر.س`
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-1">
-                              <Star className="w-4 h-4 text-amber-500 fill-current" />
-                              <span>{template.rating}</span>
-                            </div>
-                          </TableCell>
-                          <TableCell>{template.downloads.toLocaleString()}</TableCell>
-                          <TableCell>
-                            <Badge variant={template.status === "active" ? "default" : "secondary"}>
-                              {template.status === "active" ? "نشط" : "معطل"}
-                            </Badge>
-                          </TableCell>
                           <TableCell>
                             <div className="flex gap-1">
                               <Button variant="ghost" size="icon" onClick={() => handleEditTemplate(template)}>
@@ -772,6 +744,34 @@ const AdminDashboard = () => {
                               <Button variant="ghost" size="icon" onClick={() => handleDeleteTemplate(template.id)}>
                                 <Trash2 className="w-4 h-4 text-destructive" />
                               </Button>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={template.status === "active" ? "default" : "secondary"}>
+                              {template.status === "active" ? "نشط" : "معطل"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>{template.downloads.toLocaleString()}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-1">
+                              <Star className="w-4 h-4 text-amber-500 fill-current" />
+                              <span>{template.rating}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {template.price === 0 ? (
+                              <Badge variant="secondary">مجاني</Badge>
+                            ) : (
+                              `${template.price} ر.س`
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline">{categoryLabels[template.category]}</Badge>
+                          </TableCell>
+                          <TableCell className="font-medium">
+                            <div className="flex items-center gap-2">
+                              {template.isPremium && <Crown className="w-4 h-4 text-amber-500" />}
+                              {template.name}
                             </div>
                           </TableCell>
                         </TableRow>
