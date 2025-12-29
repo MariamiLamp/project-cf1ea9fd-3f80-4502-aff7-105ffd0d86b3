@@ -297,13 +297,13 @@ const AdminDashboard = () => {
           {stats.map((stat, index) => (
             <Card key={index} className="border-border/50">
               <CardContent className="p-6">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className={`w-12 h-12 rounded-xl ${stat.bg} flex items-center justify-center shrink-0`}>
+                    <stat.icon className={`w-6 h-6 ${stat.color}`} />
+                  </div>
                   <div>
                     <p className="text-sm text-muted-foreground">{stat.label}</p>
                     <p className="text-2xl font-bold mt-1">{stat.value}</p>
-                  </div>
-                  <div className={`w-12 h-12 rounded-xl ${stat.bg} flex items-center justify-center`}>
-                    <stat.icon className={`w-6 h-6 ${stat.color}`} />
                   </div>
                 </div>
               </CardContent>
@@ -336,14 +336,13 @@ const AdminDashboard = () => {
             </TabsTrigger>
           </TabsList>
 
-          {/* Search */}
           <div className="relative max-w-md">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               placeholder="بحث..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pr-10"
+              className="ps-10"
             />
           </div>
 
@@ -541,39 +540,39 @@ const AdminDashboard = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card className="border-border/50">
                   <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center shrink-0">
+                        <Users className="w-6 h-6 text-blue-500" />
+                      </div>
                       <div>
                         <p className="text-sm text-muted-foreground">إجمالي المشتركين</p>
                         <p className="text-2xl font-bold mt-1">{plans.reduce((sum, p) => sum + p.usersCount, 0)}</p>
                       </div>
-                      <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center">
-                        <Users className="w-6 h-6 text-blue-500" />
-                      </div>
                     </div>
                   </CardContent>
                 </Card>
                 <Card className="border-border/50">
                   <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0">
+                        <DollarSign className="w-6 h-6 text-emerald-500" />
+                      </div>
                       <div>
                         <p className="text-sm text-muted-foreground">الإيرادات الشهرية</p>
                         <p className="text-2xl font-bold mt-1">{totalPlanRevenue.toLocaleString()} ر.س</p>
                       </div>
-                      <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-                        <DollarSign className="w-6 h-6 text-emerald-500" />
-                      </div>
                     </div>
                   </CardContent>
                 </Card>
                 <Card className="border-border/50">
                   <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center shrink-0">
+                        <Package className="w-6 h-6 text-purple-500" />
+                      </div>
                       <div>
                         <p className="text-sm text-muted-foreground">خطط نشطة</p>
                         <p className="text-2xl font-bold mt-1">{plans.filter(p => p.isActive).length}</p>
-                      </div>
-                      <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center">
-                        <Package className="w-6 h-6 text-purple-500" />
                       </div>
                     </div>
                   </CardContent>
