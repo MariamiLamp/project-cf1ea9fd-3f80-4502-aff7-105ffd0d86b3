@@ -339,13 +339,13 @@ const CompanyDashboard = () => {
           {stats.map((stat, index) => (
             <Card key={index} className="border-border/50">
               <CardContent className="p-6">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className={`w-12 h-12 rounded-xl ${stat.bg} flex items-center justify-center shrink-0`}>
+                    <stat.icon className={`w-6 h-6 ${stat.color}`} />
+                  </div>
                   <div>
                     <p className="text-sm text-muted-foreground">{stat.label}</p>
                     <p className="text-2xl font-bold mt-1">{stat.value}</p>
-                  </div>
-                  <div className={`w-12 h-12 rounded-xl ${stat.bg} flex items-center justify-center`}>
-                    <stat.icon className={`w-6 h-6 ${stat.color}`} />
                   </div>
                 </div>
               </CardContent>
@@ -355,25 +355,26 @@ const CompanyDashboard = () => {
 
         {/* Tabs */}
         <Tabs defaultValue="jobs" className="space-y-4">
-          <div className="flex items-center justify-between">
-            <TabsList className="bg-muted/50 flex-wrap h-auto gap-1">
-              <TabsTrigger value="jobs" className="gap-2">
-                <Briefcase className="w-4 h-4" />
-                الوظائف
-              </TabsTrigger>
-              <TabsTrigger value="candidates" className="gap-2">
-                <Users className="w-4 h-4" />
-                المرشحون
-              </TabsTrigger>
-              <TabsTrigger value="applications" className="gap-2">
-                <FileText className="w-4 h-4" />
-                الطلبات
-              </TabsTrigger>
-              <TabsTrigger value="promotion" className="gap-2">
-                <Megaphone className="w-4 h-4" />
-                الترويج
-              </TabsTrigger>
-            </TabsList>
+          <div className="flex flex-col items-end gap-4">
+            <div className="flex items-center justify-between w-full flex-row-reverse">
+              <TabsList className="bg-muted/50 flex-wrap h-auto gap-1">
+                <TabsTrigger value="jobs" className="gap-2">
+                  <Briefcase className="w-4 h-4" />
+                  الوظائف
+                </TabsTrigger>
+                <TabsTrigger value="candidates" className="gap-2">
+                  <Users className="w-4 h-4" />
+                  المرشحون
+                </TabsTrigger>
+                <TabsTrigger value="applications" className="gap-2">
+                  <FileText className="w-4 h-4" />
+                  الطلبات
+                </TabsTrigger>
+                <TabsTrigger value="promotion" className="gap-2">
+                  <Megaphone className="w-4 h-4" />
+                  الترويج
+                </TabsTrigger>
+              </TabsList>
 
             <Dialog open={isAddJobOpen} onOpenChange={setIsAddJobOpen}>
               <DialogTrigger asChild>
@@ -522,50 +523,35 @@ const CompanyDashboard = () => {
                 </div>
               </DialogContent>
             </Dialog>
+            </div>
           </div>
 
           {/* Jobs Tab */}
           <TabsContent value="jobs">
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+              <CardHeader className="text-right">
+                <CardTitle className="flex items-center justify-end gap-2">
+                  <span>الوظائف المنشورة</span>
                   <Briefcase className="w-5 h-5" />
-                  الوظائف المنشورة
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Table>
+                <Table dir="rtl">
                   <TableHeader>
                     <TableRow>
-                      <TableHead>المسمى الوظيفي</TableHead>
-                      <TableHead>القسم</TableHead>
-                      <TableHead>نوع الدوام</TableHead>
-                      <TableHead>الموقع</TableHead>
-                      <TableHead>عدد الطلبات</TableHead>
-                      <TableHead>الحالة</TableHead>
-                      <TableHead>تاريخ النشر</TableHead>
                       <TableHead>الإجراءات</TableHead>
+                      <TableHead>تاريخ النشر</TableHead>
+                      <TableHead>الحالة</TableHead>
+                      <TableHead>عدد الطلبات</TableHead>
+                      <TableHead>الموقع</TableHead>
+                      <TableHead>نوع الدوام</TableHead>
+                      <TableHead>القسم</TableHead>
+                      <TableHead>المسمى الوظيفي</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {jobs.map((job) => (
                       <TableRow key={job.id}>
-                        <TableCell className="font-medium">{job.title}</TableCell>
-                        <TableCell>{job.department}</TableCell>
-                        <TableCell>{job.type}</TableCell>
-                        <TableCell className="flex items-center gap-1">
-                          <MapPin className="w-3 h-3" />
-                          {job.location}
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="secondary">{job.applications} طلب</Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={job.status === "active" ? "default" : "outline"}>
-                            {job.status === "active" ? "نشطة" : "مغلقة"}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-muted-foreground">{job.postedDate}</TableCell>
                         <TableCell>
                           <div className="flex gap-1">
                             <Button variant="ghost" size="icon" onClick={() => handleEditJob(job)}>
@@ -576,6 +562,24 @@ const CompanyDashboard = () => {
                             </Button>
                           </div>
                         </TableCell>
+                        <TableCell className="text-muted-foreground">{job.postedDate}</TableCell>
+                        <TableCell>
+                          <Badge variant={job.status === "active" ? "default" : "outline"}>
+                            {job.status === "active" ? "نشطة" : "مغلقة"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="secondary">{job.applications} طلب</Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-1">
+                            <MapPin className="w-3 h-3" />
+                            {job.location}
+                          </div>
+                        </TableCell>
+                        <TableCell>{job.type}</TableCell>
+                        <TableCell>{job.department}</TableCell>
+                        <TableCell className="font-medium">{job.title}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -587,37 +591,40 @@ const CompanyDashboard = () => {
           {/* Candidates Tab */}
           <TabsContent value="candidates">
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+              <CardHeader className="text-right">
+                <CardTitle className="flex items-center justify-end gap-2">
+                  <span>المرشحون المتوافقون مع وظائفكم</span>
                   <Users className="w-5 h-5" />
-                  المرشحون المتوافقون مع وظائفكم
                 </CardTitle>
-                <CardDescription>مرشحون تتوافق مهاراتهم مع متطلبات وظائفكم المنشورة</CardDescription>
+                <CardDescription className="text-right">مرشحون تتوافق مهاراتهم مع متطلبات وظائفكم المنشورة</CardDescription>
               </CardHeader>
               <CardContent>
-                <Table>
+                <Table dir="rtl">
                   <TableHeader>
                     <TableRow>
-                      <TableHead>الاسم</TableHead>
-                      <TableHead>البريد الإلكتروني</TableHead>
-                      <TableHead>نسبة التوافق</TableHead>
-                      <TableHead>المهارات</TableHead>
-                      <TableHead>الخبرة</TableHead>
                       <TableHead>الوظيفة المناسبة</TableHead>
+                      <TableHead>الخبرة</TableHead>
+                      <TableHead>المهارات</TableHead>
+                      <TableHead>نسبة التوافق</TableHead>
+                      <TableHead>البريد الإلكتروني</TableHead>
+                      <TableHead>الاسم</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {candidates.map((candidate) => (
                       <TableRow key={candidate.id}>
-                        <TableCell className="font-medium">
-                          <button
-                            onClick={() => handleViewCandidate(candidate.id)}
-                            className="text-primary hover:underline cursor-pointer font-medium"
-                          >
-                            {candidate.name}
-                          </button>
+                        <TableCell>{candidate.appliedFor}</TableCell>
+                        <TableCell>{candidate.experience}</TableCell>
+                        <TableCell>
+                          <div className="flex flex-wrap gap-1">
+                            {candidate.skills.slice(0, 2).map((skill, i) => (
+                              <Badge key={i} variant="secondary" className="text-xs">{skill}</Badge>
+                            ))}
+                            {candidate.skills.length > 2 && (
+                              <Badge variant="outline" className="text-xs">+{candidate.skills.length - 2}</Badge>
+                            )}
+                          </div>
                         </TableCell>
-                        <TableCell className="text-muted-foreground">{candidate.email}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
                             <div className="w-16 h-2 bg-muted rounded-full overflow-hidden">
@@ -632,18 +639,15 @@ const CompanyDashboard = () => {
                             <span className="text-sm font-medium">{candidate.matchScore}%</span>
                           </div>
                         </TableCell>
-                        <TableCell>
-                          <div className="flex flex-wrap gap-1">
-                            {candidate.skills.slice(0, 2).map((skill, i) => (
-                              <Badge key={i} variant="secondary" className="text-xs">{skill}</Badge>
-                            ))}
-                            {candidate.skills.length > 2 && (
-                              <Badge variant="outline" className="text-xs">+{candidate.skills.length - 2}</Badge>
-                            )}
-                          </div>
+                        <TableCell className="text-muted-foreground">{candidate.email}</TableCell>
+                        <TableCell className="font-medium">
+                          <button
+                            onClick={() => handleViewCandidate(candidate.id)}
+                            className="text-primary hover:underline cursor-pointer font-medium"
+                          >
+                            {candidate.name}
+                          </button>
                         </TableCell>
-                        <TableCell>{candidate.experience}</TableCell>
-                        <TableCell>{candidate.appliedFor}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -655,36 +659,27 @@ const CompanyDashboard = () => {
           {/* Applications Tab */}
           <TabsContent value="applications">
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+              <CardHeader className="text-right">
+                <CardTitle className="flex items-center justify-end gap-2">
+                  <span>طلبات التوظيف</span>
                   <FileText className="w-5 h-5" />
-                  طلبات التوظيف
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Table>
+                <Table dir="rtl">
                   <TableHeader>
                     <TableRow>
-                      <TableHead>اسم المتقدم</TableHead>
-                      <TableHead>الوظيفة</TableHead>
-                      <TableHead>نسبة التوافق</TableHead>
-                      <TableHead>تاريخ التقديم</TableHead>
-                      <TableHead>الحالة</TableHead>
                       <TableHead>الإجراءات</TableHead>
+                      <TableHead>الحالة</TableHead>
+                      <TableHead>تاريخ التقديم</TableHead>
+                      <TableHead>نسبة التوافق</TableHead>
+                      <TableHead>الوظيفة</TableHead>
+                      <TableHead>اسم المتقدم</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {applications.map((app) => (
                       <TableRow key={app.id}>
-                        <TableCell className="font-medium">{app.candidateName}</TableCell>
-                        <TableCell>{app.jobTitle}</TableCell>
-                        <TableCell>
-                          <Badge variant={app.matchScore >= 90 ? "default" : "secondary"}>
-                            {app.matchScore}%
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-muted-foreground">{app.appliedDate}</TableCell>
-                        <TableCell>{getStatusBadge(app.status)}</TableCell>
                         <TableCell>
                           <div className="flex gap-1">
                             <Button variant="ghost" size="icon" onClick={() => handleViewApplication(app)}>
@@ -702,6 +697,15 @@ const CompanyDashboard = () => {
                             )}
                           </div>
                         </TableCell>
+                        <TableCell>{getStatusBadge(app.status)}</TableCell>
+                        <TableCell className="text-muted-foreground">{app.appliedDate}</TableCell>
+                        <TableCell>
+                          <Badge variant={app.matchScore >= 90 ? "default" : "secondary"}>
+                            {app.matchScore}%
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{app.jobTitle}</TableCell>
+                        <TableCell className="font-medium">{app.candidateName}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -770,22 +774,22 @@ const CompanyDashboard = () => {
 
               {/* Featured Jobs */}
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                <CardHeader className="text-right">
+                  <CardTitle className="flex items-center justify-end gap-2">
+                    <span>الوظائف المميزة</span>
                     <Star className="w-5 h-5 text-amber-500" />
-                    الوظائف المميزة
                   </CardTitle>
-                  <CardDescription>اختر الوظائف التي تريد إبرازها في أعلى قائمة البحث</CardDescription>
+                  <CardDescription className="text-right">اختر الوظائف التي تريد إبرازها في أعلى قائمة البحث</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Table>
+                  <Table dir="rtl">
                     <TableHeader>
                       <TableRow>
-                        <TableHead>الوظيفة</TableHead>
-                        <TableHead>القسم</TableHead>
-                        <TableHead>الحالة</TableHead>
-                        <TableHead>مميزة</TableHead>
                         <TableHead></TableHead>
+                        <TableHead>مميزة</TableHead>
+                        <TableHead>الحالة</TableHead>
+                        <TableHead>القسم</TableHead>
+                        <TableHead>الوظيفة</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -793,12 +797,16 @@ const CompanyDashboard = () => {
                         const isFeatured = featuredJobs.some(f => f.id === job.id);
                         return (
                           <TableRow key={job.id}>
-                            <TableCell className="font-medium">{job.title}</TableCell>
-                            <TableCell>{job.department}</TableCell>
                             <TableCell>
-                              <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30">
-                                نشطة
-                              </Badge>
+                              <Button
+                                variant={isFeatured ? "outline" : "default"}
+                                size="sm"
+                                onClick={() => handleToggleFeatured(job.id)}
+                                className="gap-1"
+                              >
+                                <Star className={`w-4 h-4 ${isFeatured ? "" : "fill-current"}`} />
+                                {isFeatured ? "إلغاء التمييز" : "تمييز"}
+                              </Button>
                             </TableCell>
                             <TableCell>
                               {isFeatured ? (
@@ -811,16 +819,12 @@ const CompanyDashboard = () => {
                               )}
                             </TableCell>
                             <TableCell>
-                              <Button
-                                variant={isFeatured ? "outline" : "default"}
-                                size="sm"
-                                onClick={() => handleToggleFeatured(job.id)}
-                                className="gap-1"
-                              >
-                                <Star className={`w-4 h-4 ${isFeatured ? "" : "fill-current"}`} />
-                                {isFeatured ? "إلغاء التمييز" : "تمييز"}
-                              </Button>
+                              <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30">
+                                نشطة
+                              </Badge>
                             </TableCell>
+                            <TableCell>{job.department}</TableCell>
+                            <TableCell className="font-medium">{job.title}</TableCell>
                           </TableRow>
                         );
                       })}
