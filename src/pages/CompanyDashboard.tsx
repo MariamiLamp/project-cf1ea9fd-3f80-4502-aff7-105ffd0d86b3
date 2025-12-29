@@ -536,7 +536,7 @@ const CompanyDashboard = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Table dir="rtl">
+                <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>الإجراءات</TableHead>
@@ -599,7 +599,7 @@ const CompanyDashboard = () => {
                 <CardDescription className="text-right">مرشحون تتوافق مهاراتهم مع متطلبات وظائفكم المنشورة</CardDescription>
               </CardHeader>
               <CardContent>
-                <Table dir="rtl">
+                <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>الوظيفة المناسبة</TableHead>
@@ -666,7 +666,7 @@ const CompanyDashboard = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Table dir="rtl">
+                <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>الإجراءات</TableHead>
@@ -782,7 +782,7 @@ const CompanyDashboard = () => {
                   <CardDescription className="text-right">اختر الوظائف التي تريد إبرازها في أعلى قائمة البحث</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Table dir="rtl">
+                  <Table>
                     <TableHeader>
                       <TableRow>
                         <TableHead></TableHead>
