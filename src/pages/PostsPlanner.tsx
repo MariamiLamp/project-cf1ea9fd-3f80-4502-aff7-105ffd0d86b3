@@ -584,21 +584,108 @@ const PostsPlanner = () => {
           {/* Generator Tab */}
           <TabsContent value="generator" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Generator Form */}
-              <Card className="bg-card border-border">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-primary" />
-                    مولد المنشورات بالذكاء الاصطناعي
+              {/* Generated Posts Preview - Now on left */}
+              <Card className="bg-card border-border order-2 lg:order-1">
+                <CardHeader className="text-right">
+                  <CardTitle className="flex items-center justify-end gap-2">
+                    <span>المنشورات المُنشأة</span>
+                    <Edit className="w-5 h-5 text-primary" />
+                    {generatedPosts.length > 0 && (
+                      <Badge variant="secondary" className="mr-auto">{generatedPosts.filter(p => p.selected).length} مختار</Badge>
+                    )}
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-right">
+                    اختر المنشورات وجدولها بتواريخ مختلفة
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {generatedPosts.length > 0 ? (
+                    <>
+                      <ScrollArea className="h-[400px] pr-4">
+                        <div className="space-y-4">
+                          {generatedPosts.map((post, index) => (
+                            <div 
+                              key={post.id} 
+                              className={`p-4 rounded-lg border transition-all ${
+                                post.selected ? 'border-primary bg-primary/5' : 'border-border bg-muted/30'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between mb-3">
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon"
+                                  onClick={() => handleDeleteGeneratedPost(post.id)}
+                                  className="text-destructive hover:text-destructive"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                                <div className="flex items-center gap-3">
+                                  <span className="font-medium">منشور {index + 1}</span>
+                                  <div className={`w-8 h-8 rounded-full ${platformColors[post.platform]} flex items-center justify-center text-white`}>
+                                    {platformIcons[post.platform]}
+                                  </div>
+                                  <Checkbox
+                                    checked={post.selected}
+                                    onCheckedChange={() => handleTogglePostSelection(post.id)}
+                                  />
+                                </div>
+                              </div>
+                              <Textarea
+                                value={post.content}
+                                onChange={(e) => handleUpdatePostContent(post.id, e.target.value)}
+                                rows={6}
+                                className="font-medium text-sm text-right"
+                                dir="rtl"
+                              />
+                              <div className="flex justify-end">
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  onClick={() => handleCopyPost(post.content)}
+                                  className="mt-2"
+                                >
+                                  <Copy className="w-3 h-3 ml-1" />
+                                  نسخ
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </ScrollArea>
+                      <Button 
+                        onClick={handleScheduleSelectedPosts} 
+                        className="w-full"
+                        disabled={generatedPosts.filter(p => p.selected).length === 0}
+                      >
+                        <CalendarIcon className="w-4 h-4 ml-2" />
+                        جدولة المنشورات المختارة
+                      </Button>
+                    </>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground">
+                      <Sparkles className="w-12 h-12 mb-4 opacity-20" />
+                      <p>أدخل موضوعاً واضغط على "إنشاء المنشورات"</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Generator Form - Now on right */}
+              <Card className="bg-card border-border order-1 lg:order-2">
+                <CardHeader className="text-right">
+                  <CardTitle className="flex items-center justify-end gap-2">
+                    <span>مولد المنشورات بالذكاء الاصطناعي</span>
+                    <Sparkles className="w-5 h-5 text-primary" />
+                  </CardTitle>
+                  <CardDescription className="text-right">
                     أدخل الموضوع واختر عدد المنشورات لإنشائها
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="space-y-2">
+                  <div className="space-y-2 text-right">
                     <Label>موضوع المنشور</Label>
                     <Input
+                      className="text-right"
                       placeholder="مثال: نصائح لكتابة سيرة ذاتية احترافية"
                       value={generatorForm.topic}
                       onChange={(e) => setGeneratorForm({ ...generatorForm, topic: e.target.value })}
@@ -606,7 +693,7 @@ const PostsPlanner = () => {
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
+                    <div className="space-y-2 text-right">
                       <Label>المنصة</Label>
                       <Select 
                         value={generatorForm.platform} 
@@ -644,7 +731,7 @@ const PostsPlanner = () => {
                       </Select>
                     </div>
                     
-                    <div className="space-y-2">
+                    <div className="space-y-2 text-right">
                       <Label>نبرة المنشور</Label>
                       <Select 
                         value={generatorForm.tone} 
@@ -662,10 +749,10 @@ const PostsPlanner = () => {
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label className="flex items-center gap-2">
+                  <div className="space-y-2 text-right">
+                    <Label className="flex items-center justify-end gap-2">
+                      <span>عدد المنشورات</span>
                       <ListPlus className="w-4 h-4" />
-                      عدد المنشورات
                     </Label>
                     <Select 
                       value={generatorForm.postCount.toString()} 
@@ -684,24 +771,24 @@ const PostsPlanner = () => {
                     </Select>
                   </div>
 
-                  <div className="flex gap-4">
+                  <div className="flex gap-4 justify-end">
                     <label className="flex items-center gap-2 cursor-pointer">
+                      <span className="text-sm">إضافة هاشتاقات</span>
                       <input
                         type="checkbox"
                         checked={generatorForm.includeHashtags}
                         onChange={(e) => setGeneratorForm({ ...generatorForm, includeHashtags: e.target.checked })}
                         className="rounded border-border"
                       />
-                      <span className="text-sm">إضافة هاشتاقات</span>
                     </label>
                     <label className="flex items-center gap-2 cursor-pointer">
+                      <span className="text-sm">إضافة إيموجي</span>
                       <input
                         type="checkbox"
                         checked={generatorForm.includeEmojis}
                         onChange={(e) => setGeneratorForm({ ...generatorForm, includeEmojis: e.target.checked })}
                         className="rounded border-border"
                       />
-                      <span className="text-sm">إضافة إيموجي</span>
                     </label>
                   </div>
 
@@ -722,93 +809,6 @@ const PostsPlanner = () => {
                       </>
                     )}
                   </Button>
-                </CardContent>
-              </Card>
-
-              {/* Generated Posts Preview */}
-              <Card className="bg-card border-border">
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    <span className="flex items-center gap-2">
-                      <Edit className="w-5 h-5 text-primary" />
-                      المنشورات المُنشأة
-                    </span>
-                    {generatedPosts.length > 0 && (
-                      <Badge variant="secondary">{generatedPosts.filter(p => p.selected).length} مختار</Badge>
-                    )}
-                  </CardTitle>
-                  <CardDescription>
-                    اختر المنشورات وجدولها بتواريخ مختلفة
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {generatedPosts.length > 0 ? (
-                    <>
-                      <ScrollArea className="h-[400px] pr-4">
-                        <div className="space-y-4">
-                          {generatedPosts.map((post, index) => (
-                            <div 
-                              key={post.id} 
-                              className={`p-4 rounded-lg border transition-all ${
-                                post.selected ? 'border-primary bg-primary/5' : 'border-border bg-muted/30'
-                              }`}
-                            >
-                              <div className="flex items-center justify-between mb-3">
-                                <div className="flex items-center gap-3">
-                                  <Checkbox
-                                    checked={post.selected}
-                                    onCheckedChange={() => handleTogglePostSelection(post.id)}
-                                  />
-                                  <div className={`w-8 h-8 rounded-full ${platformColors[post.platform]} flex items-center justify-center text-white`}>
-                                    {platformIcons[post.platform]}
-                                  </div>
-                                  <span className="font-medium">منشور {index + 1}</span>
-                                </div>
-                                <Button 
-                                  variant="ghost" 
-                                  size="icon"
-                                  onClick={() => handleDeleteGeneratedPost(post.id)}
-                                  className="text-destructive hover:text-destructive"
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </Button>
-                              </div>
-                              <Textarea
-                                value={post.content}
-                                onChange={(e) => handleUpdatePostContent(post.id, e.target.value)}
-                                rows={6}
-                                className="font-medium text-sm"
-                              />
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                onClick={() => handleCopyPost(post.content)}
-                                className="mt-2"
-                              >
-                                <Copy className="w-3 h-3 ml-1" />
-                                نسخ
-                              </Button>
-                            </div>
-                          ))}
-                        </div>
-                      </ScrollArea>
-                      <Button 
-                        onClick={handleScheduleSelectedPosts} 
-                        className="w-full"
-                        disabled={generatedPosts.filter(p => p.selected).length === 0}
-                      >
-                        <CalendarIcon className="w-4 h-4 ml-2" />
-                        جدولة المنشورات المختارة ({generatedPosts.filter(p => p.selected).length})
-                      </Button>
-                    </>
-                  ) : (
-                    <div className="h-64 flex items-center justify-center text-muted-foreground">
-                      <div className="text-center">
-                        <Sparkles className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                        <p>أدخل موضوعاً واضغط على "إنشاء المنشورات"</p>
-                      </div>
-                    </div>
-                  )}
                 </CardContent>
               </Card>
             </div>
