@@ -34,7 +34,7 @@ const Settings = () => {
         <p className="text-muted-foreground">إدارة حسابك وتفضيلاتك</p>
       </div>
 
-      <div className="grid gap-6 max-w-3xl ml-auto">
+      <div className="grid gap-6 max-w-3xl mx-auto w-full">
         {/* Profile Settings */}
         <Card className="border-border">
           <CardHeader className="text-right">
