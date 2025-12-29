@@ -313,46 +313,48 @@ const AdminDashboard = () => {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="bg-muted/50 flex-wrap h-auto gap-1 p-1">
-            <TabsTrigger value="users" className="gap-2">
-              <Users className="w-4 h-4" />
-              الباحثين عن عمل
-            </TabsTrigger>
-            <TabsTrigger value="companies" className="gap-2">
-              <Building2 className="w-4 h-4" />
-              الشركات
-            </TabsTrigger>
-            <TabsTrigger value="hr" className="gap-2">
-              <UserCheck className="w-4 h-4" />
-              موظفي HR
-            </TabsTrigger>
-            <TabsTrigger value="subscriptions" className="gap-2">
-              <CreditCard className="w-4 h-4" />
-              خطط الاشتراك
-            </TabsTrigger>
-            <TabsTrigger value="templates" className="gap-2">
-              <LayoutTemplate className="w-4 h-4" />
-              القوالب
-            </TabsTrigger>
-          </TabsList>
+          <div className="flex flex-col items-end gap-4">
+            <TabsList className="bg-muted/50 flex-wrap h-auto gap-1 p-1">
+              <TabsTrigger value="users" className="gap-2">
+                <Users className="w-4 h-4" />
+                الباحثين عن عمل
+              </TabsTrigger>
+              <TabsTrigger value="companies" className="gap-2">
+                <Building2 className="w-4 h-4" />
+                الشركات
+              </TabsTrigger>
+              <TabsTrigger value="hr" className="gap-2">
+                <UserCheck className="w-4 h-4" />
+                موظفي HR
+              </TabsTrigger>
+              <TabsTrigger value="subscriptions" className="gap-2">
+                <CreditCard className="w-4 h-4" />
+                خطط الاشتراك
+              </TabsTrigger>
+              <TabsTrigger value="templates" className="gap-2">
+                <LayoutTemplate className="w-4 h-4" />
+                القوالب
+              </TabsTrigger>
+            </TabsList>
 
-          <div className="relative max-w-md">
-            <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              placeholder="بحث..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="ps-10"
-            />
+            <div className="relative w-full max-w-md">
+              <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="بحث..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="ps-10"
+              />
+            </div>
           </div>
 
           {/* Users Tab */}
           <TabsContent value="users">
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+              <CardHeader className="text-right">
+                <CardTitle className="flex items-center justify-end gap-2">
+                  <span>قائمة الباحثين عن عمل</span>
                   <Users className="w-5 h-5" />
-                  قائمة الباحثين عن عمل
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -419,10 +421,10 @@ const AdminDashboard = () => {
           {/* Companies Tab */}
           <TabsContent value="companies">
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+              <CardHeader className="text-right">
+                <CardTitle className="flex items-center justify-end gap-2">
+                  <span>قائمة الشركات</span>
                   <Building2 className="w-5 h-5" />
-                  قائمة الشركات
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -481,10 +483,10 @@ const AdminDashboard = () => {
           {/* HR Tab */}
           <TabsContent value="hr">
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+              <CardHeader className="text-right">
+                <CardTitle className="flex items-center justify-end gap-2">
+                  <span>قائمة موظفي الموارد البشرية</span>
                   <UserCheck className="w-5 h-5" />
-                  قائمة موظفي الموارد البشرية
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -580,10 +582,10 @@ const AdminDashboard = () => {
               </div>
 
               <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
+                <CardHeader className="flex flex-row-reverse items-center justify-between">
                   <CardTitle className="flex items-center gap-2">
+                    <span>خطط الاشتراك</span>
                     <CreditCard className="w-5 h-5" />
-                    خطط الاشتراك
                   </CardTitle>
                   <Button onClick={handleAddPlan} className="gap-2">
                     <Plus className="w-4 h-4" />
@@ -707,10 +709,10 @@ const AdminDashboard = () => {
               </div>
 
               <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
+                <CardHeader className="flex flex-row-reverse items-center justify-between">
                   <CardTitle className="flex items-center gap-2">
+                    <span>إدارة القوالب</span>
                     <LayoutTemplate className="w-5 h-5" />
-                    إدارة القوالب
                   </CardTitle>
                   <Button onClick={handleAddTemplate} className="gap-2">
                     <Plus className="w-4 h-4" />
