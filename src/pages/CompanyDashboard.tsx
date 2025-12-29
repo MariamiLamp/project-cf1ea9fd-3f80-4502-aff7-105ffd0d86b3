@@ -719,53 +719,59 @@ const CompanyDashboard = () => {
             <div className="space-y-6">
               {/* Company Banner */}
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                <CardHeader className="text-right">
+                  <CardTitle className="flex items-center justify-end gap-2">
+                    <span>بانر الشركة</span>
                     <Image className="w-5 h-5 text-primary" />
-                    بانر الشركة
                   </CardTitle>
-                  <CardDescription>قم بإنشاء بانر ترويجي لشركتك يظهر في صفحة الوظائف الرئيسية</CardDescription>
+                  <CardDescription className="text-right">قم بإنشاء بانر ترويجي لشركتك يظهر في صفحة الوظائف الرئيسية</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid md:grid-cols-2 gap-4">
+                    <div className="border border-dashed border-border rounded-lg p-4 bg-muted/20">
+                      <p className="text-xs text-muted-foreground mb-2 text-right">معاينة البانر</p>
+                      <div className="bg-gradient-to-l from-primary/20 to-accent/20 rounded-lg p-6 text-center">
+                        <h3 className="font-bold text-lg">{companyBanner.title || "عنوان البانر"}</h3>
+                        <p className="text-sm text-muted-foreground mt-2">
+                          {companyBanner.description || "وصف البانر سيظهر هنا..."}
+                        </p>
+                      </div>
+                    </div>
                     <div className="space-y-4">
-                      <div className="space-y-2">
+                      <div className="space-y-2 text-right">
                         <Label>عنوان البانر</Label>
                         <Input
+                          className="text-right"
                           placeholder="مثال: انضم لفريقنا المميز"
                           value={companyBanner.title}
                           onChange={(e) => setCompanyBanner({ ...companyBanner, title: e.target.value })}
                         />
                       </div>
-                      <div className="space-y-2">
+                      <div className="space-y-2 text-right">
                         <Label>وصف البانر</Label>
                         <Textarea
+                          className="text-right"
                           placeholder="اكتب وصفاً جذاباً لشركتك..."
                           value={companyBanner.description}
                           onChange={(e) => setCompanyBanner({ ...companyBanner, description: e.target.value })}
                           rows={3}
                         />
                       </div>
-                      <div className="space-y-2">
+                      <div className="space-y-2 text-right">
                         <Label>رابط صورة البانر</Label>
                         <Input
+                          className="text-right"
+                          dir="ltr"
                           placeholder="https://example.com/banner.jpg"
                           value={companyBanner.imageUrl}
                           onChange={(e) => setCompanyBanner({ ...companyBanner, imageUrl: e.target.value })}
                         />
                       </div>
-                      <Button onClick={handleSaveBanner} className="gap-2">
-                        <Megaphone className="w-4 h-4" />
-                        حفظ البانر
-                      </Button>
-                    </div>
-                    <div className="border border-dashed border-border rounded-lg p-4 bg-muted/20">
-                      <p className="text-xs text-muted-foreground mb-2">معاينة البانر</p>
-                      <div className="bg-gradient-to-r from-primary/20 to-accent/20 rounded-lg p-6 text-center">
-                        <h3 className="font-bold text-lg">{companyBanner.title || "عنوان البانر"}</h3>
-                        <p className="text-sm text-muted-foreground mt-2">
-                          {companyBanner.description || "وصف البانر سيظهر هنا..."}
-                        </p>
+                      <div className="flex justify-end">
+                        <Button onClick={handleSaveBanner} className="gap-2">
+                          <Megaphone className="w-4 h-4" />
+                          حفظ البانر
+                        </Button>
                       </div>
                     </div>
                   </div>
