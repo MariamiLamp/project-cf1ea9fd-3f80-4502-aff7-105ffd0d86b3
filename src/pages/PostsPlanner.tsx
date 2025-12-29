@@ -570,16 +570,18 @@ const PostsPlanner = () => {
         </div>
 
         <Tabs defaultValue="generator" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
-            <TabsTrigger value="generator" className="gap-2">
-              <Sparkles className="w-4 h-4" />
-              مولد المنشورات
-            </TabsTrigger>
-            <TabsTrigger value="calendar" className="gap-2">
-              <CalendarIcon className="w-4 h-4" />
-              التقويم والجدولة
-            </TabsTrigger>
-          </TabsList>
+          <div className="flex justify-end">
+            <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
+              <TabsTrigger value="calendar" className="gap-2">
+                <CalendarIcon className="w-4 h-4" />
+                التقويم والجدولة
+              </TabsTrigger>
+              <TabsTrigger value="generator" className="gap-2">
+                <Sparkles className="w-4 h-4" />
+                مولد المنشورات
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* Generator Tab */}
           <TabsContent value="generator" className="space-y-6">
@@ -814,15 +816,14 @@ const PostsPlanner = () => {
             </div>
           </TabsContent>
 
-          {/* Calendar Tab */}
           <TabsContent value="calendar" className="space-y-6">
-            <div className="flex flex-col lg:flex-row gap-6">
-              {/* Calendar */}
+            <div className="flex flex-col lg:flex-row-reverse gap-6">
+              {/* Calendar - Now on right */}
               <Card className="bg-card border-border w-full lg:w-auto lg:flex-shrink-0">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                <CardHeader className="text-right">
+                  <CardTitle className="flex items-center justify-end gap-2">
+                    <span>التقويم</span>
                     <CalendarIcon className="w-5 h-5 text-primary" />
-                    التقويم
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -842,22 +843,20 @@ const PostsPlanner = () => {
                       },
                     }}
                   />
-                  <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
-                    <div className="w-3 h-3 rounded-full bg-primary/20" />
+                  <div className="mt-4 flex items-center justify-end gap-2 text-sm text-muted-foreground">
                     <span>أيام تحتوي على منشورات</span>
+                    <div className="w-3 h-3 rounded-full bg-primary/20" />
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Posts for Selected Date */}
+              {/* Posts for Selected Date - Now on left */}
               <Card className="bg-card border-border flex-1 min-h-[400px]">
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between flex-wrap gap-2">
-                    <span className="flex items-center gap-2">
-                      <Clock className="w-5 h-5 text-primary" />
-                      منشورات {format(selectedDate, "dd MMMM yyyy", { locale: ar })}
-                    </span>
-                    <Badge variant="secondary">{postsForSelectedDate.length} منشور</Badge>
+                <CardHeader className="text-right">
+                  <CardTitle className="flex items-center justify-end gap-2">
+                    <Badge variant="secondary" className="mr-auto">{postsForSelectedDate.length} منشور</Badge>
+                    <span>منشورات {format(selectedDate, "dd MMMM yyyy", { locale: ar })}</span>
+                    <Clock className="w-5 h-5 text-primary" />
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -868,18 +867,6 @@ const PostsPlanner = () => {
                           <Card key={post.id} className="bg-muted/30 border-border">
                             <CardContent className="p-4">
                               <div className="flex items-start justify-between gap-4">
-                                <div className="flex items-center gap-3">
-                                  <div className={`w-10 h-10 rounded-full ${platformColors[post.platform]} flex items-center justify-center text-white`}>
-                                    {platformIcons[post.platform]}
-                                  </div>
-                                  <div>
-                                    <p className="font-medium capitalize">{post.platform}</p>
-                                    <p className="text-sm text-muted-foreground flex items-center gap-1">
-                                      <Clock className="w-3 h-3" />
-                                      {post.time}
-                                    </p>
-                                  </div>
-                                </div>
                                 <div className="flex items-center gap-2">
                                   <Badge 
                                     variant={
@@ -891,24 +878,34 @@ const PostsPlanner = () => {
                                      post.status === "scheduled" ? "مجدول" : "مسودة"}
                                   </Badge>
                                 </div>
+                                <div className="flex items-center gap-3">
+                                  <div className="text-right">
+                                    <p className="font-medium capitalize">{post.platform}</p>
+                                    <p className="text-sm text-muted-foreground flex items-center justify-end gap-1">
+                                      {post.time}
+                                      <Clock className="w-3 h-3" />
+                                    </p>
+                                  </div>
+                                  <div className={`w-10 h-10 rounded-full ${platformColors[post.platform]} flex items-center justify-center text-white`}>
+                                    {platformIcons[post.platform]}
+                                  </div>
+                                </div>
                               </div>
-                              <p className="mt-3 text-sm whitespace-pre-wrap">{post.content}</p>
+                              <p className="mt-3 text-sm whitespace-pre-wrap text-right">{post.content}</p>
                               {post.topic && (
-                                <p className="mt-2 text-xs text-muted-foreground">
+                                <p className="mt-2 text-xs text-muted-foreground text-right">
                                   الموضوع: {post.topic}
                                 </p>
                               )}
-                              <div className="flex gap-2 mt-4">
+                              <div className="flex gap-2 mt-4 justify-end">
                                 <Button 
                                   size="sm" 
                                   variant="outline"
-                                  onClick={() => {
-                                    navigator.clipboard.writeText(post.content);
-                                    toast({ title: "تم النسخ!" });
-                                  }}
+                                  className="text-destructive hover:text-destructive"
+                                  onClick={() => handleDeletePost(post.id)}
                                 >
-                                  <Copy className="w-3 h-3 ml-1" />
-                                  نسخ
+                                  <Trash2 className="w-3 h-3 ml-1" />
+                                  حذف
                                 </Button>
                                 {post.status !== "posted" && (
                                   <Button 
@@ -924,11 +921,13 @@ const PostsPlanner = () => {
                                 <Button 
                                   size="sm" 
                                   variant="outline"
-                                  className="text-destructive hover:text-destructive"
-                                  onClick={() => handleDeletePost(post.id)}
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(post.content);
+                                    toast({ title: "تم النسخ!" });
+                                  }}
                                 >
-                                  <Trash2 className="w-3 h-3 ml-1" />
-                                  حذف
+                                  <Copy className="w-3 h-3 ml-1" />
+                                  نسخ
                                 </Button>
                               </div>
                             </CardContent>
@@ -957,10 +956,10 @@ const PostsPlanner = () => {
 
             {/* All Scheduled Posts */}
             <Card className="bg-card border-border">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+              <CardHeader className="text-right">
+                <CardTitle className="flex items-center justify-end gap-2">
+                  <span>جميع المنشورات المجدولة</span>
                   <Bell className="w-5 h-5 text-primary" />
-                  جميع المنشورات المجدولة
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -975,17 +974,6 @@ const PostsPlanner = () => {
                           className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer"
                           onClick={() => setSelectedDate(post.date)}
                         >
-                          <div className="flex items-center gap-3">
-                            <div className={`w-8 h-8 rounded-full ${platformColors[post.platform]} flex items-center justify-center text-white`}>
-                              {platformIcons[post.platform]}
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium line-clamp-1">{post.content.substring(0, 50)}...</p>
-                              <p className="text-xs text-muted-foreground">
-                                {format(post.date, "dd MMMM yyyy", { locale: ar })} - {post.time}
-                              </p>
-                            </div>
-                          </div>
                           <Button 
                             variant="ghost" 
                             size="icon"
@@ -997,6 +985,17 @@ const PostsPlanner = () => {
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
+                          <div className="flex items-center gap-3">
+                            <div className="text-right">
+                              <p className="text-sm font-medium line-clamp-1">{post.content.substring(0, 50)}...</p>
+                              <p className="text-xs text-muted-foreground">
+                                {format(post.date, "dd MMMM yyyy", { locale: ar })} - {post.time}
+                              </p>
+                            </div>
+                            <div className={`w-8 h-8 rounded-full ${platformColors[post.platform]} flex items-center justify-center text-white`}>
+                              {platformIcons[post.platform]}
+                            </div>
+                          </div>
                         </div>
                       ))}
                     {scheduledPosts.filter(p => p.status === "scheduled").length === 0 && (
