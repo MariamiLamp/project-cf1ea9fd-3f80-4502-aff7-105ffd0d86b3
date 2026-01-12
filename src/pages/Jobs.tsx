@@ -105,7 +105,7 @@ const JobsPage = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
-  const [selectedJob, setSelectedJob] = useState<typeof jobs[0] | null>(null);
+  const [selectedJob, setSelectedJob] = useState<typeof jobs[0] | null>(jobs[0]);
   const [isApplyDialogOpen, setIsApplyDialogOpen] = useState(false);
   
   // Application form state - pre-filled with saved CV data
@@ -119,6 +119,9 @@ const JobsPage = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
 
+  const handleSelectJob = (job: typeof jobs[0]) => {
+    setSelectedJob(job);
+  };
   const handleApply = (job: typeof jobs[0]) => {
     setSelectedJob(job);
     setIsApplyDialogOpen(true);
@@ -177,7 +180,7 @@ ${applicationForm.fullName || "[اسمك]"}`;
 
   return (
     <DashboardLayout>
-      <div className="mb-8">
+      <div className="mb-6">
         <h1 className="text-2xl font-bold text-foreground mb-2">فرص العمل</h1>
         <p className="text-muted-foreground">
           اكتشف الوظائف المناسبة لملفك الشخصي ومهاراتك
@@ -217,94 +220,159 @@ ${applicationForm.fullName || "[اسمك]"}`;
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="flex flex-wrap gap-4 mb-6">
-        <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/5 text-primary">
-          <Briefcase className="w-4 h-4" />
-          <span className="font-medium">٢٤٧ وظيفة</span>
-        </div>
-        <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-muted text-muted-foreground">
-          <MapPin className="w-4 h-4" />
-          <span>جميع المواقع</span>
-        </div>
-        <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-muted text-muted-foreground">
-          <Clock className="w-4 h-4" />
-          <span>جميع أنواع الدوام</span>
-        </div>
-      </div>
-
-      {/* Jobs Grid */}
-      <div className="space-y-4">
-        {jobs.map((job, index) => (
-          <div
-            key={job.id}
-            className="job-card opacity-0 animate-fade-up"
-            style={{ animationDelay: `${index * 100}ms`, animationFillMode: "forwards" }}
-          >
-            {/* Company Logo */}
-            <div className="w-14 h-14 rounded-xl bg-muted flex items-center justify-center shrink-0 overflow-hidden">
-              <Building2 className="w-6 h-6 text-muted-foreground" />
-            </div>
-
-            {/* Job Info */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-start justify-between gap-2 mb-2">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-foreground truncate">{job.title}</h3>
-                    {job.isNew && (
-                      <span className="px-2 py-0.5 rounded-full bg-success/10 text-success text-xs font-medium">
-                        جديد
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-sm text-muted-foreground">{job.company}</p>
+      {/* Split Panel Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Left Side - Job Details */}
+        <div className="order-2 lg:order-1">
+          {selectedJob ? (
+            <div className="card-elevated p-6 sticky top-6">
+              {/* Company Header */}
+              <div className="flex items-start gap-4 mb-6 pb-6 border-b border-border">
+                <div className="w-16 h-16 rounded-xl bg-muted flex items-center justify-center shrink-0">
+                  <Building2 className="w-8 h-8 text-muted-foreground" />
                 </div>
-                <button
-                  className={cn(
-                    "p-2 rounded-lg transition-colors shrink-0",
-                    job.isSaved
-                      ? "bg-primary/10 text-primary"
-                      : "hover:bg-muted text-muted-foreground"
-                  )}
-                >
-                  <Bookmark className={cn("w-4 h-4", job.isSaved && "fill-current")} />
-                </button>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground mb-3">
-                <span className="flex items-center gap-1">
-                  <MapPin className="w-4 h-4" />
-                  {job.location}
-                </span>
-                <span className="flex items-center gap-1">
-                  <Clock className="w-4 h-4" />
-                  {job.type}
+                <div className="flex-1">
+                  <h2 className="text-xl font-bold text-foreground mb-1">{selectedJob.title}</h2>
+                  <p className="text-primary font-medium mb-2">{selectedJob.company}</p>
+                  <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+                    <span className="flex items-center gap-1">
+                      <MapPin className="w-4 h-4" />
+                      {selectedJob.location}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-4 h-4" />
+                      {selectedJob.type}
+                    </span>
+                  </div>
+                </div>
+                <span className={cn("match-badge", getMatchBadgeClass(selectedJob.matchScore))}>
+                  {selectedJob.matchScore}%
                 </span>
               </div>
 
-              <div className="flex items-center justify-between">
-                <span className={cn("match-badge", getMatchBadgeClass(job.matchScore))}>
-                  نسبة التوافق: {job.matchScore}%
-                </span>
-                <button 
-                  onClick={() => handleApply(job)}
-                  className="flex items-center gap-1 text-sm font-medium text-primary hover:text-primary-light transition-colors group"
-                >
-                  التقديم الآن
-                  <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                </button>
+              {/* Job Description */}
+              <div className="mb-6">
+                <h3 className="font-semibold text-foreground mb-3">وصف الوظيفة</h3>
+                <p className="text-muted-foreground leading-relaxed">{selectedJob.description}</p>
               </div>
+
+              {/* Requirements */}
+              <div className="mb-6">
+                <h3 className="font-semibold text-foreground mb-3">المتطلبات</h3>
+                <ul className="space-y-2">
+                  {selectedJob.requirements.map((req, i) => (
+                    <li key={i} className="flex items-start gap-2 text-muted-foreground">
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0"></span>
+                      {req}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Apply Button */}
+              <Button 
+                variant="gradient" 
+                size="lg" 
+                className="w-full"
+                onClick={() => handleApply(selectedJob)}
+              >
+                <Briefcase className="w-5 h-5" />
+                التقديم على هذه الوظيفة
+              </Button>
+            </div>
+          ) : (
+            <div className="card-elevated p-12 text-center">
+              <Building2 className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-foreground mb-2">اختر وظيفة</h3>
+              <p className="text-muted-foreground">اضغط على أي وظيفة لعرض التفاصيل</p>
+            </div>
+          )}
+        </div>
+
+        {/* Right Side - Job Listings */}
+        <div className="order-1 lg:order-2 space-y-3">
+          {/* Stats */}
+          <div className="flex flex-wrap gap-3 mb-4">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary/5 text-primary text-sm">
+              <Briefcase className="w-4 h-4" />
+              <span className="font-medium">٢٤٧ وظيفة</span>
             </div>
           </div>
-        ))}
-      </div>
 
-      {/* Load More */}
-      <div className="text-center mt-8">
-        <Button variant="outline" size="lg">
-          تحميل المزيد من الوظائف
-        </Button>
+          {/* Job Cards */}
+          {jobs.map((job, index) => (
+            <div
+              key={job.id}
+              onClick={() => handleSelectJob(job)}
+              className={cn(
+                "p-4 rounded-xl border cursor-pointer transition-all opacity-0 animate-fade-up",
+                selectedJob?.id === job.id
+                  ? "border-primary bg-primary/5 shadow-md"
+                  : "border-border bg-card hover:border-primary/30 hover:shadow-sm"
+              )}
+              style={{ animationDelay: `${index * 50}ms`, animationFillMode: "forwards" }}
+            >
+              <div className="flex items-start gap-3">
+                {/* Company Logo */}
+                <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                  <Building2 className="w-5 h-5 text-muted-foreground" />
+                </div>
+
+                {/* Job Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2 mb-1">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-semibold text-foreground text-sm truncate">{job.title}</h3>
+                        {job.isNew && (
+                          <span className="px-1.5 py-0.5 rounded-full bg-success/10 text-success text-xs font-medium">
+                            جديد
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground">{job.company}</p>
+                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}
+                      className={cn(
+                        "p-1.5 rounded-lg transition-colors shrink-0",
+                        job.isSaved
+                          ? "bg-primary/10 text-primary"
+                          : "hover:bg-muted text-muted-foreground"
+                      )}
+                    >
+                      <Bookmark className={cn("w-3.5 h-3.5", job.isSaved && "fill-current")} />
+                    </button>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground mb-2">
+                    <span className="flex items-center gap-1">
+                      <MapPin className="w-3 h-3" />
+                      {job.location}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      {job.type}
+                    </span>
+                  </div>
+
+                  <span className={cn("match-badge text-xs", getMatchBadgeClass(job.matchScore))}>
+                    نسبة التوافق: {job.matchScore}%
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+
+          {/* Load More */}
+          <div className="text-center pt-4">
+            <Button variant="outline" size="default">
+              تحميل المزيد من الوظائف
+            </Button>
+          </div>
+        </div>
       </div>
 
       {/* Job Application Dialog */}
