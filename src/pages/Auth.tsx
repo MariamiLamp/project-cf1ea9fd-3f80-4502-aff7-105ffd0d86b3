@@ -8,26 +8,26 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth, UserRole } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { Briefcase, Building2, User } from "lucide-react";
-
 const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [selectedRole, setSelectedRole] = useState<UserRole>("user");
-  const { login } = useAuth();
+  const {
+    login
+  } = useAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
-
+  const {
+    toast
+  } = useToast();
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    
     const success = login(email, password, selectedRole);
-    
     if (success) {
       toast({
         title: "تم تسجيل الدخول بنجاح",
-        description: "مرحباً بك في منصة الموارد البشرية",
+        description: "مرحباً بك في منصة الموارد البشرية"
       });
-      
+
       // Redirect based on role
       if (selectedRole === "admin") {
         navigate("/admin");
@@ -40,18 +40,22 @@ const Auth = () => {
       toast({
         title: "خطأ في تسجيل الدخول",
         description: "البريد الإلكتروني أو كلمة المرور غير صحيحة",
-        variant: "destructive",
+        variant: "destructive"
       });
     }
   };
-
-  const roles = [
-    { value: "user" as UserRole, label: "باحث عن عمل", icon: User, color: "text-blue-500" },
-    { value: "company" as UserRole, label: "شركة / HR", icon: Building2, color: "text-emerald-500" },
-  ];
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4" dir="rtl">
+  const roles = [{
+    value: "user" as UserRole,
+    label: "باحث عن عمل",
+    icon: User,
+    color: "text-blue-500"
+  }, {
+    value: "company" as UserRole,
+    label: "شركة / HR",
+    icon: Building2,
+    color: "text-emerald-500"
+  }];
+  return <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4" dir="rtl">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
@@ -73,50 +77,20 @@ const Auth = () => {
               <div className="space-y-3">
                 <Label>نوع الحساب</Label>
                 <div className="grid grid-cols-3 gap-3">
-                  {roles.map((role) => (
-                    <button
-                      key={role.value}
-                      type="button"
-                      onClick={() => setSelectedRole(role.value)}
-                      className={`p-4 rounded-xl border-2 transition-all duration-200 flex flex-col items-center gap-2 ${
-                        selectedRole === role.value
-                          ? "border-primary bg-primary/10"
-                          : "border-border hover:border-primary/50"
-                      }`}
-                    >
-                      <role.icon className={`w-6 h-6 ${role.color}`} />
-                      <span className="text-xs font-medium">{role.label}</span>
-                    </button>
-                  ))}
+                  {roles.map(role => {})}
                 </div>
               </div>
 
               {/* Email */}
               <div className="space-y-2">
                 <Label htmlFor="email">البريد الإلكتروني</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="example@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="text-left"
-                  dir="ltr"
-                  required
-                />
+                <Input id="email" type="email" placeholder="example@email.com" value={email} onChange={e => setEmail(e.target.value)} className="text-left" dir="ltr" required />
               </div>
 
               {/* Password */}
               <div className="space-y-2">
                 <Label htmlFor="password">كلمة المرور</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
+                <Input id="password" type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required />
               </div>
 
               <Button type="submit" className="w-full">
@@ -125,18 +99,10 @@ const Auth = () => {
             </form>
 
             {/* Demo Credentials */}
-            <div className="mt-6 p-4 bg-muted/50 rounded-xl">
-              <p className="text-sm font-medium text-muted-foreground mb-2">بيانات تجريبية:</p>
-              <div className="space-y-1 text-xs text-muted-foreground">
-                <p>شركة: company@hr.com / company123</p>
-                <p>مستخدم: user@hr.com / user123</p>
-              </div>
-            </div>
+            
           </CardContent>
         </Card>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Auth;
