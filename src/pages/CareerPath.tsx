@@ -674,8 +674,8 @@ const CareerPath = () => {
 
                                   {/* Item Details - Collapsible Content */}
                                   <CollapsibleContent>
-                                    <div className="px-4 pb-4 pr-12 space-y-3">
-                                      <p className="text-sm text-foreground/80">
+                                    <div className="px-4 pb-4 pr-12 space-y-3 text-right">
+                                      <p className="text-sm text-foreground/80 text-right">
                                         {item.description}
                                       </p>
                                       {item.resources &&
@@ -685,7 +685,7 @@ const CareerPath = () => {
                                               <BookOpen className="h-4 w-4 text-primary" />
                                               <span>المصادر والمراجع</span>
                                             </div>
-                                            <div className="space-y-2 mr-6">
+                                            <div className="space-y-2 mr-6 text-right">
                                               {item.resources.map(
                                                 (resource, idx) => {
                                                   const resourceKey = `${item.id}-resource-${idx}`;
@@ -718,7 +718,7 @@ const CareerPath = () => {
                                                           );
                                                         }}
                                                         href="#"
-                                                        className={`text-sm ${
+                                                        className={`text-sm w-full text-right ${
                                                           isResourceCompleted
                                                             ? "line-through text-muted-foreground"
                                                             : "text-foreground"

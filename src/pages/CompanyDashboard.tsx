@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -32,6 +38,7 @@ import {
 } from "@/components/ui/select";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import useAds, { AdPlacement } from "@/hooks/use-ads";
 import {
   Briefcase,
   Plus,
@@ -57,42 +64,152 @@ import {
 
 // Mock data
 const initialJobs = [
-  { id: 1, title: "مطور واجهات أمامية", department: "التقنية", type: "دوام كامل", location: "الرياض", applications: 24, status: "active", postedDate: "2024-01-10" },
-  { id: 2, title: "محلل بيانات", department: "البيانات", type: "دوام كامل", location: "جدة", applications: 18, status: "active", postedDate: "2024-01-15" },
-  { id: 3, title: "مدير مشاريع", department: "الإدارة", type: "دوام كامل", location: "الرياض", applications: 12, status: "closed", postedDate: "2024-01-05" },
+  {
+    id: 1,
+    title: "مطور واجهات أمامية",
+    department: "التقنية",
+    type: "دوام كامل",
+    location: "الرياض",
+    applications: 24,
+    status: "active",
+    postedDate: "2024-01-10",
+  },
+  {
+    id: 2,
+    title: "محلل بيانات",
+    department: "البيانات",
+    type: "دوام كامل",
+    location: "جدة",
+    applications: 18,
+    status: "active",
+    postedDate: "2024-01-15",
+  },
+  {
+    id: 3,
+    title: "مدير مشاريع",
+    department: "الإدارة",
+    type: "دوام كامل",
+    location: "الرياض",
+    applications: 12,
+    status: "closed",
+    postedDate: "2024-01-05",
+  },
 ];
 
 const initialCandidates = [
-  { id: 1, name: "أحمد محمد", email: "ahmed@email.com", phone: "0501234567", matchScore: 95, skills: ["React", "TypeScript", "Node.js"], experience: "5 سنوات", appliedFor: "مطور واجهات أمامية", education: "بكالوريوس علوم حاسب", summary: "مطور واجهات أمامية متمرس مع خبرة في بناء تطبيقات ويب حديثة" },
-  { id: 2, name: "سارة علي", email: "sara@email.com", phone: "0509876543", matchScore: 88, skills: ["Python", "SQL", "Tableau"], experience: "3 سنوات", appliedFor: "محلل بيانات", education: "ماجستير تحليل بيانات", summary: "محللة بيانات مع خبرة في استخراج الرؤى من البيانات الضخمة" },
-  { id: 3, name: "محمد خالد", email: "mohamed@email.com", phone: "0551112233", matchScore: 82, skills: ["React", "Vue", "CSS"], experience: "4 سنوات", appliedFor: "مطور واجهات أمامية", education: "بكالوريوس هندسة برمجيات", summary: "مطور واجهات مع شغف لتصميم تجارب مستخدم متميزة" },
-  { id: 4, name: "فاطمة أحمد", email: "fatima@email.com", phone: "0544455566", matchScore: 78, skills: ["Project Management", "Agile"], experience: "6 سنوات", appliedFor: "مدير مشاريع", education: "ماجستير إدارة أعمال", summary: "مديرة مشاريع معتمدة PMP مع خبرة في قيادة فرق تقنية" },
+  {
+    id: 1,
+    name: "أحمد محمد",
+    email: "ahmed@email.com",
+    phone: "0501234567",
+    matchScore: 95,
+    skills: ["React", "TypeScript", "Node.js"],
+    experience: "5 سنوات",
+    appliedFor: "مطور واجهات أمامية",
+    education: "بكالوريوس علوم حاسب",
+    summary: "مطور واجهات أمامية متمرس مع خبرة في بناء تطبيقات ويب حديثة",
+  },
+  {
+    id: 2,
+    name: "سارة علي",
+    email: "sara@email.com",
+    phone: "0509876543",
+    matchScore: 88,
+    skills: ["Python", "SQL", "Tableau"],
+    experience: "3 سنوات",
+    appliedFor: "محلل بيانات",
+    education: "ماجستير تحليل بيانات",
+    summary: "محللة بيانات مع خبرة في استخراج الرؤى من البيانات الضخمة",
+  },
+  {
+    id: 3,
+    name: "محمد خالد",
+    email: "mohamed@email.com",
+    phone: "0551112233",
+    matchScore: 82,
+    skills: ["React", "Vue", "CSS"],
+    experience: "4 سنوات",
+    appliedFor: "مطور واجهات أمامية",
+    education: "بكالوريوس هندسة برمجيات",
+    summary: "مطور واجهات مع شغف لتصميم تجارب مستخدم متميزة",
+  },
+  {
+    id: 4,
+    name: "فاطمة أحمد",
+    email: "fatima@email.com",
+    phone: "0544455566",
+    matchScore: 78,
+    skills: ["Project Management", "Agile"],
+    experience: "6 سنوات",
+    appliedFor: "مدير مشاريع",
+    education: "ماجستير إدارة أعمال",
+    summary: "مديرة مشاريع معتمدة PMP مع خبرة في قيادة فرق تقنية",
+  },
 ];
 
 const initialApplications = [
-  { id: 1, candidateName: "أحمد محمد", jobTitle: "مطور واجهات أمامية", status: "pending", appliedDate: "2024-01-20", matchScore: 95 },
-  { id: 2, candidateName: "سارة علي", jobTitle: "محلل بيانات", status: "reviewed", appliedDate: "2024-01-19", matchScore: 88 },
-  { id: 3, candidateName: "محمد خالد", jobTitle: "مطور واجهات أمامية", status: "accepted", appliedDate: "2024-01-18", matchScore: 82 },
-  { id: 4, candidateName: "فاطمة أحمد", jobTitle: "مدير مشاريع", status: "rejected", appliedDate: "2024-01-17", matchScore: 78 },
-  { id: 5, candidateName: "عمر حسن", jobTitle: "مطور واجهات أمامية", status: "pending", appliedDate: "2024-01-21", matchScore: 91 },
+  {
+    id: 1,
+    candidateName: "أحمد محمد",
+    jobTitle: "مطور واجهات أمامية",
+    status: "pending",
+    appliedDate: "2024-01-20",
+    matchScore: 95,
+  },
+  {
+    id: 2,
+    candidateName: "سارة علي",
+    jobTitle: "محلل بيانات",
+    status: "reviewed",
+    appliedDate: "2024-01-19",
+    matchScore: 88,
+  },
+  {
+    id: 3,
+    candidateName: "محمد خالد",
+    jobTitle: "مطور واجهات أمامية",
+    status: "accepted",
+    appliedDate: "2024-01-18",
+    matchScore: 82,
+  },
+  {
+    id: 4,
+    candidateName: "فاطمة أحمد",
+    jobTitle: "مدير مشاريع",
+    status: "rejected",
+    appliedDate: "2024-01-17",
+    matchScore: 78,
+  },
+  {
+    id: 5,
+    candidateName: "عمر حسن",
+    jobTitle: "مطور واجهات أمامية",
+    status: "pending",
+    appliedDate: "2024-01-21",
+    matchScore: 91,
+  },
 ];
 
 const CompanyDashboard = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  
+
   // State management
   const [jobs, setJobs] = useState(initialJobs);
   const [candidates] = useState(initialCandidates);
   const [applications, setApplications] = useState(initialApplications);
-  
+
   const [isAddJobOpen, setIsAddJobOpen] = useState(false);
   const [isEditJobOpen, setIsEditJobOpen] = useState(false);
   const [isViewApplicationOpen, setIsViewApplicationOpen] = useState(false);
-  const [selectedJob, setSelectedJob] = useState<typeof initialJobs[0] | null>(null);
-  const [selectedApplication, setSelectedApplication] = useState<typeof initialApplications[0] | null>(null);
-  
+  const [selectedJob, setSelectedJob] = useState<
+    (typeof initialJobs)[0] | null
+  >(null);
+  const [selectedApplication, setSelectedApplication] = useState<
+    (typeof initialApplications)[0] | null
+  >(null);
+
   const [newJob, setNewJob] = useState({
     title: "",
     department: "",
@@ -111,7 +228,12 @@ const CompanyDashboard = () => {
 
   // Featured jobs & banners state
   const [featuredJobs, setFeaturedJobs] = useState([
-    { id: 1, title: "مطور واجهات أمامية", featured: true, featuredUntil: "2024-04-15" },
+    {
+      id: 1,
+      title: "مطور واجهات أمامية",
+      featured: true,
+      featuredUntil: "2024-04-15",
+    },
   ]);
   const [companyBanner, setCompanyBanner] = useState({
     enabled: false,
@@ -119,7 +241,19 @@ const CompanyDashboard = () => {
     description: "",
     imageUrl: "",
   });
-  
+
+  // Ads management (banners placed on public pages)
+  const adsHook = useAds();
+  const { ads, add: addAd, remove: removeAd, getByPlacement } = adsHook;
+  const [adForm, setAdForm] = useState({
+    title: "",
+    description: "",
+    imageUrl: "",
+    link: "",
+    placement: "hero-bottom",
+  });
+  const liveAds = ads.filter((a) => a.enabled);
+
   const [editJob, setEditJob] = useState({
     id: 0,
     title: "",
@@ -135,7 +269,12 @@ const CompanyDashboard = () => {
   };
 
   const handleAddJob = () => {
-    if (!newJob.title || !newJob.department || !newJob.type || !newJob.location) {
+    if (
+      !newJob.title ||
+      !newJob.department ||
+      !newJob.type ||
+      !newJob.location
+    ) {
       toast({
         title: "خطأ",
         description: "يرجى ملء جميع الحقول المطلوبة",
@@ -152,19 +291,26 @@ const CompanyDashboard = () => {
       location: newJob.location,
       applications: 0,
       status: "active",
-      postedDate: new Date().toISOString().split('T')[0],
+      postedDate: new Date().toISOString().split("T")[0],
     };
-    
+
     setJobs([...jobs, job]);
     toast({
       title: "تم إضافة الوظيفة",
       description: "تم نشر الوظيفة بنجاح",
     });
     setIsAddJobOpen(false);
-    setNewJob({ title: "", department: "", type: "", location: "", description: "", requirements: "" });
+    setNewJob({
+      title: "",
+      department: "",
+      type: "",
+      location: "",
+      description: "",
+      requirements: "",
+    });
   };
 
-  const handleEditJob = (job: typeof initialJobs[0]) => {
+  const handleEditJob = (job: (typeof initialJobs)[0]) => {
     setSelectedJob(job);
     setEditJob({
       id: job.id,
@@ -178,11 +324,20 @@ const CompanyDashboard = () => {
   };
 
   const handleSaveEdit = () => {
-    setJobs(jobs.map(job => 
-      job.id === editJob.id 
-        ? { ...job, title: editJob.title, department: editJob.department, type: editJob.type, location: editJob.location, status: editJob.status }
-        : job
-    ));
+    setJobs(
+      jobs.map((job) =>
+        job.id === editJob.id
+          ? {
+              ...job,
+              title: editJob.title,
+              department: editJob.department,
+              type: editJob.type,
+              location: editJob.location,
+              status: editJob.status,
+            }
+          : job
+      )
+    );
     toast({
       title: "تم التحديث",
       description: "تم تحديث بيانات الوظيفة بنجاح",
@@ -191,7 +346,7 @@ const CompanyDashboard = () => {
   };
 
   const handleDeleteJob = (jobId: number) => {
-    setJobs(jobs.filter(job => job.id !== jobId));
+    setJobs(jobs.filter((job) => job.id !== jobId));
     toast({
       title: "تم الحذف",
       description: "تم حذف الوظيفة بنجاح",
@@ -202,18 +357,19 @@ const CompanyDashboard = () => {
     navigate(`/candidate/${candidateId}?view=company`);
   };
 
-  const handleViewApplication = (app: typeof initialApplications[0]) => {
+  const handleViewApplication = (app: (typeof initialApplications)[0]) => {
     setSelectedApplication(app);
     setIsViewApplicationOpen(true);
   };
 
   const handleUpdateApplicationStatus = (appId: number, status: string) => {
-    setApplications(applications.map(app => 
-      app.id === appId ? { ...app, status } : app
-    ));
+    setApplications(
+      applications.map((app) => (app.id === appId ? { ...app, status } : app))
+    );
     toast({
       title: status === "accepted" ? "تم القبول" : "تم الرفض",
-      description: status === "accepted" ? "تم قبول طلب التوظيف" : "تم رفض طلب التوظيف",
+      description:
+        status === "accepted" ? "تم قبول طلب التوظيف" : "تم رفض طلب التوظيف",
     });
   };
 
@@ -230,9 +386,11 @@ const CompanyDashboard = () => {
 
     setIsGenerating(true);
     // Simulate AI generation delay
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    const mockDescription = `نبحث عن ${jobGenTitle} متميز للانضمام إلى فريقنا في قسم ${jobGenDepartment || "التقنية"}.
+    const mockDescription = `نبحث عن ${jobGenTitle} متميز للانضمام إلى فريقنا في قسم ${
+      jobGenDepartment || "التقنية"
+    }.
 
 المسؤوليات الرئيسية:
 • تطوير وصيانة التطبيقات والأنظمة
@@ -269,15 +427,29 @@ const CompanyDashboard = () => {
   };
 
   const handleToggleFeatured = (jobId: number) => {
-    const job = jobs.find(j => j.id === jobId);
+    const job = jobs.find((j) => j.id === jobId);
     if (job) {
-      const isFeatured = featuredJobs.some(f => f.id === jobId);
+      const isFeatured = featuredJobs.some((f) => f.id === jobId);
       if (isFeatured) {
-        setFeaturedJobs(featuredJobs.filter(f => f.id !== jobId));
-        toast({ title: "تم إلغاء التمييز", description: "تم إزالة الوظيفة من القائمة المميزة" });
+        setFeaturedJobs(featuredJobs.filter((f) => f.id !== jobId));
+        toast({
+          title: "تم إلغاء التمييز",
+          description: "تم إزالة الوظيفة من القائمة المميزة",
+        });
       } else {
-        setFeaturedJobs([...featuredJobs, { id: jobId, title: job.title, featured: true, featuredUntil: "2024-05-01" }]);
-        toast({ title: "تم التمييز", description: "تم إضافة الوظيفة للقائمة المميزة" });
+        setFeaturedJobs([
+          ...featuredJobs,
+          {
+            id: jobId,
+            title: job.title,
+            featured: true,
+            featuredUntil: "2024-05-01",
+          },
+        ]);
+        toast({
+          title: "تم التمييز",
+          description: "تم إضافة الوظيفة للقائمة المميزة",
+        });
       }
     }
   };
@@ -290,26 +462,104 @@ const CompanyDashboard = () => {
     });
   };
 
+  const handleAddAd = () => {
+    if (!adForm.imageUrl) {
+      toast({
+        title: "خطأ",
+        description: "يرجى إدخال رابط صورة البانر",
+        variant: "destructive",
+      });
+      return;
+    }
+    // create ad request (pending approval) - do not enable until admin approves
+    const created = addAd({
+      title: adForm.title || undefined,
+      description: adForm.description || undefined,
+      imageUrl: adForm.imageUrl,
+      link: adForm.link || undefined,
+      placement: adForm.placement as AdPlacement,
+      enabled: false,
+    });
+    toast({
+      title: "تم إرسال الطلب",
+      description: "تم إرسال طلب الإعلان، سيتم تفعيله بعد الموافقة",
+    });
+    setAdForm({
+      title: "",
+      description: "",
+      imageUrl: "",
+      link: "",
+      placement: "hero-bottom",
+    });
+    // send the user to checkout to complete payment
+    navigate("/checkout");
+  };
+
+  const handleRemoveAd = (id: number) => {
+    removeAd(id);
+    toast({ title: "تم الحذف", description: "تمت إزالة الإعلان" });
+  };
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "pending":
-        return <Badge variant="outline" className="gap-1"><Clock className="w-3 h-3" /> قيد المراجعة</Badge>;
+        return (
+          <Badge variant="outline" className="gap-1">
+            <Clock className="w-3 h-3" /> قيد المراجعة
+          </Badge>
+        );
       case "reviewed":
-        return <Badge variant="secondary" className="gap-1"><Eye className="w-3 h-3" /> تمت المراجعة</Badge>;
+        return (
+          <Badge variant="secondary" className="gap-1">
+            <Eye className="w-3 h-3" /> تمت المراجعة
+          </Badge>
+        );
       case "accepted":
-        return <Badge className="gap-1 bg-emerald-500"><CheckCircle className="w-3 h-3" /> مقبول</Badge>;
+        return (
+          <Badge className="gap-1 bg-emerald-500">
+            <CheckCircle className="w-3 h-3" /> مقبول
+          </Badge>
+        );
       case "rejected":
-        return <Badge variant="destructive" className="gap-1"><XCircle className="w-3 h-3" /> مرفوض</Badge>;
+        return (
+          <Badge variant="destructive" className="gap-1">
+            <XCircle className="w-3 h-3" /> مرفوض
+          </Badge>
+        );
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
   };
 
   const stats = [
-    { label: "الوظائف النشطة", value: "12", icon: Briefcase, color: "text-blue-500", bg: "bg-blue-500/10" },
-    { label: "إجمالي الطلبات", value: "156", icon: FileText, color: "text-emerald-500", bg: "bg-emerald-500/10" },
-    { label: "المرشحون المتوافقون", value: "48", icon: Users, color: "text-purple-500", bg: "bg-purple-500/10" },
-    { label: "معدل القبول", value: "32%", icon: TrendingUp, color: "text-amber-500", bg: "bg-amber-500/10" },
+    {
+      label: "الوظائف النشطة",
+      value: "12",
+      icon: Briefcase,
+      color: "text-blue-500",
+      bg: "bg-blue-500/10",
+    },
+    {
+      label: "إجمالي الطلبات",
+      value: "156",
+      icon: FileText,
+      color: "text-emerald-500",
+      bg: "bg-emerald-500/10",
+    },
+    {
+      label: "المرشحون المتوافقون",
+      value: "48",
+      icon: Users,
+      color: "text-purple-500",
+      bg: "bg-purple-500/10",
+    },
+    {
+      label: "معدل القبول",
+      value: "32%",
+      icon: TrendingUp,
+      color: "text-amber-500",
+      bg: "bg-amber-500/10",
+    },
   ];
 
   return (
@@ -323,7 +573,9 @@ const CompanyDashboard = () => {
             </div>
             <div>
               <h1 className="font-bold text-lg">لوحة تحكم الشركة</h1>
-              <p className="text-sm text-muted-foreground">{user?.companyName || "شركتك"}</p>
+              <p className="text-sm text-muted-foreground">
+                {user?.companyName || "شركتك"}
+              </p>
             </div>
           </div>
           <Button variant="outline" onClick={handleLogout} className="gap-2">
@@ -340,11 +592,15 @@ const CompanyDashboard = () => {
             <Card key={index} className="border-border/50">
               <CardContent className="p-6">
                 <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-xl ${stat.bg} flex items-center justify-center shrink-0`}>
+                  <div
+                    className={`w-12 h-12 rounded-xl ${stat.bg} flex items-center justify-center shrink-0`}
+                  >
                     <stat.icon className={`w-6 h-6 ${stat.color}`} />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">{stat.label}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {stat.label}
+                    </p>
                     <p className="text-2xl font-bold mt-1">{stat.value}</p>
                   </div>
                 </div>
@@ -374,94 +630,122 @@ const CompanyDashboard = () => {
                   <Megaphone className="w-4 h-4" />
                   الترويج
                 </TabsTrigger>
+                <TabsTrigger value="ads" className="gap-2">
+                  <Megaphone className="w-4 h-4" />
+                  الإعلانات
+                </TabsTrigger>
               </TabsList>
 
-            <Dialog open={isAddJobOpen} onOpenChange={setIsAddJobOpen}>
-              <DialogTrigger asChild>
-                <Button className="gap-2">
-                  <Plus className="w-4 h-4" />
-                  إضافة وظيفة
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-lg" dir="rtl">
-                <DialogHeader>
-                  <DialogTitle>إضافة وظيفة جديدة</DialogTitle>
-                  <DialogDescription>أدخل تفاصيل الوظيفة المطلوبة</DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4 mt-4">
-                  <div className="space-y-2">
-                    <Label>المسمى الوظيفي *</Label>
-                    <Input
-                      placeholder="مثال: مطور واجهات أمامية"
-                      value={newJob.title}
-                      onChange={(e) => setNewJob({ ...newJob, title: e.target.value })}
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
+              <Dialog open={isAddJobOpen} onOpenChange={setIsAddJobOpen}>
+                <DialogTrigger asChild>
+                  <Button className="gap-2">
+                    <Plus className="w-4 h-4" />
+                    إضافة وظيفة
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-lg" dir="rtl">
+                  <DialogHeader>
+                    <DialogTitle>إضافة وظيفة جديدة</DialogTitle>
+                    <DialogDescription>
+                      أدخل تفاصيل الوظيفة المطلوبة
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 mt-4">
                     <div className="space-y-2">
-                      <Label>القسم *</Label>
-                      <Select onValueChange={(value) => setNewJob({ ...newJob, department: value })}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="اختر القسم" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="التقنية">التقنية</SelectItem>
-                          <SelectItem value="التسويق">التسويق</SelectItem>
-                          <SelectItem value="المالية">المالية</SelectItem>
-                          <SelectItem value="الإدارة">الإدارة</SelectItem>
-                          <SelectItem value="الموارد البشرية">الموارد البشرية</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <Label>المسمى الوظيفي *</Label>
+                      <Input
+                        placeholder="مثال: مطور واجهات أمامية"
+                        value={newJob.title}
+                        onChange={(e) =>
+                          setNewJob({ ...newJob, title: e.target.value })
+                        }
+                      />
                     </div>
-                    <div className="space-y-2">
-                      <Label>نوع الدوام *</Label>
-                      <Select onValueChange={(value) => setNewJob({ ...newJob, type: value })}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="اختر النوع" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="دوام كامل">دوام كامل</SelectItem>
-                          <SelectItem value="دوام جزئي">دوام جزئي</SelectItem>
-                          <SelectItem value="عن بعد">عن بعد</SelectItem>
-                          <SelectItem value="عقد">عقد</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>الموقع *</Label>
-                    <Select onValueChange={(value) => setNewJob({ ...newJob, location: value })}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="اختر المدينة" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="الرياض">الرياض</SelectItem>
-                        <SelectItem value="جدة">جدة</SelectItem>
-                        <SelectItem value="الدمام">الدمام</SelectItem>
-                        <SelectItem value="مكة">مكة</SelectItem>
-                        <SelectItem value="المدينة">المدينة</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label>وصف الوظيفة</Label>
-                      <Button 
-                        type="button"
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => {
-                          if (!newJob.title) {
-                            toast({
-                              title: "خطأ",
-                              description: "يرجى إدخال المسمى الوظيفي أولاً",
-                              variant: "destructive",
-                            });
-                            return;
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>القسم *</Label>
+                        <Select
+                          onValueChange={(value) =>
+                            setNewJob({ ...newJob, department: value })
                           }
-                          setIsGenerating(true);
-                          setTimeout(() => {
-                            const mockDescription = `نبحث عن ${newJob.title} متميز للانضمام إلى فريقنا${newJob.department ? ` في قسم ${newJob.department}` : ""}.
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="اختر القسم" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="التقنية">التقنية</SelectItem>
+                            <SelectItem value="التسويق">التسويق</SelectItem>
+                            <SelectItem value="المالية">المالية</SelectItem>
+                            <SelectItem value="الإدارة">الإدارة</SelectItem>
+                            <SelectItem value="الموارد البشرية">
+                              الموارد البشرية
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label>نوع الدوام *</Label>
+                        <Select
+                          onValueChange={(value) =>
+                            setNewJob({ ...newJob, type: value })
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="اختر النوع" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="دوام كامل">دوام كامل</SelectItem>
+                            <SelectItem value="دوام جزئي">دوام جزئي</SelectItem>
+                            <SelectItem value="عن بعد">عن بعد</SelectItem>
+                            <SelectItem value="عقد">عقد</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>الموقع *</Label>
+                      <Select
+                        onValueChange={(value) =>
+                          setNewJob({ ...newJob, location: value })
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="اختر المدينة" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="الرياض">الرياض</SelectItem>
+                          <SelectItem value="جدة">جدة</SelectItem>
+                          <SelectItem value="الدمام">الدمام</SelectItem>
+                          <SelectItem value="مكة">مكة</SelectItem>
+                          <SelectItem value="المدينة">المدينة</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <Label>وصف الوظيفة</Label>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            if (!newJob.title) {
+                              toast({
+                                title: "خطأ",
+                                description: "يرجى إدخال المسمى الوظيفي أولاً",
+                                variant: "destructive",
+                              });
+                              return;
+                            }
+                            setIsGenerating(true);
+                            setTimeout(() => {
+                              const mockDescription = `نبحث عن ${
+                                newJob.title
+                              } متميز للانضمام إلى فريقنا${
+                                newJob.department
+                                  ? ` في قسم ${newJob.department}`
+                                  : ""
+                              }.
 
 المسؤوليات الرئيسية:
 • تطوير وصيانة التطبيقات والأنظمة
@@ -477,52 +761,59 @@ const CompanyDashboard = () => {
 • راتب تنافسي
 • تأمين صحي شامل
 • بيئة عمل محفزة`;
-                            setNewJob({ ...newJob, description: mockDescription });
-                            setIsGenerating(false);
-                            toast({
-                              title: "تم التوليد",
-                              description: "تم إنشاء وصف الوظيفة بنجاح",
-                            });
-                          }, 1500);
-                        }}
-                        disabled={isGenerating}
-                        className="gap-1 h-7 text-xs"
-                      >
-                        {isGenerating ? (
-                          <>
-                            <Loader2 className="w-3 h-3 animate-spin" />
-                            جاري التوليد...
-                          </>
-                        ) : (
-                          <>
-                            <Sparkles className="w-3 h-3" />
-                            توليد بالذكاء الاصطناعي
-                          </>
-                        )}
-                      </Button>
+                              setNewJob({
+                                ...newJob,
+                                description: mockDescription,
+                              });
+                              setIsGenerating(false);
+                              toast({
+                                title: "تم التوليد",
+                                description: "تم إنشاء وصف الوظيفة بنجاح",
+                              });
+                            }, 1500);
+                          }}
+                          disabled={isGenerating}
+                          className="gap-1 h-7 text-xs"
+                        >
+                          {isGenerating ? (
+                            <>
+                              <Loader2 className="w-3 h-3 animate-spin" />
+                              جاري التوليد...
+                            </>
+                          ) : (
+                            <>
+                              <Sparkles className="w-3 h-3" />
+                              توليد بالذكاء الاصطناعي
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                      <Textarea
+                        placeholder="اكتب وصفاً تفصيلياً للوظيفة أو استخدم الذكاء الاصطناعي..."
+                        value={newJob.description}
+                        onChange={(e) =>
+                          setNewJob({ ...newJob, description: e.target.value })
+                        }
+                        rows={6}
+                      />
                     </div>
-                    <Textarea
-                      placeholder="اكتب وصفاً تفصيلياً للوظيفة أو استخدم الذكاء الاصطناعي..."
-                      value={newJob.description}
-                      onChange={(e) => setNewJob({ ...newJob, description: e.target.value })}
-                      rows={6}
-                    />
+                    <div className="space-y-2">
+                      <Label>المتطلبات</Label>
+                      <Textarea
+                        placeholder="اكتب متطلبات الوظيفة..."
+                        value={newJob.requirements}
+                        onChange={(e) =>
+                          setNewJob({ ...newJob, requirements: e.target.value })
+                        }
+                        rows={3}
+                      />
+                    </div>
+                    <Button onClick={handleAddJob} className="w-full">
+                      نشر الوظيفة
+                    </Button>
                   </div>
-                  <div className="space-y-2">
-                    <Label>المتطلبات</Label>
-                    <Textarea
-                      placeholder="اكتب متطلبات الوظيفة..."
-                      value={newJob.requirements}
-                      onChange={(e) => setNewJob({ ...newJob, requirements: e.target.value })}
-                      rows={3}
-                    />
-                  </div>
-                  <Button onClick={handleAddJob} className="w-full">
-                    نشر الوظيفة
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
 
@@ -554,22 +845,38 @@ const CompanyDashboard = () => {
                       <TableRow key={job.id}>
                         <TableCell>
                           <div className="flex gap-1">
-                            <Button variant="ghost" size="icon" onClick={() => handleEditJob(job)}>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleEditJob(job)}
+                            >
                               <Edit className="w-4 h-4" />
                             </Button>
-                            <Button variant="ghost" size="icon" onClick={() => handleDeleteJob(job.id)}>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleDeleteJob(job.id)}
+                            >
                               <Trash2 className="w-4 h-4 text-destructive" />
                             </Button>
                           </div>
                         </TableCell>
-                        <TableCell className="text-muted-foreground">{job.postedDate}</TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {job.postedDate}
+                        </TableCell>
                         <TableCell>
-                          <Badge variant={job.status === "active" ? "default" : "outline"}>
+                          <Badge
+                            variant={
+                              job.status === "active" ? "default" : "outline"
+                            }
+                          >
                             {job.status === "active" ? "نشطة" : "مغلقة"}
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="secondary">{job.applications} طلب</Badge>
+                          <Badge variant="secondary">
+                            {job.applications} طلب
+                          </Badge>
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-1">
@@ -579,11 +886,74 @@ const CompanyDashboard = () => {
                         </TableCell>
                         <TableCell>{job.type}</TableCell>
                         <TableCell>{job.department}</TableCell>
-                        <TableCell className="font-medium">{job.title}</TableCell>
+                        <TableCell className="font-medium">
+                          {job.title}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Ads Tab */}
+          <TabsContent value="ads">
+            <Card>
+              <CardHeader className="text-right">
+                <CardTitle className="flex items-center justify-end gap-2">
+                  <span>الإعلانات الحالية</span>
+                  <Megaphone className="w-5 h-5 text-primary" />
+                </CardTitle>
+                <CardDescription className="text-right">
+                  قائمة الإعلانات المنشورة للموقع
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {liveAds.length === 0 ? (
+                  <p className="text-muted-foreground text-right">
+                    لا توجد إعلانات حالياً
+                  </p>
+                ) : (
+                  <div className="grid gap-2">
+                    {liveAds.map((a) => (
+                      <div
+                        key={a.id}
+                        className="flex items-center justify-between p-2 border rounded-md"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-24 h-12 rounded overflow-hidden bg-muted">
+                            <img
+                              src={a.imageUrl}
+                              alt={a.title || "ad"}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="text-right">
+                            <div className="font-medium">
+                              {a.title || "بدون عنوان"}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              {a.placement === "hero-bottom"
+                                ? "تحت الهيرو"
+                                : "تحت فحص الـATS"}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleRemoveAd(a.id)}
+                            className="text-destructive"
+                          >
+                            حذف
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -596,7 +966,9 @@ const CompanyDashboard = () => {
                   <span>المرشحون المتوافقون مع وظائفكم</span>
                   <Users className="w-5 h-5" />
                 </CardTitle>
-                <CardDescription className="text-right">مرشحون تتوافق مهاراتهم مع متطلبات وظائفكم المنشورة</CardDescription>
+                <CardDescription className="text-right">
+                  مرشحون تتوافق مهاراتهم مع متطلبات وظائفكم المنشورة
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <Table>
@@ -618,10 +990,18 @@ const CompanyDashboard = () => {
                         <TableCell>
                           <div className="flex flex-wrap gap-1">
                             {candidate.skills.slice(0, 2).map((skill, i) => (
-                              <Badge key={i} variant="secondary" className="text-xs">{skill}</Badge>
+                              <Badge
+                                key={i}
+                                variant="secondary"
+                                className="text-xs"
+                              >
+                                {skill}
+                              </Badge>
                             ))}
                             {candidate.skills.length > 2 && (
-                              <Badge variant="outline" className="text-xs">+{candidate.skills.length - 2}</Badge>
+                              <Badge variant="outline" className="text-xs">
+                                +{candidate.skills.length - 2}
+                              </Badge>
                             )}
                           </div>
                         </TableCell>
@@ -630,16 +1010,23 @@ const CompanyDashboard = () => {
                             <div className="w-16 h-2 bg-muted rounded-full overflow-hidden">
                               <div
                                 className={`h-full rounded-full ${
-                                  candidate.matchScore >= 90 ? "bg-emerald-500" :
-                                  candidate.matchScore >= 80 ? "bg-primary" : "bg-amber-500"
+                                  candidate.matchScore >= 90
+                                    ? "bg-emerald-500"
+                                    : candidate.matchScore >= 80
+                                    ? "bg-primary"
+                                    : "bg-amber-500"
                                 }`}
                                 style={{ width: `${candidate.matchScore}%` }}
                               />
                             </div>
-                            <span className="text-sm font-medium">{candidate.matchScore}%</span>
+                            <span className="text-sm font-medium">
+                              {candidate.matchScore}%
+                            </span>
                           </div>
                         </TableCell>
-                        <TableCell className="text-muted-foreground">{candidate.email}</TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {candidate.email}
+                        </TableCell>
                         <TableCell className="font-medium">
                           <button
                             onClick={() => handleViewCandidate(candidate.id)}
@@ -682,15 +1069,38 @@ const CompanyDashboard = () => {
                       <TableRow key={app.id}>
                         <TableCell>
                           <div className="flex gap-1">
-                            <Button variant="ghost" size="icon" onClick={() => handleViewApplication(app)}>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleViewApplication(app)}
+                            >
                               <Eye className="w-4 h-4" />
                             </Button>
-                            {(app.status === "pending" || app.status === "reviewed") && (
+                            {(app.status === "pending" ||
+                              app.status === "reviewed") && (
                               <>
-                                <Button variant="ghost" size="icon" onClick={() => handleUpdateApplicationStatus(app.id, "accepted")}>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() =>
+                                    handleUpdateApplicationStatus(
+                                      app.id,
+                                      "accepted"
+                                    )
+                                  }
+                                >
                                   <CheckCircle className="w-4 h-4 text-emerald-500" />
                                 </Button>
-                                <Button variant="ghost" size="icon" onClick={() => handleUpdateApplicationStatus(app.id, "rejected")}>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() =>
+                                    handleUpdateApplicationStatus(
+                                      app.id,
+                                      "rejected"
+                                    )
+                                  }
+                                >
                                   <XCircle className="w-4 h-4 text-destructive" />
                                 </Button>
                               </>
@@ -698,14 +1108,22 @@ const CompanyDashboard = () => {
                           </div>
                         </TableCell>
                         <TableCell>{getStatusBadge(app.status)}</TableCell>
-                        <TableCell className="text-muted-foreground">{app.appliedDate}</TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {app.appliedDate}
+                        </TableCell>
                         <TableCell>
-                          <Badge variant={app.matchScore >= 90 ? "default" : "secondary"}>
+                          <Badge
+                            variant={
+                              app.matchScore >= 90 ? "default" : "secondary"
+                            }
+                          >
                             {app.matchScore}%
                           </Badge>
                         </TableCell>
                         <TableCell>{app.jobTitle}</TableCell>
-                        <TableCell className="font-medium">{app.candidateName}</TableCell>
+                        <TableCell className="font-medium">
+                          {app.candidateName}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -717,66 +1135,139 @@ const CompanyDashboard = () => {
           {/* Promotion Tab */}
           <TabsContent value="promotion">
             <div className="space-y-6">
-              {/* Company Banner */}
+              {/* Company Banner (updated - saves as an ad placement) */}
               <Card>
                 <CardHeader className="text-right">
                   <CardTitle className="flex items-center justify-end gap-2">
                     <span>بانر الشركة</span>
                     <Image className="w-5 h-5 text-primary" />
                   </CardTitle>
-                  <CardDescription className="text-right">قم بإنشاء بانر ترويجي لشركتك يظهر في صفحة الوظائف الرئيسية</CardDescription>
+                  <CardDescription className="text-right">
+                    قم بإنشاء بانر ترويجي لشركتك يظهر في الصفحة الرئيسية
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="border border-dashed border-border rounded-lg p-4 bg-muted/20">
-                      <p className="text-xs text-muted-foreground mb-2 text-right">معاينة البانر</p>
-                      <div className="bg-gradient-to-l from-primary/20 to-accent/20 rounded-lg p-6 text-center">
-                        <h3 className="font-bold text-lg">{companyBanner.title || "عنوان البانر"}</h3>
-                        <p className="text-sm text-muted-foreground mt-2">
-                          {companyBanner.description || "وصف البانر سيظهر هنا..."}
-                        </p>
-                      </div>
+                      <p className="text-xs text-muted-foreground mb-2 text-right">
+                        معاينة البانر
+                      </p>
+                      {adForm.imageUrl ? (
+                        <a
+                          href={adForm.link || "#"}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          <img
+                            src={adForm.imageUrl}
+                            alt={adForm.title || "بانر"}
+                            className="w-full rounded-lg object-cover"
+                          />
+                        </a>
+                      ) : (
+                        <div className="bg-gradient-to-l from-primary/20 to-accent/20 rounded-lg p-6 text-center">
+                          <h3 className="font-bold text-lg">
+                            {adForm.title || "عنوان البانر"}
+                          </h3>
+                          <p className="text-sm text-muted-foreground mt-2">
+                            {adForm.description || "وصف البانر سيظهر هنا..."}
+                          </p>
+                        </div>
+                      )}
                     </div>
+
                     <div className="space-y-4">
                       <div className="space-y-2 text-right">
                         <Label>عنوان البانر</Label>
                         <Input
                           className="text-right"
                           placeholder="مثال: انضم لفريقنا المميز"
-                          value={companyBanner.title}
-                          onChange={(e) => setCompanyBanner({ ...companyBanner, title: e.target.value })}
+                          value={adForm.title}
+                          onChange={(e) =>
+                            setAdForm({ ...adForm, title: e.target.value })
+                          }
                         />
                       </div>
+
                       <div className="space-y-2 text-right">
                         <Label>وصف البانر</Label>
                         <Textarea
                           className="text-right"
                           placeholder="اكتب وصفاً جذاباً لشركتك..."
-                          value={companyBanner.description}
-                          onChange={(e) => setCompanyBanner({ ...companyBanner, description: e.target.value })}
+                          value={adForm.description}
+                          onChange={(e) =>
+                            setAdForm({
+                              ...adForm,
+                              description: e.target.value,
+                            })
+                          }
                           rows={3}
                         />
                       </div>
+
                       <div className="space-y-2 text-right">
                         <Label>رابط صورة البانر</Label>
                         <Input
                           className="text-right"
                           dir="ltr"
                           placeholder="https://example.com/banner.jpg"
-                          value={companyBanner.imageUrl}
-                          onChange={(e) => setCompanyBanner({ ...companyBanner, imageUrl: e.target.value })}
+                          value={adForm.imageUrl}
+                          onChange={(e) =>
+                            setAdForm({ ...adForm, imageUrl: e.target.value })
+                          }
                         />
                       </div>
+
+                      <div className="space-y-2 text-right">
+                        <Label>رابط الوجهة عند النقر (اختياري)</Label>
+                        <Input
+                          className="text-right"
+                          dir="ltr"
+                          placeholder="https://"
+                          value={adForm.link}
+                          onChange={(e) =>
+                            setAdForm({ ...adForm, link: e.target.value })
+                          }
+                        />
+                      </div>
+
+                      <div className="space-y-2 text-right">
+                        <Label>المكان</Label>
+                        <Select
+                          onValueChange={(value) =>
+                            setAdForm({ ...adForm, placement: value })
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue>
+                              {adForm.placement === "hero-bottom"
+                                ? "تحت الهيرو"
+                                : "تحت فحص الـATS"}
+                            </SelectValue>
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="hero-bottom">
+                              تحت الهيرو
+                            </SelectItem>
+                            <SelectItem value="ats-bottom">
+                              تحت فحص الـATS
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
                       <div className="flex justify-end">
-                        <Button onClick={handleSaveBanner} className="gap-2">
+                        <Button onClick={handleAddAd} className="gap-2">
                           <Megaphone className="w-4 h-4" />
-                          حفظ البانر
+                          طلب البانر
                         </Button>
                       </div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Ads Management moved to its own tab */}
 
               {/* Featured Jobs */}
               <Card>
@@ -785,7 +1276,9 @@ const CompanyDashboard = () => {
                     <span>الوظائف المميزة</span>
                     <Star className="w-5 h-5 text-amber-500" />
                   </CardTitle>
-                  <CardDescription className="text-right">اختر الوظائف التي تريد إبرازها في أعلى قائمة البحث</CardDescription>
+                  <CardDescription className="text-right">
+                    اختر الوظائف التي تريد إبرازها في أعلى قائمة البحث
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Table>
@@ -799,41 +1292,54 @@ const CompanyDashboard = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {jobs.filter(j => j.status === "active").map((job) => {
-                        const isFeatured = featuredJobs.some(f => f.id === job.id);
-                        return (
-                          <TableRow key={job.id}>
-                            <TableCell>
-                              <Button
-                                variant={isFeatured ? "outline" : "default"}
-                                size="sm"
-                                onClick={() => handleToggleFeatured(job.id)}
-                                className="gap-1"
-                              >
-                                <Star className={`w-4 h-4 ${isFeatured ? "" : "fill-current"}`} />
-                                {isFeatured ? "إلغاء التمييز" : "تمييز"}
-                              </Button>
-                            </TableCell>
-                            <TableCell>
-                              {isFeatured ? (
-                                <Badge className="gap-1 bg-amber-500">
-                                  <Star className="w-3 h-3" />
-                                  مميزة
+                      {jobs
+                        .filter((j) => j.status === "active")
+                        .map((job) => {
+                          const isFeatured = featuredJobs.some(
+                            (f) => f.id === job.id
+                          );
+                          return (
+                            <TableRow key={job.id}>
+                              <TableCell>
+                                <Button
+                                  variant={isFeatured ? "outline" : "default"}
+                                  size="sm"
+                                  onClick={() => handleToggleFeatured(job.id)}
+                                  className="gap-1"
+                                >
+                                  <Star
+                                    className={`w-4 h-4 ${
+                                      isFeatured ? "" : "fill-current"
+                                    }`}
+                                  />
+                                  {isFeatured ? "إلغاء التمييز" : "تمييز"}
+                                </Button>
+                              </TableCell>
+                              <TableCell>
+                                {isFeatured ? (
+                                  <Badge className="gap-1 bg-amber-500">
+                                    <Star className="w-3 h-3" />
+                                    مميزة
+                                  </Badge>
+                                ) : (
+                                  <Badge variant="outline">عادية</Badge>
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                <Badge
+                                  variant="outline"
+                                  className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30"
+                                >
+                                  نشطة
                                 </Badge>
-                              ) : (
-                                <Badge variant="outline">عادية</Badge>
-                              )}
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30">
-                                نشطة
-                              </Badge>
-                            </TableCell>
-                            <TableCell>{job.department}</TableCell>
-                            <TableCell className="font-medium">{job.title}</TableCell>
-                          </TableRow>
-                        );
-                      })}
+                              </TableCell>
+                              <TableCell>{job.department}</TableCell>
+                              <TableCell className="font-medium">
+                                {job.title}
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
                     </TableBody>
                   </Table>
                 </CardContent>
@@ -854,13 +1360,20 @@ const CompanyDashboard = () => {
                 <Label>المسمى الوظيفي</Label>
                 <Input
                   value={editJob.title}
-                  onChange={(e) => setEditJob({ ...editJob, title: e.target.value })}
+                  onChange={(e) =>
+                    setEditJob({ ...editJob, title: e.target.value })
+                  }
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>القسم</Label>
-                  <Select value={editJob.department} onValueChange={(value) => setEditJob({ ...editJob, department: value })}>
+                  <Select
+                    value={editJob.department}
+                    onValueChange={(value) =>
+                      setEditJob({ ...editJob, department: value })
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -875,7 +1388,12 @@ const CompanyDashboard = () => {
                 </div>
                 <div className="space-y-2">
                   <Label>نوع الدوام</Label>
-                  <Select value={editJob.type} onValueChange={(value) => setEditJob({ ...editJob, type: value })}>
+                  <Select
+                    value={editJob.type}
+                    onValueChange={(value) =>
+                      setEditJob({ ...editJob, type: value })
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -891,7 +1409,12 @@ const CompanyDashboard = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>الموقع</Label>
-                  <Select value={editJob.location} onValueChange={(value) => setEditJob({ ...editJob, location: value })}>
+                  <Select
+                    value={editJob.location}
+                    onValueChange={(value) =>
+                      setEditJob({ ...editJob, location: value })
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -906,7 +1429,12 @@ const CompanyDashboard = () => {
                 </div>
                 <div className="space-y-2">
                   <Label>الحالة</Label>
-                  <Select value={editJob.status} onValueChange={(value) => setEditJob({ ...editJob, status: value })}>
+                  <Select
+                    value={editJob.status}
+                    onValueChange={(value) =>
+                      setEditJob({ ...editJob, status: value })
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -925,7 +1453,10 @@ const CompanyDashboard = () => {
         </Dialog>
 
         {/* View Application Dialog */}
-        <Dialog open={isViewApplicationOpen} onOpenChange={setIsViewApplicationOpen}>
+        <Dialog
+          open={isViewApplicationOpen}
+          onOpenChange={setIsViewApplicationOpen}
+        >
           <DialogContent className="max-w-lg" dir="rtl">
             <DialogHeader>
               <DialogTitle>تفاصيل طلب التوظيف</DialogTitle>
@@ -934,41 +1465,60 @@ const CompanyDashboard = () => {
               <div className="space-y-4 mt-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="font-bold text-lg">{selectedApplication.candidateName}</h3>
-                    <p className="text-muted-foreground">{selectedApplication.jobTitle}</p>
+                    <h3 className="font-bold text-lg">
+                      {selectedApplication.candidateName}
+                    </h3>
+                    <p className="text-muted-foreground">
+                      {selectedApplication.jobTitle}
+                    </p>
                   </div>
                   {getStatusBadge(selectedApplication.status)}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-3 bg-muted/50 rounded-lg">
-                    <p className="text-sm text-muted-foreground">تاريخ التقديم</p>
-                    <p className="font-medium">{selectedApplication.appliedDate}</p>
+                    <p className="text-sm text-muted-foreground">
+                      تاريخ التقديم
+                    </p>
+                    <p className="font-medium">
+                      {selectedApplication.appliedDate}
+                    </p>
                   </div>
                   <div className="p-3 bg-muted/50 rounded-lg">
-                    <p className="text-sm text-muted-foreground">نسبة التوافق</p>
-                    <p className="font-bold text-lg">{selectedApplication.matchScore}%</p>
+                    <p className="text-sm text-muted-foreground">
+                      نسبة التوافق
+                    </p>
+                    <p className="font-bold text-lg">
+                      {selectedApplication.matchScore}%
+                    </p>
                   </div>
                 </div>
 
-                {(selectedApplication.status === "pending" || selectedApplication.status === "reviewed") && (
+                {(selectedApplication.status === "pending" ||
+                  selectedApplication.status === "reviewed") && (
                   <div className="flex gap-2">
-                    <Button 
+                    <Button
                       onClick={() => {
-                        handleUpdateApplicationStatus(selectedApplication.id, "accepted");
+                        handleUpdateApplicationStatus(
+                          selectedApplication.id,
+                          "accepted"
+                        );
                         setIsViewApplicationOpen(false);
-                      }} 
+                      }}
                       className="flex-1 gap-2 bg-emerald-500 hover:bg-emerald-600"
                     >
                       <CheckCircle className="w-4 h-4" />
                       قبول الطلب
                     </Button>
-                    <Button 
+                    <Button
                       variant="destructive"
                       onClick={() => {
-                        handleUpdateApplicationStatus(selectedApplication.id, "rejected");
+                        handleUpdateApplicationStatus(
+                          selectedApplication.id,
+                          "rejected"
+                        );
                         setIsViewApplicationOpen(false);
-                      }} 
+                      }}
                       className="flex-1 gap-2"
                     >
                       <XCircle className="w-4 h-4" />
