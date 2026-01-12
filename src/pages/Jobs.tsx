@@ -222,8 +222,8 @@ ${applicationForm.fullName || "[اسمك]"}`;
 
       {/* Split Panel Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left Side - Job Details */}
-        <div className="order-2 lg:order-1">
+        {/* Right Side - Job Details (appears on left in RTL) */}
+        <div className="order-2 lg:order-2">
           {selectedJob ? (
             <div className="card-elevated p-6 sticky top-6">
               {/* Company Header */}
@@ -289,8 +289,8 @@ ${applicationForm.fullName || "[اسمك]"}`;
           )}
         </div>
 
-        {/* Right Side - Job Listings */}
-        <div className="order-1 lg:order-2 space-y-3">
+        {/* Left Side - Job Listings (appears on right in RTL) */}
+        <div className="order-1 lg:order-1 space-y-3">
           {/* Stats */}
           <div className="flex flex-wrap gap-3 mb-4">
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary/5 text-primary text-sm">
