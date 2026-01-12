@@ -6,12 +6,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { 
-  Target, 
-  Sparkles, 
-  BookOpen, 
-  Code, 
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
+  Target,
+  Sparkles,
+  BookOpen,
+  Code,
   Trophy,
   ChevronLeft,
   ChevronDown,
@@ -22,7 +26,7 @@ import {
   Rocket,
   GraduationCap,
   Briefcase,
-  Star
+  Star,
 } from "lucide-react";
 
 interface RoadmapItem {
@@ -50,12 +54,16 @@ const CareerPath = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [roadmap, setRoadmap] = useState<RoadmapPhase[] | null>(null);
   const [completedItems, setCompletedItems] = useState<Set<string>>(new Set());
-  const [completedResources, setCompletedResources] = useState<Set<string>>(new Set());
-  const [openPhases, setOpenPhases] = useState<Set<string>>(new Set(["phase-1"]));
+  const [completedResources, setCompletedResources] = useState<Set<string>>(
+    new Set()
+  );
+  const [openPhases, setOpenPhases] = useState<Set<string>>(
+    new Set(["phase-1"])
+  );
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
 
   const toggleResourceCompletion = (resourceKey: string) => {
-    setCompletedResources(prev => {
+    setCompletedResources((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(resourceKey)) {
         newSet.delete(resourceKey);
@@ -66,11 +74,50 @@ const CareerPath = () => {
     });
   };
 
+  const handleOpenResource = (
+    itemId: string,
+    idx: number,
+    resource: string,
+    type: string
+  ) => {
+    const resourceKey = `${itemId}-resource-${idx}`;
+
+    setCompletedResources((prev) => {
+      const newSet = new Set(prev);
+      newSet.add(resourceKey);
+
+      // If all resources for this item are completed, mark the item completed
+      const item = roadmap
+        ?.flatMap((p) => p.items)
+        .find((i) => i.id === itemId);
+      if (item && item.resources) {
+        const allDone = item.resources.every((_, i2) =>
+          newSet.has(`${itemId}-resource-${i2}`)
+        );
+        if (allDone) {
+          setCompletedItems((prevItems) => {
+            const s = new Set(prevItems);
+            s.add(itemId);
+            return s;
+          });
+        }
+      }
+
+      return newSet;
+    });
+
+    // Open an external search (Google) for the resource in a new tab
+    const url = `https://www.google.com/search?q=${encodeURIComponent(
+      resource
+    )}`;
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
   const generateRoadmap = () => {
     if (!goal.trim()) return;
-    
+
     setIsGenerating(true);
-    
+
     // Simulate AI generation
     setTimeout(() => {
       const generatedRoadmap: RoadmapPhase[] = [
@@ -83,11 +130,12 @@ const CareerPath = () => {
             {
               id: "item-1",
               title: "إتقان TypeScript المتقدم",
-              description: "تعلم الأنماط المتقدمة والـ Generics والـ Decorators",
+              description:
+                "تعلم الأنماط المتقدمة والـ Generics والـ Decorators",
               type: "technology",
               duration: "٣ أسابيع",
               completed: false,
-              resources: ["TypeScript Deep Dive", "Effective TypeScript"]
+              resources: ["TypeScript Deep Dive", "Effective TypeScript"],
             },
             {
               id: "item-2",
@@ -96,7 +144,7 @@ const CareerPath = () => {
               type: "course",
               duration: "٤ أسابيع",
               completed: false,
-              resources: ["Clean Code", "Design Patterns"]
+              resources: ["Clean Code", "Design Patterns"],
             },
             {
               id: "item-3",
@@ -104,9 +152,9 @@ const CareerPath = () => {
               description: "تطبيق عملي لجميع المفاهيم المتعلمة",
               type: "exercise",
               duration: "٢ أسابيع",
-              completed: false
-            }
-          ]
+              completed: false,
+            },
+          ],
         },
         {
           id: "phase-2",
@@ -121,7 +169,10 @@ const CareerPath = () => {
               type: "technology",
               duration: "٦ أسابيع",
               completed: false,
-              resources: ["System Design Interview", "Designing Data-Intensive Applications"]
+              resources: [
+                "System Design Interview",
+                "Designing Data-Intensive Applications",
+              ],
             },
             {
               id: "item-5",
@@ -130,7 +181,7 @@ const CareerPath = () => {
               type: "course",
               duration: "٤ أسابيع",
               completed: false,
-              resources: ["The Manager's Path", "Staff Engineer"]
+              resources: ["The Manager's Path", "Staff Engineer"],
             },
             {
               id: "item-6",
@@ -138,7 +189,7 @@ const CareerPath = () => {
               description: "ممارسة مراجعة الكود وتقديم الملاحظات البناءة",
               type: "exercise",
               duration: "مستمر",
-              completed: false
+              completed: false,
             },
             {
               id: "item-7",
@@ -146,9 +197,9 @@ const CareerPath = () => {
               description: "تقنيات تحسين أداء التطبيقات",
               type: "technology",
               duration: "٣ أسابيع",
-              completed: false
-            }
-          ]
+              completed: false,
+            },
+          ],
         },
         {
           id: "phase-3",
@@ -162,7 +213,7 @@ const CareerPath = () => {
               description: "المشاركة في مشاريع GitHub معروفة",
               type: "exercise",
               duration: "مستمر",
-              completed: false
+              completed: false,
             },
             {
               id: "item-9",
@@ -170,7 +221,7 @@ const CareerPath = () => {
               description: "مشاركة المعرفة عبر المدونات والمنصات التقنية",
               type: "exercise",
               duration: "مقال شهرياً",
-              completed: false
+              completed: false,
             },
             {
               id: "item-10",
@@ -179,9 +230,12 @@ const CareerPath = () => {
               type: "milestone",
               duration: "٤ أسابيع",
               completed: false,
-              resources: ["AWS Solutions Architect", "Google Cloud Professional"]
-            }
-          ]
+              resources: [
+                "AWS Solutions Architect",
+                "Google Cloud Professional",
+              ],
+            },
+          ],
         },
         {
           id: "phase-4",
@@ -195,7 +249,7 @@ const CareerPath = () => {
               description: "إبراز المهارات والإنجازات الجديدة",
               type: "milestone",
               duration: "أسبوع",
-              completed: false
+              completed: false,
             },
             {
               id: "item-12",
@@ -203,7 +257,7 @@ const CareerPath = () => {
               description: "التدرب على أسئلة المقابلات للمستوى الأعلى",
               type: "exercise",
               duration: "٢ أسابيع",
-              completed: false
+              completed: false,
             },
             {
               id: "item-13",
@@ -211,25 +265,43 @@ const CareerPath = () => {
               description: "البحث والتقديم على الوظائف المناسبة",
               type: "milestone",
               duration: "مستمر",
-              completed: false
-            }
-          ]
-        }
+              completed: false,
+            },
+          ],
+        },
       ];
-      
+
       setRoadmap(generatedRoadmap);
       setIsGenerating(false);
     }, 2500);
   };
 
   const toggleItemCompletion = (itemId: string) => {
-    setCompletedItems(prev => {
+    setCompletedItems((prev) => {
       const newSet = new Set(prev);
-      if (newSet.has(itemId)) {
-        newSet.delete(itemId);
-      } else {
+      const willBeCompleted = !newSet.has(itemId);
+      if (willBeCompleted) {
         newSet.add(itemId);
+      } else {
+        newSet.delete(itemId);
       }
+
+      // Sync resources: mark all resources completed when item completed, remove when unchecking
+      setCompletedResources((prevRes) => {
+        const newRes = new Set(prevRes);
+        const item = roadmap
+          ?.flatMap((p) => p.items)
+          .find((i) => i.id === itemId);
+        if (item && item.resources) {
+          item.resources.forEach((_, idx) => {
+            const key = `${item.id}-resource-${idx}`;
+            if (willBeCompleted) newRes.add(key);
+            else newRes.delete(key);
+          });
+        }
+        return newRes;
+      });
+
       return newSet;
     });
   };
@@ -300,7 +372,7 @@ const CareerPath = () => {
   };
 
   const togglePhase = (phaseId: string) => {
-    setOpenPhases(prev => {
+    setOpenPhases((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(phaseId)) {
         newSet.delete(phaseId);
@@ -312,7 +384,7 @@ const CareerPath = () => {
   };
 
   const toggleItem = (itemId: string) => {
-    setOpenItems(prev => {
+    setOpenItems((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(itemId)) {
         newSet.delete(itemId);
@@ -329,7 +401,9 @@ const CareerPath = () => {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-foreground">المسار المهني</h1>
+            <h1 className="text-2xl font-bold text-foreground">
+              المسار المهني
+            </h1>
             <p className="text-muted-foreground mt-1">
               حدد هدفك المهني واحصل على خارطة طريق مخصصة للوصول إليه
             </p>
@@ -391,7 +465,7 @@ const CareerPath = () => {
                 />
               </div>
 
-              <Button 
+              <Button
                 onClick={generateRoadmap}
                 disabled={!goal.trim() || isGenerating}
                 className="w-full btn-gradient gap-2"
@@ -414,7 +488,9 @@ const CareerPath = () => {
                 <div className="text-center space-y-3 py-4">
                   <div className="ai-indicator mx-auto">
                     <Sparkles className="h-5 w-5 text-primary animate-pulse" />
-                    <span className="text-sm">الذكاء الاصطناعي يحلل ملفك الشخصي...</span>
+                    <span className="text-sm">
+                      الذكاء الاصطناعي يحلل ملفك الشخصي...
+                    </span>
                   </div>
                   <Progress value={65} className="h-2" />
                 </div>
@@ -433,15 +509,21 @@ const CareerPath = () => {
                       <Target className="h-6 w-6 text-white" />
                     </div>
                     <div>
-                      <h2 className="text-lg font-bold text-foreground">الهدف: {goal}</h2>
+                      <h2 className="text-lg font-bold text-foreground">
+                        الهدف: {goal}
+                      </h2>
                       <p className="text-sm text-muted-foreground">
                         {getCompletedCount()} من {getTotalItems()} مهمة مكتملة
                       </p>
                     </div>
                   </div>
                   <div className="text-left">
-                    <div className="text-3xl font-bold text-primary">{getProgressPercentage()}%</div>
-                    <div className="text-sm text-muted-foreground">نسبة الإنجاز</div>
+                    <div className="text-3xl font-bold text-primary">
+                      {getProgressPercentage()}%
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      نسبة الإنجاز
+                    </div>
                   </div>
                 </div>
                 <Progress value={getProgressPercentage()} className="h-3" />
@@ -451,15 +533,17 @@ const CareerPath = () => {
             {/* Roadmap Phases */}
             <div className="space-y-4">
               {roadmap.map((phase, phaseIndex) => {
-                const phaseCompletedCount = phase.items.filter(item => 
+                const phaseCompletedCount = phase.items.filter((item) =>
                   completedItems.has(item.id)
                 ).length;
-                const phaseProgress = Math.round((phaseCompletedCount / phase.items.length) * 100);
+                const phaseProgress = Math.round(
+                  (phaseCompletedCount / phase.items.length) * 100
+                );
                 const isPhaseOpen = openPhases.has(phase.id);
 
                 return (
-                  <Collapsible 
-                    key={phase.id} 
+                  <Collapsible
+                    key={phase.id}
                     open={isPhaseOpen}
                     onOpenChange={() => togglePhase(phase.id)}
                   >
@@ -469,8 +553,13 @@ const CareerPath = () => {
                         <div className="bg-gradient-to-l from-primary/10 to-transparent p-4 border-b border-border/50 cursor-pointer hover:bg-primary/5 transition-colors">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                              <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold
-                                ${phaseProgress === 100 ? 'bg-success' : 'bg-gradient-to-br from-primary to-secondary'}`}
+                              <div
+                                className={`w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold
+                                ${
+                                  phaseProgress === 100
+                                    ? "bg-success"
+                                    : "bg-gradient-to-br from-primary to-secondary"
+                                }`}
                               >
                                 {phaseProgress === 100 ? (
                                   <CheckCircle2 className="h-5 w-5" />
@@ -479,8 +568,12 @@ const CareerPath = () => {
                                 )}
                               </div>
                               <div>
-                                <h3 className="font-bold text-foreground">{phase.title}</h3>
-                                <p className="text-sm text-muted-foreground">{phase.description}</p>
+                                <h3 className="font-bold text-foreground">
+                                  {phase.title}
+                                </h3>
+                                <p className="text-sm text-muted-foreground">
+                                  {phase.description}
+                                </p>
                               </div>
                             </div>
                             <div className="flex items-center gap-4">
@@ -498,7 +591,10 @@ const CareerPath = () => {
                               )}
                             </div>
                           </div>
-                          <Progress value={phaseProgress} className="h-1.5 mt-3" />
+                          <Progress
+                            value={phaseProgress}
+                            className="h-1.5 mt-3"
+                          />
                         </div>
                       </CollapsibleTrigger>
 
@@ -508,18 +604,18 @@ const CareerPath = () => {
                           {phase.items.map((item) => {
                             const isCompleted = completedItems.has(item.id);
                             const isItemOpen = openItems.has(item.id);
-                            
+
                             return (
                               <Collapsible
                                 key={item.id}
                                 open={isItemOpen}
                                 onOpenChange={() => toggleItem(item.id)}
                               >
-                                <div 
+                                <div
                                   className={`rounded-xl border transition-all duration-200 ${
-                                    isCompleted 
-                                      ? 'bg-success/5 border-success/20' 
-                                      : 'bg-card border-border hover:border-primary/30 hover:shadow-soft'
+                                    isCompleted
+                                      ? "bg-success/5 border-success/20"
+                                      : "bg-card border-border hover:border-primary/30 hover:shadow-soft"
                                   }`}
                                 >
                                   {/* Item Header - Collapsible Trigger */}
@@ -528,26 +624,39 @@ const CareerPath = () => {
                                       <div className="flex items-center gap-3">
                                         <Checkbox
                                           checked={isCompleted}
-                                          onCheckedChange={() => toggleItemCompletion(item.id)}
+                                          onCheckedChange={() =>
+                                            toggleItemCompletion(item.id)
+                                          }
                                           onClick={(e) => e.stopPropagation()}
                                           className="mt-0"
                                         />
                                         <div className="flex-1">
                                           <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-2">
-                                              <h4 className={`font-medium ${isCompleted ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
+                                              <h4
+                                                className={`font-medium ${
+                                                  isCompleted
+                                                    ? "line-through text-muted-foreground"
+                                                    : "text-foreground"
+                                                }`}
+                                              >
                                                 {item.title}
                                               </h4>
-                                              <Badge 
-                                                variant="outline" 
-                                                className={`text-xs gap-1 ${getItemTypeBadgeClass(item.type)}`}
+                                              <Badge
+                                                variant="outline"
+                                                className={`text-xs gap-1 ${getItemTypeBadgeClass(
+                                                  item.type
+                                                )}`}
                                               >
                                                 {getItemIcon(item.type)}
                                                 {getItemTypeLabel(item.type)}
                                               </Badge>
                                             </div>
                                             <div className="flex items-center gap-2">
-                                              <Badge variant="secondary" className="gap-1 text-xs">
+                                              <Badge
+                                                variant="secondary"
+                                                className="gap-1 text-xs"
+                                              >
                                                 <Clock className="h-3 w-3" />
                                                 {item.duration}
                                               </Badge>
@@ -569,43 +678,61 @@ const CareerPath = () => {
                                       <p className="text-sm text-foreground/80">
                                         {item.description}
                                       </p>
-                                      {item.resources && item.resources.length > 0 && (
-                                        <div className="space-y-2 pt-2">
-                                          <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-                                            <BookOpen className="h-4 w-4 text-primary" />
-                                            <span>المصادر والمراجع</span>
+                                      {item.resources &&
+                                        item.resources.length > 0 && (
+                                          <div className="space-y-2 pt-2">
+                                            <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                                              <BookOpen className="h-4 w-4 text-primary" />
+                                              <span>المصادر والمراجع</span>
+                                            </div>
+                                            <div className="space-y-2 mr-6">
+                                              {item.resources.map(
+                                                (resource, idx) => {
+                                                  const resourceKey = `${item.id}-resource-${idx}`;
+                                                  const isResourceCompleted =
+                                                    completedResources.has(
+                                                      resourceKey
+                                                    );
+                                                  const basePath =
+                                                    item.type === "course"
+                                                      ? "/courses"
+                                                      : "/articles";
+
+                                                  return (
+                                                    <div
+                                                      key={idx}
+                                                      className={`flex items-center gap-3 p-2 rounded-lg border transition-all ${
+                                                        isResourceCompleted
+                                                          ? "bg-success/10 border-success/30"
+                                                          : "bg-card border-border hover:border-primary/30"
+                                                      }`}
+                                                    >
+                                                      <a
+                                                        onClick={(e) => {
+                                                          e.stopPropagation();
+                                                          handleOpenResource(
+                                                            item.id,
+                                                            idx,
+                                                            resource,
+                                                            item.type
+                                                          );
+                                                        }}
+                                                        href="#"
+                                                        className={`text-sm ${
+                                                          isResourceCompleted
+                                                            ? "line-through text-muted-foreground"
+                                                            : "text-foreground"
+                                                        }`}
+                                                      >
+                                                        {resource}
+                                                      </a>
+                                                    </div>
+                                                  );
+                                                }
+                                              )}
+                                            </div>
                                           </div>
-                                          <div className="space-y-2 mr-6">
-                                            {item.resources.map((resource, idx) => {
-                                              const resourceKey = `${item.id}-resource-${idx}`;
-                                              const isResourceCompleted = completedResources.has(resourceKey);
-                                              
-                                              return (
-                                                <label 
-                                                  key={idx} 
-                                                  className={`flex items-center gap-3 p-2 rounded-lg border cursor-pointer transition-all ${
-                                                    isResourceCompleted 
-                                                      ? 'bg-success/10 border-success/30' 
-                                                      : 'bg-card border-border hover:border-primary/30'
-                                                  }`}
-                                                >
-                                                  <Checkbox
-                                                    checked={isResourceCompleted}
-                                                    onCheckedChange={() => toggleResourceCompletion(resourceKey)}
-                                                  />
-                                                  <span className={`text-sm ${
-                                                    isResourceCompleted 
-                                                      ? 'line-through text-muted-foreground' 
-                                                      : 'text-foreground'
-                                                  }`}>
-                                                    {resource}
-                                                  </span>
-                                                </label>
-                                              );
-                                            })}
-                                          </div>
-                                        </div>
-                                      )}
+                                        )}
                                     </div>
                                   </CollapsibleContent>
                                 </div>
@@ -631,7 +758,8 @@ const CareerPath = () => {
                     تهانينا! 🎉
                   </h3>
                   <p className="text-muted-foreground">
-                    لقد أكملت جميع المهام في خارطة الطريق. أنت جاهز للوصول إلى هدفك!
+                    لقد أكملت جميع المهام في خارطة الطريق. أنت جاهز للوصول إلى
+                    هدفك!
                   </p>
                 </CardContent>
               </Card>
