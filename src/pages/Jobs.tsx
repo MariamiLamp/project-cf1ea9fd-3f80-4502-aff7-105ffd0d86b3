@@ -1,5 +1,5 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { Search, SlidersHorizontal, MapPin, Briefcase, Clock, Building2, Bookmark, ArrowLeft, X, Sparkles, Loader2, FileText, Copy, Check, Eye, Upload } from "lucide-react";
+import { Search, SlidersHorizontal, MapPin, Briefcase, Clock, Building2, Bookmark, ArrowLeft, X, Sparkles, Loader2, FileText, Copy, Check, Eye, Upload, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -118,9 +118,19 @@ const JobsPage = () => {
   const [generatedCoverLetter, setGeneratedCoverLetter] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const jobsPerPage = 4;
+
+  const totalPages = Math.ceil(jobs.length / jobsPerPage);
+  const paginatedJobs = jobs.slice((currentPage - 1) * jobsPerPage, currentPage * jobsPerPage);
 
   const handleSelectJob = (job: typeof jobs[0]) => {
     setSelectedJob(job);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    setSelectedJob(paginatedJobs[0] || null);
   };
   const handleApply = (job: typeof jobs[0]) => {
     setSelectedJob(job);
@@ -300,7 +310,7 @@ ${applicationForm.fullName || "[اسمك]"}`;
           </div>
 
           {/* Job Cards */}
-          {jobs.map((job, index) => (
+          {paginatedJobs.map((job, index) => (
             <div
               key={job.id}
               onClick={() => handleSelectJob(job)}
@@ -366,10 +376,38 @@ ${applicationForm.fullName || "[اسمك]"}`;
             </div>
           ))}
 
-          {/* Load More */}
-          <div className="text-center pt-4">
-            <Button variant="outline" size="default">
-              تحميل المزيد من الوظائف
+          {/* Pagination */}
+          <div className="flex items-center justify-center gap-2 pt-4">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="h-9 w-9"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+            
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <Button
+                key={page}
+                variant={currentPage === page ? "default" : "outline"}
+                size="icon"
+                onClick={() => handlePageChange(page)}
+                className="h-9 w-9"
+              >
+                {page}
+              </Button>
+            ))}
+            
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="h-9 w-9"
+            >
+              <ChevronLeft className="w-4 h-4" />
             </Button>
           </div>
         </div>
