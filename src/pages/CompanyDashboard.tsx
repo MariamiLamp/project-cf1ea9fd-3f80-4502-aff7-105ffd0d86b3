@@ -251,6 +251,7 @@ const CompanyDashboard = () => {
     imageUrl: "",
     link: "",
     placement: "hero-bottom",
+    duration: "1_week",
   });
   const liveAds = ads.filter((a) => a.enabled);
 
@@ -472,27 +473,57 @@ const CompanyDashboard = () => {
       return;
     }
     // create ad request (pending approval) - do not enable until admin approves
-    const created = addAd({
-      title: adForm.title || undefined,
-      description: adForm.description || undefined,
+    // Calculate price based on duration
+    let price = 500;
+    const durationLabel =
+      adForm.duration === "1_week"
+        ? "أسبوع"
+        : adForm.duration === "2_weeks"
+        ? "أسبوعين"
+        : adForm.duration === "1_month"
+        ? "شهر"
+        : "شهر";
+
+    switch (adForm.duration) {
+      case "1_week":
+        price = 500;
+        break;
+      case "2_weeks":
+        price = 900;
+        break;
+      case "1_month":
+        price = 1500;
+        break;
+      default:
+        price = 500;
+    }
+
+    const adRequestData = {
+      title: adForm.title || "بدون عنوان",
+      description: adForm.description || "",
       imageUrl: adForm.imageUrl,
-      link: adForm.link || undefined,
+      link: adForm.link || "",
       placement: adForm.placement as AdPlacement,
       enabled: false,
-    });
-    toast({
-      title: "تم إرسال الطلب",
-      description: "تم إرسال طلب الإعلان، سيتم تفعيله بعد الموافقة",
-    });
+      status: "pending", // Will be pending until paid/approved
+      companyName: user?.companyName || "شركة تجريبية",
+      date: new Date().toISOString().split("T")[0],
+      price: price,
+      duration: durationLabel,
+      type: "بنر إعلاني",
+    };
+
+    // Navigate to checkout with the ad request data
+    navigate("/checkout", { state: { adRequest: adRequestData } });
+
     setAdForm({
       title: "",
       description: "",
       imageUrl: "",
       link: "",
       placement: "hero-bottom",
+      duration: "1_week",
     });
-    // send the user to checkout to complete payment
-    navigate("/checkout");
   };
 
   const handleRemoveAd = (id: number) => {
@@ -827,7 +858,10 @@ const CompanyDashboard = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Table>
+                <Table
+                  dir="ltr"
+                  className="text-right [&_th]:text-right [&_td]:text-right"
+                >
                   <TableHeader>
                     <TableRow>
                       <TableHead>الإجراءات</TableHead>
@@ -844,7 +878,7 @@ const CompanyDashboard = () => {
                     {jobs.map((job) => (
                       <TableRow key={job.id}>
                         <TableCell>
-                          <div className="flex gap-1">
+                          <div className="flex gap-1 justify-end">
                             <Button
                               variant="ghost"
                               size="icon"
@@ -971,7 +1005,10 @@ const CompanyDashboard = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Table>
+                <Table
+                  dir="ltr"
+                  className="text-right [&_th]:text-right [&_td]:text-right"
+                >
                   <TableHeader>
                     <TableRow>
                       <TableHead>الوظيفة المناسبة</TableHead>
@@ -1053,7 +1090,10 @@ const CompanyDashboard = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Table>
+                <Table
+                  dir="ltr"
+                  className="text-right [&_th]:text-right [&_td]:text-right"
+                >
                   <TableHeader>
                     <TableRow>
                       <TableHead>الإجراءات</TableHead>
@@ -1068,7 +1108,7 @@ const CompanyDashboard = () => {
                     {applications.map((app) => (
                       <TableRow key={app.id}>
                         <TableCell>
-                          <div className="flex gap-1">
+                          <div className="flex gap-1 justify-end">
                             <Button
                               variant="ghost"
                               size="icon"
@@ -1219,6 +1259,31 @@ const CompanyDashboard = () => {
                       </div>
 
                       <div className="space-y-2 text-right">
+                        <Label>المدة</Label>
+                        <Select
+                          value={adForm.duration}
+                          onValueChange={(value) =>
+                            setAdForm({ ...adForm, duration: value })
+                          }
+                        >
+                          <SelectTrigger dir="rtl">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent dir="rtl">
+                            <SelectItem value="1_week">
+                              أسبوع (500 ر.س)
+                            </SelectItem>
+                            <SelectItem value="2_weeks">
+                              أسبوعين (900 ر.س)
+                            </SelectItem>
+                            <SelectItem value="1_month">
+                              شهر (1500 ر.س)
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2 text-right">
                         <Label>رابط الوجهة عند النقر (اختياري)</Label>
                         <Input
                           className="text-right"
@@ -1281,7 +1346,10 @@ const CompanyDashboard = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Table>
+                  <Table
+                    dir="ltr"
+                    className="text-right [&_th]:text-right [&_td]:text-right"
+                  >
                     <TableHeader>
                       <TableRow>
                         <TableHead></TableHead>
@@ -1301,19 +1369,21 @@ const CompanyDashboard = () => {
                           return (
                             <TableRow key={job.id}>
                               <TableCell>
-                                <Button
-                                  variant={isFeatured ? "outline" : "default"}
-                                  size="sm"
-                                  onClick={() => handleToggleFeatured(job.id)}
-                                  className="gap-1"
-                                >
-                                  <Star
-                                    className={`w-4 h-4 ${
-                                      isFeatured ? "" : "fill-current"
-                                    }`}
-                                  />
-                                  {isFeatured ? "إلغاء التمييز" : "تمييز"}
-                                </Button>
+                                <div className="flex justify-end">
+                                  <Button
+                                    variant={isFeatured ? "outline" : "default"}
+                                    size="sm"
+                                    onClick={() => handleToggleFeatured(job.id)}
+                                    className="gap-1"
+                                  >
+                                    <Star
+                                      className={`w-4 h-4 ${
+                                        isFeatured ? "" : "fill-current"
+                                      }`}
+                                    />
+                                    {isFeatured ? "إلغاء التمييز" : "تمييز"}
+                                  </Button>
+                                </div>
                               </TableCell>
                               <TableCell>
                                 {isFeatured ? (

@@ -10,6 +10,13 @@ export type AdItem = {
   link?: string;
   placement: AdPlacement;
   enabled?: boolean;
+  // Extended fields
+  status?: "pending" | "active" | "rejected";
+  price?: number;
+  date?: string;
+  companyName?: string;
+  duration?: string;
+  type?: string;
 };
 
 const STORAGE_KEY = "site_ads";
@@ -72,5 +79,5 @@ export default function useAds() {
     writeToStorage([]);
   };
 
-  return { ads, add, remove, getByPlacement, clear } as const;
+  return { ads, add, update, remove, getByPlacement, clear } as const;
 }

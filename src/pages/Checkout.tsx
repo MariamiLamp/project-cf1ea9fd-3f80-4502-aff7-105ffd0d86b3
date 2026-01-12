@@ -3,31 +3,45 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import useCart from "@/hooks/use-cart";
+import useAds from "@/hooks/use-ads";
 
 const Checkout = () => {
   const { items, total, clear } = useCart();
+  const { add: addAd } = useAds();
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
+
+  const adRequest = location.state?.adRequest;
 
   const [email, setEmail] = useState("");
 
-  const subtotal = total;
+  const subtotal = adRequest ? adRequest.price : total;
   const tax = +(subtotal * 0.15).toFixed(2);
   const grandTotal = +(subtotal + tax).toFixed(2);
 
   const handlePay = () => {
     // Mock payment
-    toast({
-      title: "تم الدفع",
-      description: `تم شراء ${
-        items.length
-      } قالب بنجاح — سيتم إرسال الإيصال إلى ${email || "البريد الإلكتروني"}`,
-    });
-    clear();
-    navigate("/templates");
+    if (adRequest) {
+      addAd(adRequest);
+      toast({
+        title: "تم الدفع بنجاح",
+        description: "تم استلام طلب الإعلان وسيتم مراجعته قريباً",
+      });
+      navigate("/company-dashboard");
+    } else {
+      toast({
+        title: "تم الدفع",
+        description: `تم شراء ${
+          items.length
+        } قالب بنجاح — سيتم إرسال الإيصال إلى ${email || "البريد الإلكتروني"}`,
+      });
+      clear();
+      navigate("/templates");
+    }
   };
 
   return (
@@ -68,7 +82,7 @@ const Checkout = () => {
                 <Button
                   className="w-full mt-3"
                   onClick={handlePay}
-                  disabled={items.length === 0}
+                  disabled={!adRequest && items.length === 0}
                 >
                   ادفع الآن
                 </Button>
@@ -83,22 +97,42 @@ const Checkout = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3 text-sm">
-                  {items.map((item) => (
-                    <div key={item.id} className="flex justify-between">
+                  {adRequest ? (
+                    <div className="flex justify-between border-b pb-4">
                       <div>
-                        <div className="font-medium">{item.name}</div>
+                        <div className="font-medium">{adRequest.title}</div>
                         <div className="text-muted-foreground text-xs">
-                          كمية: {item.quantity}
+                          المدة: {adRequest.duration}
+                        </div>
+                        <div className="text-muted-foreground text-xs">
+                          المكان:{" "}
+                          {adRequest.placement === "hero-bottom"
+                            ? "تحت الهيرو"
+                            : "تحت فحص الـATS"}
                         </div>
                       </div>
                       <div className="text-right">
-                        <div>{item.price} ر.س</div>
-                        <div className="text-muted-foreground text-xs">
-                          {(item.price * item.quantity).toFixed(2)} ر.س
-                        </div>
+                        <div>{adRequest.price} ر.س</div>
                       </div>
                     </div>
-                  ))}
+                  ) : (
+                    items.map((item) => (
+                      <div key={item.id} className="flex justify-between">
+                        <div>
+                          <div className="font-medium">{item.name}</div>
+                          <div className="text-muted-foreground text-xs">
+                            كمية: {item.quantity}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div>{item.price} ر.س</div>
+                          <div className="text-muted-foreground text-xs">
+                            {(item.price * item.quantity).toFixed(2)} ر.س
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
 
                   <div className="pt-2">
                     <div className="flex justify-between text-sm">
