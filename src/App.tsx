@@ -20,6 +20,8 @@ import CandidateProfile from "./pages/CandidateProfile";
 import JobSeekerRegistration from "./pages/JobSeekerRegistration";
 import HRDashboard from "./pages/HRDashboard";
 import TemplatesMarketplace from "./pages/TemplatesMarketplace";
+import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
 import PostsPlanner from "./pages/PostsPlanner";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -47,9 +49,14 @@ const App = () => (
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/company" element={<CompanyDashboard />} />
               <Route path="/candidate/:id" element={<CandidateProfile />} />
-              <Route path="/register/jobseeker" element={<JobSeekerRegistration />} />
+              <Route
+                path="/register/jobseeker"
+                element={<JobSeekerRegistration />}
+              />
               <Route path="/hr" element={<HRDashboard />} />
               <Route path="/templates" element={<TemplatesMarketplace />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/checkout" element={<Checkout />} />
               <Route path="/posts-planner" element={<PostsPlanner />} />
               <Route path="/settings" element={<Settings />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
