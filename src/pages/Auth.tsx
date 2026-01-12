@@ -73,14 +73,6 @@ const Auth = () => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-6">
-              {/* Role Selection */}
-              <div className="space-y-3">
-                <Label>نوع الحساب</Label>
-                <div className="grid grid-cols-3 gap-3">
-                  {roles.map(role => {})}
-                </div>
-              </div>
-
               {/* Email */}
               <div className="space-y-2">
                 <Label htmlFor="email">البريد الإلكتروني</Label>
