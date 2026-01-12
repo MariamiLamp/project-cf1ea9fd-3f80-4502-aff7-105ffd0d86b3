@@ -1,8 +1,9 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { Upload, FileText, CheckCircle, AlertCircle, Sparkles } from "lucide-react";
+import { Upload, FileText, CheckCircle, AlertCircle, FileEdit, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { CVScoreRing } from "@/components/dashboard/CVScoreRing";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const CVCheckPage = () => {
   const [hasFile, setHasFile] = useState(false);
@@ -122,9 +123,11 @@ const CVCheckPage = () => {
                 ))}
               </div>
 
-              <Button variant="gradient" size="lg" className="w-full mt-6">
-                <Sparkles className="w-5 h-5" />
-                تحسين تلقائي بالذكاء الاصطناعي
+              <Button variant="gradient" size="lg" className="w-full mt-6" asChild>
+                <Link to="/cv-builder">
+                  <FileEdit className="w-5 h-5" />
+                  أنشئ سيرة ذاتية احترافية
+                </Link>
               </Button>
             </div>
           ) : (
