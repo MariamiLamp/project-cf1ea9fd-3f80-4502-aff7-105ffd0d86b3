@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,8 +17,6 @@ const Checkout = () => {
 
   const adRequest = location.state?.adRequest;
 
-  const [email, setEmail] = useState("");
-
   const subtotal = adRequest ? adRequest.price : total;
   const tax = +(subtotal * 0.15).toFixed(2);
   const grandTotal = +(subtotal + tax).toFixed(2);
@@ -35,9 +33,7 @@ const Checkout = () => {
     } else {
       toast({
         title: "تم الدفع",
-        description: `تم شراء ${
-          items.length
-        } قالب بنجاح — سيتم إرسال الإيصال إلى ${email || "البريد الإلكتروني"}`,
+        description: `تم شراء ${items.length} قالب بنجاح — سيتم إرسال الإيصال إلى البريد الإلكتروني`,
       });
       clear();
       navigate("/templates");
@@ -63,22 +59,19 @@ const Checkout = () => {
                 <CardTitle>تفاصيل الدفع</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <div>
-                  <label className="text-sm">البريد الإلكتروني</label>
-                  <Input
-                    placeholder="example@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
-
                 <Input placeholder="رقم البطاقة" />
-                <Input placeholder="اسم صاحب البطاقة" />
-                <div className="grid grid-cols-2 gap-2">
-                  <Input placeholder="انتهاء (MM/YY)" />
+                <Input placeholder="الاسم كما يظهر على البطاقة" />
+
+                <div className="space-y-1">
                   <Input placeholder="CVV" />
                 </div>
-
+                <div className="space-y-1">
+                  <label className="text-sm">تاريخ الانتهاء</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Input placeholder="الشهر" />
+                    <Input placeholder="السنة" />
+                  </div>
+                </div>
                 <Button
                   className="w-full mt-3"
                   onClick={handlePay}

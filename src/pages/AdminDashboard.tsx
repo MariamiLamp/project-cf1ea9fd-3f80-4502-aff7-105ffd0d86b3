@@ -385,10 +385,24 @@ const AdminDashboard = () => {
     category: "cv",
     price: 0,
     isPremium: false,
+    fileName: "",
   });
 
   // Ads state
-  // Ads state
+  // Create Ad state
+  const { add: addAd } = useAds();
+  const [adForm, setAdForm] = useState({
+    title: "",
+    description: "",
+    imageUrl: "",
+    link: "",
+    placement: "hero-bottom",
+    duration: "1_week",
+  });
+  const [editingAdId, setEditingAdId] = useState<number | null>(null);
+  const [isAdDialogOpen, setIsAdDialogOpen] = useState(false);
+
+  // Ads display state (from useAds hook)
   const { ads: adsRequests, update: updateAd } = useAds();
 
   const handleLogout = () => {
@@ -473,7 +487,13 @@ const AdminDashboard = () => {
   // Template handlers
   const handleAddTemplate = () => {
     setEditingTemplate(null);
-    setTemplateForm({ name: "", category: "cv", price: 0, isPremium: false });
+    setTemplateForm({
+      name: "",
+      category: "cv",
+      price: 0,
+      isPremium: false,
+      fileName: "",
+    });
     setIsTemplateDialogOpen(true);
   };
 
@@ -484,6 +504,7 @@ const AdminDashboard = () => {
       category: template.category,
       price: template.price,
       isPremium: template.isPremium,
+      fileName: "", // In a real app, this might come from the template data
     });
     setIsTemplateDialogOpen(true);
   };
@@ -549,6 +570,135 @@ const AdminDashboard = () => {
     toast({ title: "تم الرفض", description: "تم رفض طلب الإعلان" });
   };
 
+  const handleCreateAd = () => {
+    // Basic validation
+    if (!adForm.title || !adForm.imageUrl) {
+      toast({
+        title: "خطأ",
+        description: "يرجى ملء جميع الحقول المطلوبة",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Calculate price based on duration (just for record keeping, admins don't pay)
+    let price = 500;
+    const durationLabel =
+      adForm.duration === "1_week"
+        ? "أسبوع"
+        : adForm.duration === "2_weeks"
+        ? "أسبوعين"
+        : adForm.duration === "1_month"
+        ? "شهر"
+        : "شهر";
+
+    switch (adForm.duration) {
+      case "1_week":
+        price = 500;
+        break;
+      case "2_weeks":
+        price = 900;
+        break;
+      case "1_month":
+        price = 1500;
+        break;
+      default:
+        price = 500;
+    }
+
+    const newAd = {
+      title: adForm.title,
+      description: adForm.description,
+      imageUrl: adForm.imageUrl,
+      link: adForm.link,
+      placement: adForm.placement as any,
+      enabled: true, // Auto-enable for admins
+      status: "active" as const, // Auto-approve for admins
+      companyName: "إدارة النظام", // or user?.companyName
+      date: new Date().toISOString().split("T")[0],
+      price: price,
+      duration: durationLabel,
+      type: "بنر إعلاني",
+    };
+
+    addAd(newAd);
+
+    toast({
+      title: "تم الإنشاء",
+      description: "تم إنشاء الإعلان ونشره بنجاح",
+    });
+
+    // Reset form
+    setAdForm({
+      title: "",
+      description: "",
+      imageUrl: "",
+      link: "",
+      placement: "hero-bottom",
+      duration: "1_week",
+    });
+
+    // Switch to ads tab to see it
+    setActiveTab("ads");
+  };
+
+  const handleEditAdRequest = (ad: any) => {
+    setEditingAdId(ad.id);
+    setAdForm({
+      title: ad.title || "",
+      description: ad.description || "",
+      imageUrl: ad.imageUrl || "",
+      link: ad.link || "",
+      placement: ad.placement || "hero-bottom",
+      duration:
+        ad.duration === "أسبوع"
+          ? "1_week"
+          : ad.duration === "أسبوعين"
+          ? "2_weeks"
+          : "1_month",
+    });
+    setIsAdDialogOpen(true);
+  };
+
+  const handleSaveAdRequest = () => {
+    if (editingAdId) {
+      // Calculate price and label again
+      let price = 500;
+      const durationLabel =
+        adForm.duration === "1_week"
+          ? "أسبوع"
+          : adForm.duration === "2_weeks"
+          ? "أسبوعين"
+          : adForm.duration === "1_month"
+          ? "شهر"
+          : "شهر";
+
+      switch (adForm.duration) {
+        case "1_week":
+          price = 500;
+          break;
+        case "2_weeks":
+          price = 900;
+          break;
+        case "1_month":
+          price = 1500;
+          break;
+        default:
+          price = 500;
+      }
+
+      updateAd(editingAdId, {
+        ...adForm,
+        placement: adForm.placement as any,
+        duration: durationLabel,
+        price: price,
+      });
+      toast({ title: "تم التحديث", description: "تم تحديث الإعلان بنجاح" });
+      setIsAdDialogOpen(false);
+      setEditingAdId(null);
+    }
+  };
+
   const stats = [
     {
       label: "إجمالي المستخدمين",
@@ -588,6 +738,21 @@ const AdminDashboard = () => {
     (sum, t) => sum + t.downloads,
     0
   );
+
+  const calculateExpiry = (
+    startDate: string | undefined,
+    durationLabel: string | undefined
+  ) => {
+    if (!startDate) return "-";
+    const date = new Date(startDate);
+    let daysToAdd = 7;
+
+    if (durationLabel === "أسبوعين") daysToAdd = 14;
+    if (durationLabel === "شهر") daysToAdd = 30;
+
+    date.setDate(date.getDate() + daysToAdd);
+    return date.toISOString().split("T")[0];
+  };
 
   return (
     <div className="min-h-screen bg-background" dir="rtl">
@@ -668,15 +833,23 @@ const AdminDashboard = () => {
                 <Megaphone className="w-4 h-4" />
                 طلبات الإعلانات
               </TabsTrigger>
+              <TabsTrigger value="create_ad" className="gap-2">
+                <Plus className="w-4 h-4" />
+                إضافة إعلان
+              </TabsTrigger>
+              <TabsTrigger value="active_ads" className="gap-2">
+                <CheckCircle className="w-4 h-4" />
+                الإعلانات النشطة
+              </TabsTrigger>
             </TabsList>
 
             <div className="relative w-full max-w-md">
-              <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder="بحث..."
+                placeholder="...بحث"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="ps-10"
+                className="pr-10 text-right"
               />
             </div>
           </div>
@@ -1304,6 +1477,13 @@ const AdminDashboard = () => {
                             <Button variant="ghost" size="icon">
                               <Eye className="w-4 h-4" />
                             </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleEditAdRequest(ad)}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
                             {ad.status === "pending" && (
                               <>
                                 <Button
@@ -1353,6 +1533,222 @@ const AdminDashboard = () => {
                         </TableCell>
                       </TableRow>
                     ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Create Ad Tab */}
+          <TabsContent value="create_ad">
+            <Card>
+              <CardHeader className="text-right">
+                <CardTitle className="flex items-center justify-end gap-2">
+                  <span>إضافة إعلان جديد</span>
+                  <Megaphone className="w-5 h-5 text-primary" />
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="border border-dashed border-border rounded-lg p-4 bg-muted/20">
+                    <p className="text-xs text-muted-foreground mb-2 text-right">
+                      معاينة البانر
+                    </p>
+                    {adForm.imageUrl ? (
+                      <a
+                        href={adForm.link || "#"}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        <img
+                          src={adForm.imageUrl}
+                          alt={adForm.title || "بانر"}
+                          className="w-full rounded-lg object-cover"
+                        />
+                      </a>
+                    ) : (
+                      <div className="bg-gradient-to-l from-primary/20 to-accent/20 rounded-lg p-6 text-center">
+                        <h3 className="font-bold text-lg">
+                          {adForm.title || "عنوان البانر"}
+                        </h3>
+                        <p className="text-sm text-muted-foreground mt-2">
+                          {adForm.description || "وصف البانر سيظهر هنا..."}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="space-y-2 text-right">
+                      <Label>عنوان البانر</Label>
+                      <Input
+                        className="text-right"
+                        placeholder="مثال: خصم خاص 50%"
+                        value={adForm.title}
+                        onChange={(e) =>
+                          setAdForm({ ...adForm, title: e.target.value })
+                        }
+                      />
+                    </div>
+
+                    <div className="space-y-2 text-right">
+                      <Label>وصف الإعلان</Label>
+                      <Textarea
+                        className="text-right"
+                        placeholder="اكتب وصفاً للإعلان..."
+                        value={adForm.description}
+                        onChange={(e) =>
+                          setAdForm({ ...adForm, description: e.target.value })
+                        }
+                        rows={3}
+                      />
+                    </div>
+
+                    <div className="space-y-2 text-right">
+                      <Label>رابط الصورة</Label>
+                      <Input
+                        className="text-right"
+                        dir="ltr"
+                        placeholder="https://example.com/image.jpg"
+                        value={adForm.imageUrl}
+                        onChange={(e) =>
+                          setAdForm({ ...adForm, imageUrl: e.target.value })
+                        }
+                      />
+                    </div>
+
+                    <div className="space-y-2 text-right">
+                      <Label>المدة</Label>
+                      <Select
+                        value={adForm.duration}
+                        onValueChange={(value) =>
+                          setAdForm({ ...adForm, duration: value })
+                        }
+                      >
+                        <SelectTrigger dir="rtl">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent dir="rtl">
+                          <SelectItem value="1_week">أسبوع</SelectItem>
+                          <SelectItem value="2_weeks">أسبوعين</SelectItem>
+                          <SelectItem value="1_month">شهر</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2 text-right">
+                      <Label>الرابط المستهدف</Label>
+                      <Input
+                        className="text-right"
+                        dir="ltr"
+                        placeholder="https://"
+                        value={adForm.link}
+                        onChange={(e) =>
+                          setAdForm({ ...adForm, link: e.target.value })
+                        }
+                      />
+                    </div>
+
+                    <div className="space-y-2 text-right">
+                      <Label>المكان</Label>
+                      <Select
+                        value={adForm.placement}
+                        onValueChange={(value) =>
+                          setAdForm({ ...adForm, placement: value })
+                        }
+                      >
+                        <SelectTrigger dir="rtl">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent dir="rtl">
+                          <SelectItem value="hero-bottom">
+                            الصفحة الرئيسية - تحت الهيرو
+                          </SelectItem>
+                          <SelectItem value="ats-bottom">
+                            أداة فحص الـ ATS - في الأسفل
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <Button onClick={handleCreateAd} className="w-full mt-4">
+                      نشر الإعلان
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Active Ads Tab */}
+          <TabsContent value="active_ads">
+            <Card>
+              <CardHeader className="text-right [&_th]:text-right [&_td]:text-right">
+                <CardTitle className="flex items-center justify-end gap-2">
+                  <span>الإعلانات النشطة حالياً</span>
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Table
+                  dir="ltr"
+                  className="text-right [&_th]:text-right [&_td]:text-right"
+                >
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>الإجراءات</TableHead>
+                      <TableHead>تاريخ الانتهاء</TableHead>
+                      <TableHead>تاريخ البدء</TableHead>
+                      <TableHead>المدة</TableHead>
+                      <TableHead>المكان</TableHead>
+                      <TableHead>العنوان</TableHead>
+                      <TableHead>الشركة</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {adsRequests
+                      .filter((ad) => ad.status === "active")
+                      .map((ad) => (
+                        <TableRow key={ad.id}>
+                          <TableCell>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleDeclineAd(ad.id)}
+                              title="إيقاف الإعلان"
+                            >
+                              <Ban className="w-4 h-4 text-destructive" />
+                            </Button>
+                          </TableCell>
+                          <TableCell className="font-medium text-destructive">
+                            {calculateExpiry(ad.date, ad.duration)}
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">
+                            {ad.date || "-"}
+                          </TableCell>
+                          <TableCell>{ad.duration || "-"}</TableCell>
+                          <TableCell>
+                            {ad.placement === "hero-bottom"
+                              ? "الصفحة الرئيسية"
+                              : "فحص السيرة الذاتية"}
+                          </TableCell>
+                          <TableCell className="font-medium">
+                            {ad.title}
+                          </TableCell>
+                          <TableCell>{ad.companyName}</TableCell>
+                        </TableRow>
+                      ))}
+                    {adsRequests.filter((ad) => ad.status === "active")
+                      .length === 0 && (
+                      <TableRow>
+                        <TableCell
+                          colSpan={7}
+                          className="text-center py-8 text-muted-foreground"
+                        >
+                          لا توجد إعلانات نشطة حالياً
+                        </TableCell>
+                      </TableRow>
+                    )}
                   </TableBody>
                 </Table>
               </CardContent>
@@ -1498,6 +1894,24 @@ const AdminDashboard = () => {
                 />
               </div>
             </div>
+            <div className="space-y-2">
+              <Label>ملف القالب (Word/PDF)</Label>
+              <Input
+                type="file"
+                accept=".doc,.docx,.pdf"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    setTemplateForm({ ...templateForm, fileName: file.name });
+                  }
+                }}
+              />
+              {templateForm.fileName && (
+                <p className="text-sm text-muted-foreground mt-1">
+                  تم اختيار الملف: {templateForm.fileName}
+                </p>
+              )}
+            </div>
             <div className="flex items-center justify-between">
               <Label>قالب مميز (Premium)</Label>
               <Switch
@@ -1516,6 +1930,101 @@ const AdminDashboard = () => {
               إلغاء
             </Button>
             <Button onClick={handleSaveTemplate}>حفظ</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Ad Edit Dialog */}
+      <Dialog open={isAdDialogOpen} onOpenChange={setIsAdDialogOpen}>
+        <DialogContent dir="rtl">
+          <DialogHeader>
+            <DialogTitle>تعديل الإعلان</DialogTitle>
+            <DialogDescription>تعديل تفاصيل الإعلان الحالي</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>عنوان الإعلان</Label>
+              <Input
+                value={adForm.title}
+                onChange={(e) =>
+                  setAdForm({ ...adForm, title: e.target.value })
+                }
+                placeholder="عنوان الإعلان"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>الوصف</Label>
+              <Textarea
+                value={adForm.description}
+                onChange={(e) =>
+                  setAdForm({ ...adForm, description: e.target.value })
+                }
+                placeholder="وصف الإعلان"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>رابط الصورة</Label>
+              <Input
+                value={adForm.imageUrl}
+                onChange={(e) =>
+                  setAdForm({ ...adForm, imageUrl: e.target.value })
+                }
+                dir="ltr"
+                className="text-right"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>الرابط المستهدف</Label>
+              <Input
+                value={adForm.link}
+                onChange={(e) => setAdForm({ ...adForm, link: e.target.value })}
+                dir="ltr"
+                className="text-right"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>المدة</Label>
+              <Select
+                value={adForm.duration}
+                onValueChange={(v) => setAdForm({ ...adForm, duration: v })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1_week">أسبوع</SelectItem>
+                  <SelectItem value="2_weeks">أسبوعين</SelectItem>
+                  <SelectItem value="1_month">شهر</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>المكان</Label>
+              <Select
+                value={adForm.placement}
+                onValueChange={(value) =>
+                  setAdForm({ ...adForm, placement: value })
+                }
+              >
+                <SelectTrigger dir="rtl">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent dir="rtl">
+                  <SelectItem value="hero-bottom">
+                    الصفحة الرئيسية - تحت الهيرو
+                  </SelectItem>
+                  <SelectItem value="ats-bottom">
+                    أداة فحص الـ ATS - في الأسفل
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAdDialogOpen(false)}>
+              إلغاء
+            </Button>
+            <Button onClick={handleSaveAdRequest}>حفظ التغييرات</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
