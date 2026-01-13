@@ -12,10 +12,10 @@ export const Header = () => {
         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary via-primary/80 to-secondary flex items-center justify-center shadow-lg shadow-primary/20">
           <BookOpen className="w-5 h-5 text-primary-foreground" />
         </div>
-        <div className="hidden sm:block">
-          <h1 className="text-xl font-extrabold tracking-tight flex items-center">
+        <div className="hidden sm:block" dir="ltr">
+          <h1 className="text-xl font-extrabold tracking-tight">
             <span className="text-primary">Career</span>
-            <span className="text-foreground/90 font-light ml-1">Book</span>
+            <span className="text-foreground/90 font-light">Book</span>
           </h1>
           <p className="text-[10px] text-muted-foreground tracking-widest uppercase">كتاب المهنة</p>
         </div>
