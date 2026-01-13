@@ -60,7 +60,10 @@ import {
   Megaphone,
   Loader2,
   Copy,
+  Check,
+  X,
 } from "lucide-react";
+import { AdPlacementSelector } from "@/components/dashboard/AdPlacementSelector";
 
 // Mock data
 const initialJobs = [
@@ -251,7 +254,7 @@ const CompanyDashboard = () => {
     imageUrl: "",
     link: "",
     placement: "hero-bottom",
-    duration: "1_week",
+    duration: "1_month",
   });
   const liveAds = ads.filter((a) => a.enabled);
 
@@ -474,28 +477,34 @@ const CompanyDashboard = () => {
     }
     // create ad request (pending approval) - do not enable until admin approves
     // Calculate price based on duration
-    let price = 500;
-    const durationLabel =
-      adForm.duration === "1_week"
-        ? "أسبوع"
-        : adForm.duration === "2_weeks"
-        ? "أسبوعين"
-        : adForm.duration === "1_month"
-        ? "شهر"
-        : "شهر";
+    // Calculate price based on duration
+    let price = 1500;
+    let durationLabel = "شهر";
 
     switch (adForm.duration) {
-      case "1_week":
-        price = 500;
-        break;
-      case "2_weeks":
-        price = 900;
-        break;
       case "1_month":
         price = 1500;
+        durationLabel = "شهر";
+        break;
+      case "2_months":
+        price = 2800;
+        durationLabel = "شهرين";
+        break;
+      case "3_months":
+        price = 4000;
+        durationLabel = "3 أشهر";
+        break;
+      case "6_months":
+        price = 7500;
+        durationLabel = "6 أشهر";
+        break;
+      case "1_year":
+        price = 14000;
+        durationLabel = "سنة";
         break;
       default:
-        price = 500;
+        price = 1500;
+        durationLabel = "شهر";
     }
 
     const adRequestData = {
@@ -522,7 +531,7 @@ const CompanyDashboard = () => {
       imageUrl: "",
       link: "",
       placement: "hero-bottom",
-      duration: "1_week",
+      duration: "1_month",
     });
   };
 
@@ -1188,32 +1197,14 @@ const CompanyDashboard = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid md:grid-cols-2 gap-4">
-                    <div className="border border-dashed border-border rounded-lg p-4 bg-muted/20">
-                      <p className="text-xs text-muted-foreground mb-2 text-right">
-                        معاينة البانر
-                      </p>
-                      {adForm.imageUrl ? (
-                        <a
-                          href={adForm.link || "#"}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          <img
-                            src={adForm.imageUrl}
-                            alt={adForm.title || "بانر"}
-                            className="w-full rounded-lg object-cover"
-                          />
-                        </a>
-                      ) : (
-                        <div className="bg-gradient-to-l from-primary/20 to-accent/20 rounded-lg p-6 text-center">
-                          <h3 className="font-bold text-lg">
-                            {adForm.title || "عنوان البانر"}
-                          </h3>
-                          <p className="text-sm text-muted-foreground mt-2">
-                            {adForm.description || "وصف البانر سيظهر هنا..."}
-                          </p>
-                        </div>
-                      )}
+                    <div className="h-[600px] sticky top-4">
+                      <AdPlacementSelector
+                        selectedPlacement={adForm.placement}
+                        onSelect={(value) =>
+                          setAdForm({ ...adForm, placement: value })
+                        }
+                        adImage={adForm.imageUrl}
+                      />
                     </div>
 
                     <div className="space-y-4">
@@ -1230,32 +1221,23 @@ const CompanyDashboard = () => {
                       </div>
 
                       <div className="space-y-2 text-right">
-                        <Label>وصف البانر</Label>
-                        <Textarea
-                          className="text-right"
-                          placeholder="اكتب وصفاً جذاباً لشركتك..."
-                          value={adForm.description}
-                          onChange={(e) =>
-                            setAdForm({
-                              ...adForm,
-                              description: e.target.value,
-                            })
-                          }
-                          rows={3}
-                        />
-                      </div>
-
-                      <div className="space-y-2 text-right">
-                        <Label>رابط صورة البانر</Label>
+                        <Label>صورة البانر</Label>
                         <Input
-                          className="text-right"
-                          dir="ltr"
-                          placeholder="https://example.com/banner.jpg"
-                          value={adForm.imageUrl}
-                          onChange={(e) =>
-                            setAdForm({ ...adForm, imageUrl: e.target.value })
-                          }
+                          type="file"
+                          accept="image/*"
+                          className="text-right cursor-pointer"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              const url = URL.createObjectURL(file);
+                              setAdForm({ ...adForm, imageUrl: url });
+                            }
+                          }}
                         />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          الحجم المقترح: 1200x250 بكسل للبانر الرئيسي، 300x250
+                          بكسل للقائمة الجانبية
+                        </p>
                       </div>
 
                       <div className="space-y-2 text-right">
@@ -1270,17 +1252,26 @@ const CompanyDashboard = () => {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent dir="rtl">
-                            <SelectItem value="1_week">
-                              أسبوع (500 ر.س)
-                            </SelectItem>
-                            <SelectItem value="2_weeks">
-                              أسبوعين (900 ر.س)
-                            </SelectItem>
                             <SelectItem value="1_month">
                               شهر (1500 ر.س)
                             </SelectItem>
+                            <SelectItem value="2_months">
+                              شهرين (2800 ر.س)
+                            </SelectItem>
+                            <SelectItem value="3_months">
+                              3 أشهر (4000 ر.س)
+                            </SelectItem>
+                            <SelectItem value="6_months">
+                              6 أشهر (7500 ر.س)
+                            </SelectItem>
+                            <SelectItem value="1_year">
+                              سنة (14000 ر.س)
+                            </SelectItem>
                           </SelectContent>
                         </Select>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          مدة عرض الإعلان بالأشهر
+                        </p>
                       </div>
 
                       <div className="space-y-2 text-right">
@@ -1296,33 +1287,8 @@ const CompanyDashboard = () => {
                         />
                       </div>
 
-                      <div className="space-y-2 text-right">
-                        <Label>المكان</Label>
-                        <Select
-                          onValueChange={(value) =>
-                            setAdForm({ ...adForm, placement: value })
-                          }
-                        >
-                          <SelectTrigger>
-                            <SelectValue>
-                              {adForm.placement === "hero-bottom"
-                                ? "تحت الهيرو"
-                                : "تحت فحص الـATS"}
-                            </SelectValue>
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="hero-bottom">
-                              تحت الهيرو
-                            </SelectItem>
-                            <SelectItem value="ats-bottom">
-                              تحت فحص الـATS
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div className="flex justify-end">
-                        <Button onClick={handleAddAd} className="gap-2">
+                      <div className="flex justify-end pt-4">
+                        <Button onClick={handleAddAd} className="gap-2 w-full">
                           <Megaphone className="w-4 h-4" />
                           طلب البانر
                         </Button>
