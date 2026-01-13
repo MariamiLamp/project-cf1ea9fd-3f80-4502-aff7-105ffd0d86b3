@@ -25,6 +25,7 @@ import Checkout from "./pages/Checkout";
 import PostsPlanner from "./pages/PostsPlanner";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import Notifications from "./pages/Notifications";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +60,7 @@ const App = () => (
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/posts-planner" element={<PostsPlanner />} />
               <Route path="/settings" element={<Settings />} />
+              <Route path="/notifications" element={<Notifications />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
