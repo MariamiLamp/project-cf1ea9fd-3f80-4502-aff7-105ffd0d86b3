@@ -13,10 +13,11 @@ export const Header = () => {
           <BookOpen className="w-5 h-5 text-primary-foreground" />
         </div>
         <div className="hidden sm:block">
-          <h1 className="text-lg font-bold bg-gradient-to-l from-primary to-secondary bg-clip-text text-transparent">
-            Career Book
+          <h1 className="text-xl font-extrabold tracking-tight flex items-center">
+            <span className="text-primary">Career</span>
+            <span className="text-foreground/90 font-light ml-1">Book</span>
           </h1>
-          <p className="text-[10px] text-muted-foreground -mt-0.5">كتاب المهنة</p>
+          <p className="text-[10px] text-muted-foreground tracking-widest uppercase">كتاب المهنة</p>
         </div>
       </div>
 
