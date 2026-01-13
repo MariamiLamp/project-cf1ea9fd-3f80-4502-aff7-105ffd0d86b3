@@ -65,6 +65,7 @@ import {
   Check,
   X,
 } from "lucide-react";
+import { AdPlacementSelector } from "@/components/dashboard/AdPlacementSelector";
 
 // Mock data - Users
 const mockUsers = [
@@ -397,7 +398,7 @@ const AdminDashboard = () => {
     imageUrl: "",
     link: "",
     placement: "hero-bottom",
-    duration: "1_week",
+    duration: "1_month",
   });
   const [editingAdId, setEditingAdId] = useState<number | null>(null);
   const [isAdDialogOpen, setIsAdDialogOpen] = useState(false);
@@ -745,10 +746,27 @@ const AdminDashboard = () => {
   ) => {
     if (!startDate) return "-";
     const date = new Date(startDate);
-    let daysToAdd = 7;
+    let daysToAdd = 30;
 
-    if (durationLabel === "أسبوعين") daysToAdd = 14;
-    if (durationLabel === "شهر") daysToAdd = 30;
+    switch (durationLabel) {
+      case "1_month":
+        daysToAdd = 30;
+        break;
+      case "2_months":
+        daysToAdd = 60;
+        break;
+      case "3_months":
+        daysToAdd = 90;
+        break;
+      case "6_months":
+        daysToAdd = 180;
+        break;
+      case "1_year":
+        daysToAdd = 365;
+        break;
+      default:
+        daysToAdd = 30;
+    }
 
     date.setDate(date.getDate() + daysToAdd);
     return date.toISOString().split("T")[0];
@@ -1550,32 +1568,14 @@ const AdminDashboard = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid md:grid-cols-2 gap-4">
-                  <div className="border border-dashed border-border rounded-lg p-4 bg-muted/20">
-                    <p className="text-xs text-muted-foreground mb-2 text-right">
-                      معاينة البانر
-                    </p>
-                    {adForm.imageUrl ? (
-                      <a
-                        href={adForm.link || "#"}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        <img
-                          src={adForm.imageUrl}
-                          alt={adForm.title || "بانر"}
-                          className="w-full rounded-lg object-cover"
-                        />
-                      </a>
-                    ) : (
-                      <div className="bg-gradient-to-l from-primary/20 to-accent/20 rounded-lg p-6 text-center">
-                        <h3 className="font-bold text-lg">
-                          {adForm.title || "عنوان البانر"}
-                        </h3>
-                        <p className="text-sm text-muted-foreground mt-2">
-                          {adForm.description || "وصف البانر سيظهر هنا..."}
-                        </p>
-                      </div>
-                    )}
+                  <div className="h-[600px] sticky top-4">
+                    <AdPlacementSelector
+                      selectedPlacement={adForm.placement}
+                      onSelect={(value) =>
+                        setAdForm({ ...adForm, placement: value })
+                      }
+                      adImage={adForm.imageUrl}
+                    />
                   </div>
 
                   <div className="space-y-4">
@@ -1592,29 +1592,23 @@ const AdminDashboard = () => {
                     </div>
 
                     <div className="space-y-2 text-right">
-                      <Label>وصف الإعلان</Label>
-                      <Textarea
-                        className="text-right"
-                        placeholder="اكتب وصفاً للإعلان..."
-                        value={adForm.description}
-                        onChange={(e) =>
-                          setAdForm({ ...adForm, description: e.target.value })
-                        }
-                        rows={3}
-                      />
-                    </div>
-
-                    <div className="space-y-2 text-right">
-                      <Label>رابط الصورة</Label>
+                      <Label>صورة الإعلان</Label>
                       <Input
-                        className="text-right"
-                        dir="ltr"
-                        placeholder="https://example.com/image.jpg"
-                        value={adForm.imageUrl}
-                        onChange={(e) =>
-                          setAdForm({ ...adForm, imageUrl: e.target.value })
-                        }
+                        type="file"
+                        accept="image/*"
+                        className="text-right cursor-pointer"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const url = URL.createObjectURL(file);
+                            setAdForm({ ...adForm, imageUrl: url });
+                          }
+                        }}
                       />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        الحجم المقترح: 1200x250 بكسل للبانر الرئيسي، 300x250
+                        بكسل للقائمة الجانبية
+                      </p>
                     </div>
 
                     <div className="space-y-2 text-right">
@@ -1629,11 +1623,16 @@ const AdminDashboard = () => {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent dir="rtl">
-                          <SelectItem value="1_week">أسبوع</SelectItem>
-                          <SelectItem value="2_weeks">أسبوعين</SelectItem>
                           <SelectItem value="1_month">شهر</SelectItem>
+                          <SelectItem value="2_months">شهرين</SelectItem>
+                          <SelectItem value="3_months">3 أشهر</SelectItem>
+                          <SelectItem value="6_months">6 أشهر</SelectItem>
+                          <SelectItem value="1_year">سنة</SelectItem>
                         </SelectContent>
                       </Select>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        مدة عرض الإعلان بالأشهر
+                      </p>
                     </div>
 
                     <div className="space-y-2 text-right">
@@ -1647,28 +1646,6 @@ const AdminDashboard = () => {
                           setAdForm({ ...adForm, link: e.target.value })
                         }
                       />
-                    </div>
-
-                    <div className="space-y-2 text-right">
-                      <Label>المكان</Label>
-                      <Select
-                        value={adForm.placement}
-                        onValueChange={(value) =>
-                          setAdForm({ ...adForm, placement: value })
-                        }
-                      >
-                        <SelectTrigger dir="rtl">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent dir="rtl">
-                          <SelectItem value="hero-bottom">
-                            الصفحة الرئيسية - تحت الهيرو
-                          </SelectItem>
-                          <SelectItem value="ats-bottom">
-                            أداة فحص الـ ATS - في الأسفل
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
                     </div>
 
                     <Button onClick={handleCreateAd} className="w-full mt-4">
@@ -1936,7 +1913,10 @@ const AdminDashboard = () => {
 
       {/* Ad Edit Dialog */}
       <Dialog open={isAdDialogOpen} onOpenChange={setIsAdDialogOpen}>
-        <DialogContent dir="rtl">
+        <DialogContent
+          dir="rtl"
+          className="max-w-5xl h-[90vh] overflow-y-auto flex flex-col"
+        >
           <DialogHeader>
             <DialogTitle>تعديل الإعلان</DialogTitle>
             <DialogDescription>تعديل تفاصيل الإعلان الحالي</DialogDescription>
@@ -1992,32 +1972,24 @@ const AdminDashboard = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="1_week">أسبوع</SelectItem>
-                  <SelectItem value="2_weeks">أسبوعين</SelectItem>
                   <SelectItem value="1_month">شهر</SelectItem>
+                  <SelectItem value="2_months">شهرين</SelectItem>
+                  <SelectItem value="3_months">3 أشهر</SelectItem>
+                  <SelectItem value="6_months">6 أشهر</SelectItem>
+                  <SelectItem value="1_year">سنة</SelectItem>
                 </SelectContent>
               </Select>
+              <p className="text-xs text-muted-foreground mt-1">
+                مدة عرض الإعلان بالأشهر
+              </p>
             </div>
             <div className="space-y-2">
               <Label>المكان</Label>
-              <Select
-                value={adForm.placement}
-                onValueChange={(value) =>
-                  setAdForm({ ...adForm, placement: value })
-                }
-              >
-                <SelectTrigger dir="rtl">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent dir="rtl">
-                  <SelectItem value="hero-bottom">
-                    الصفحة الرئيسية - تحت الهيرو
-                  </SelectItem>
-                  <SelectItem value="ats-bottom">
-                    أداة فحص الـ ATS - في الأسفل
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+              <AdPlacementSelector
+                selectedPlacement={adForm.placement}
+                onSelect={(value) => setAdForm({ ...adForm, placement: value })}
+                adImage={adForm.imageUrl}
+              />
             </div>
           </div>
           <DialogFooter>

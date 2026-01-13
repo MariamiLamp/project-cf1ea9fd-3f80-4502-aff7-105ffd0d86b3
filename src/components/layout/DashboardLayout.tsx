@@ -15,16 +15,16 @@ const DashboardContent = ({ children }: DashboardLayoutProps) => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Sidebar />
-      <div className={cn(
-        "transition-all duration-300 flex-1 flex flex-col",
-        collapsed ? "mr-20" : "mr-64"
-      )}>
+      <div
+        className={cn(
+          "transition-all duration-300 flex-1 flex flex-col",
+          collapsed ? "mr-20" : "mr-64"
+        )}
+      >
         <Header />
-        <main className="p-6 flex-1">
-          {children}
-        </main>
+        <main className="p-6 flex-1">{children}</main>
+        <Footer />
       </div>
-      <Footer />
     </div>
   );
 };
