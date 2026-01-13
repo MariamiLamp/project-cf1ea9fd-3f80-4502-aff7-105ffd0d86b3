@@ -13,9 +13,9 @@ export const Header = () => {
           <BookOpen className="w-5 h-5 text-primary-foreground" />
         </div>
         <div className="hidden sm:block" dir="ltr">
-          <h1 className="text-xl font-extrabold tracking-tight">
-            <span className="text-primary">Career</span>
-            <span className="text-foreground/90 font-light">Book</span>
+          <h1 className="text-xl tracking-tight">
+            <span className="text-primary font-light">Career</span>
+            <span className="text-foreground/90 font-extrabold">Book</span>
           </h1>
           <p className="text-[10px] text-muted-foreground tracking-widest uppercase">كتاب المهنة</p>
         </div>
