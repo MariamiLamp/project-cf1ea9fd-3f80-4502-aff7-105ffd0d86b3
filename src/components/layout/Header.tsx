@@ -1,4 +1,4 @@
-import { Bell, Search, User, ChevronDown } from "lucide-react";
+import { Bell, Search, User, ChevronDown, BookOpen } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -8,8 +8,22 @@ export const Header = () => {
 
   return (
     <header className="h-16 bg-card border-b border-border px-6 flex items-center justify-between sticky top-0 z-40">
+      {/* Logo & Brand */}
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary via-primary/80 to-secondary flex items-center justify-center shadow-lg shadow-primary/20">
+          <BookOpen className="w-5 h-5 text-primary-foreground" />
+        </div>
+        <div className="hidden sm:block" dir="ltr">
+          <h1 className="text-xl tracking-tight">
+            <span className="text-primary font-light">Career</span>
+            <span className="text-foreground/90 font-extrabold">Book</span>
+          </h1>
+          <p className="text-[10px] text-muted-foreground tracking-widest uppercase">كتاب المهنة</p>
+        </div>
+      </div>
+
       {/* Search */}
-      <div className="flex-1 max-w-md">
+      <div className="flex-1 max-w-md mx-4">
         <div className="relative">
           <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <input
