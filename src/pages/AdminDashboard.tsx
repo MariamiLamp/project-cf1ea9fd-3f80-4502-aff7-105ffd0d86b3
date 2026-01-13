@@ -1605,10 +1605,6 @@ const AdminDashboard = () => {
                           }
                         }}
                       />
-                      <p className="text-xs text-muted-foreground mt-1">
-                        الحجم المقترح: 1200x250 بكسل للبانر الرئيسي، 300x250
-                        بكسل للقائمة الجانبية
-                      </p>
                     </div>
 
                     <div className="space-y-2 text-right">

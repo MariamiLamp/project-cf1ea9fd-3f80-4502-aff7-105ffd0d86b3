@@ -36,6 +36,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import useAds, { AdPlacement } from "@/hooks/use-ads";
@@ -64,6 +69,7 @@ import {
   Check,
   X,
   Search,
+  ListFilter,
 } from "lucide-react";
 import { AdPlacementSelector } from "@/components/dashboard/AdPlacementSelector";
 
@@ -1141,81 +1147,152 @@ const CompanyDashboard = () => {
               <CardHeader>
                 <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                   <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
-                    {/* Status Filter */}
-                    <Select
-                      value={filterStatus}
-                      onValueChange={setFilterStatus}
-                    >
-                      <SelectTrigger className="w-[130px] h-8 text-xs">
-                        <SelectValue placeholder="الحالة" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">كل الحالات</SelectItem>
-                        <SelectItem value="pending">قيد المراجعة</SelectItem>
-                        <SelectItem value="reviewed">تمت المراجعة</SelectItem>
-                        <SelectItem value="accepted">مقبول</SelectItem>
-                        <SelectItem value="rejected">مرفوض</SelectItem>
-                      </SelectContent>
-                    </Select>
-
-                    {/* Job Filter */}
-                    <Select value={filterJob} onValueChange={setFilterJob}>
-                      <SelectTrigger className="w-[150px] h-8 text-xs">
-                        <SelectValue placeholder="الوظيفة" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">كل الوظائف</SelectItem>
-                        {jobs.map((job) => (
-                          <SelectItem key={job.id} value={job.title}>
-                            {job.title}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-
-                    {/* Date Filter */}
-                    <Input
-                      type="date"
-                      value={filterDate}
-                      onChange={(e) => setFilterDate(e.target.value)}
-                      className="w-[130px] h-8 text-xs"
-                    />
-
-                    {/* Match Score Filter */}
-                    <Select
-                      value={filterMatchScore}
-                      onValueChange={setFilterMatchScore}
-                    >
-                      <SelectTrigger className="w-[130px] h-8 text-xs">
-                        <SelectValue placeholder="نسبة التوافق" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">الكل</SelectItem>
-                        <SelectItem value="90">90% فما فوق</SelectItem>
-                        <SelectItem value="80">80% فما فوق</SelectItem>
-                        <SelectItem value="70">70% فما فوق</SelectItem>
-                      </SelectContent>
-                    </Select>
-
-                    {(filterStatus !== "all" ||
-                      filterJob !== "all" ||
-                      filterDate ||
-                      filterMatchScore !== "all") && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setFilterStatus("all");
-                          setFilterJob("all");
-                          setFilterDate("");
-                          setFilterMatchScore("all");
-                        }}
-                        className="h-8 text-xs text-muted-foreground"
-                      >
-                        <XCircle className="w-3 h-3 ml-1" />
-                        مسح
-                      </Button>
-                    )}
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-8 gap-2 bg-background"
+                        >
+                          <ListFilter className="w-4 h-4" />
+                          <span>تصفية</span>
+                          {(filterStatus !== "all" ||
+                            filterJob !== "all" ||
+                            filterDate ||
+                            filterMatchScore !== "all") && (
+                            <Badge
+                              variant="secondary"
+                              className="mr-1 h-5 px-1 text-[10px] rounded-sm pointer-events-none"
+                            >
+                              مفعل
+                            </Badge>
+                          )}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-80 p-4" align="end">
+                        <div className="space-y-4" dir="rtl">
+                          <div className="space-y-2 border-b pb-2">
+                            <h4 className="font-medium leading-none">
+                              خيارات التصفية
+                            </h4>
+                            <p className="text-sm text-muted-foreground">
+                              قم بتصفية طلبات التوظيف حسب رغبتك
+                            </p>
+                          </div>
+                          <div className="grid gap-3">
+                            <div className="space-y-1.5">
+                              <Label htmlFor="status" className="text-xs">
+                                الحالة
+                              </Label>
+                              <Select
+                                value={filterStatus}
+                                onValueChange={setFilterStatus}
+                              >
+                                <SelectTrigger id="status" className="h-8">
+                                  <SelectValue placeholder="الحالة" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="all">
+                                    كل الحالات
+                                  </SelectItem>
+                                  <SelectItem value="pending">
+                                    قيد المراجعة
+                                  </SelectItem>
+                                  <SelectItem value="reviewed">
+                                    تمت المراجعة
+                                  </SelectItem>
+                                  <SelectItem value="accepted">
+                                    مقبول
+                                  </SelectItem>
+                                  <SelectItem value="rejected">
+                                    مرفوض
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="space-y-1.5">
+                              <Label htmlFor="job" className="text-xs">
+                                الوظيفة
+                              </Label>
+                              <Select
+                                value={filterJob}
+                                onValueChange={setFilterJob}
+                              >
+                                <SelectTrigger id="job" className="h-8">
+                                  <SelectValue placeholder="الوظيفة" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="all">
+                                    كل الوظائف
+                                  </SelectItem>
+                                  {jobs.map((job) => (
+                                    <SelectItem key={job.id} value={job.title}>
+                                      {job.title}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="space-y-1.5">
+                              <Label htmlFor="date" className="text-xs">
+                                التاريخ
+                              </Label>
+                              <Input
+                                id="date"
+                                type="date"
+                                value={filterDate}
+                                onChange={(e) => setFilterDate(e.target.value)}
+                                className="h-8"
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <Label htmlFor="match" className="text-xs">
+                                نسبة التوافق
+                              </Label>
+                              <Select
+                                value={filterMatchScore}
+                                onValueChange={setFilterMatchScore}
+                              >
+                                <SelectTrigger id="match" className="h-8">
+                                  <SelectValue placeholder="نسبة التوافق" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="all">الكل</SelectItem>
+                                  <SelectItem value="90">
+                                    90% فما فوق
+                                  </SelectItem>
+                                  <SelectItem value="80">
+                                    80% فما فوق
+                                  </SelectItem>
+                                  <SelectItem value="70">
+                                    70% فما فوق
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                          {(filterStatus !== "all" ||
+                            filterJob !== "all" ||
+                            filterDate ||
+                            filterMatchScore !== "all") && (
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              className="w-full gap-2 mt-2"
+                              onClick={() => {
+                                setFilterStatus("all");
+                                setFilterJob("all");
+                                setFilterDate("");
+                                setFilterMatchScore("all");
+                              }}
+                            >
+                              <XCircle className="w-4 h-4" />
+                              مسح الكل
+                            </Button>
+                          )}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
                   </div>
                   <CardTitle className="flex items-center gap-2">
                     <span>طلبات التوظيف</span>
@@ -1370,10 +1447,6 @@ const CompanyDashboard = () => {
                             }
                           }}
                         />
-                        <p className="text-xs text-muted-foreground mt-1">
-                          الحجم المقترح: 1200x250 بكسل للبانر الرئيسي، 300x250
-                          بكسل للقائمة الجانبية
-                        </p>
                       </div>
 
                       <div className="space-y-2 text-right">

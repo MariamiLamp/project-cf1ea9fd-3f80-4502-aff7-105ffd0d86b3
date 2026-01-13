@@ -15,6 +15,7 @@ import {
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 interface AdPlacementSelectorProps {
   selectedPlacement: string;
@@ -90,6 +91,7 @@ export function AdPlacementSelector({
   const renderAdZone = (
     zoneId: string,
     label: string,
+    dimensions: string,
     heightClass: string = "h-32"
   ) => {
     const isSelected = selectedPlacement === zoneId;
@@ -140,6 +142,12 @@ export function AdPlacementSelector({
             >
               {label}
             </span>
+            <Badge
+              variant="secondary"
+              className="relative z-20 mt-1 font-normal dir-ltr"
+            >
+              {dimensions}
+            </Badge>
           </>
         )}
 
@@ -174,6 +182,7 @@ export function AdPlacementSelector({
             {renderAdZone(
               "hero-bottom",
               "مساحة أسفل الترحيب (Hero Bottom)",
+              "1200x160 px",
               "h-40"
             )}
           </div>
@@ -221,6 +230,7 @@ export function AdPlacementSelector({
                 {renderAdZone(
                   "ats-bottom",
                   "مساحة الشريط الجانبي (Sidebar)",
+                  "300x250 px",
                   "h-64"
                 )}
               </div>
