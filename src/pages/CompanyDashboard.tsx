@@ -58,10 +58,12 @@ import {
   Image,
   Star,
   Megaphone,
+  BookOpen,
   Loader2,
   Copy,
   Check,
   X,
+  Search,
 } from "lucide-react";
 import { AdPlacementSelector } from "@/components/dashboard/AdPlacementSelector";
 
@@ -72,7 +74,7 @@ const initialJobs = [
     title: "مطور واجهات أمامية",
     department: "التقنية",
     type: "دوام كامل",
-    location: "الرياض",
+    location: "مصر",
     applications: 24,
     status: "active",
     postedDate: "2024-01-10",
@@ -82,7 +84,7 @@ const initialJobs = [
     title: "محلل بيانات",
     department: "البيانات",
     type: "دوام كامل",
-    location: "جدة",
+    location: "الإمارات",
     applications: 18,
     status: "active",
     postedDate: "2024-01-15",
@@ -92,7 +94,7 @@ const initialJobs = [
     title: "مدير مشاريع",
     department: "الإدارة",
     type: "دوام كامل",
-    location: "الرياض",
+    location: "المملكة العربية السعودية",
     applications: 12,
     status: "closed",
     postedDate: "2024-01-05",
@@ -256,6 +258,33 @@ const CompanyDashboard = () => {
     placement: "hero-bottom",
     duration: "1_month",
   });
+
+  // Filters for Applications
+  const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [filterDate, setFilterDate] = useState<string>("");
+  const [filterMatchScore, setFilterMatchScore] = useState<string>("all");
+  const [filterJob, setFilterJob] = useState<string>("all");
+
+  const filteredApplications = applications.filter((app) => {
+    // Filter by Status
+    if (filterStatus !== "all" && app.status !== filterStatus) return false;
+
+    // Filter by Job Title
+    if (filterJob !== "all" && app.jobTitle !== filterJob) return false;
+
+    // Filter by Date
+    if (filterDate && app.appliedDate !== filterDate) return false;
+
+    // Filter by Match Score (>= selected score)
+    if (
+      filterMatchScore !== "all" &&
+      app.matchScore < parseInt(filterMatchScore)
+    )
+      return false;
+
+    return true;
+  });
+
   const liveAds = ads.filter((a) => a.enabled);
 
   const [editJob, setEditJob] = useState({
@@ -605,18 +634,33 @@ const CompanyDashboard = () => {
   return (
     <div className="min-h-screen bg-background" dir="rtl">
       {/* Header */}
-      <header className="bg-card border-b border-border px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center">
-              <Building2 className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h1 className="font-bold text-lg">لوحة تحكم الشركة</h1>
-              <p className="text-sm text-muted-foreground">
-                {user?.companyName || "شركتك"}
-              </p>
-            </div>
+      <header className="bg-card border-b border-border px-6 py-4 flex items-center justify-between sticky top-0 z-40 shadow-sm">
+        {/* Logo & Brand */}
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary via-primary/80 to-secondary flex items-center justify-center shadow-lg shadow-primary/20">
+            <BookOpen className="w-5 h-5 text-primary-foreground" />
+          </div>
+          <div className="hidden sm:block" dir="ltr">
+            <h1 className="text-xl tracking-tight">
+              <span className="text-primary font-light">Career</span>
+              <span className="text-foreground/90 font-extrabold">Book</span>
+            </h1>
+            <p className="text-[10px] text-muted-foreground tracking-widest uppercase">
+              كتاب المهنة
+            </p>
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex items-center gap-4">
+          <div className="hidden md:block text-right">
+            <p className="text-sm font-medium">لوحة تحكم الشركة</p>
+            <p className="text-xs text-muted-foreground">
+              {user?.companyName || "شركتك"}
+            </p>
+          </div>
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center">
+            <Building2 className="w-5 h-5 text-white" />
           </div>
           <Button variant="outline" onClick={handleLogout} className="gap-2">
             <LogOut className="w-4 h-4" />
@@ -753,11 +797,13 @@ const CompanyDashboard = () => {
                           <SelectValue placeholder="اختر المدينة" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="الرياض">الرياض</SelectItem>
-                          <SelectItem value="جدة">جدة</SelectItem>
-                          <SelectItem value="الدمام">الدمام</SelectItem>
-                          <SelectItem value="مكة">مكة</SelectItem>
-                          <SelectItem value="المدينة">المدينة</SelectItem>
+                          <SelectItem value="المملكة العربية السعودية">
+                            المملكة العربية السعودية
+                          </SelectItem>
+                          <SelectItem value="الإمارات">الإمارات</SelectItem>
+                          <SelectItem value="قطر">قطر</SelectItem>
+                          <SelectItem value="الكويت">الكويت</SelectItem>
+                          <SelectItem value="مصر">مصر</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -922,7 +968,7 @@ const CompanyDashboard = () => {
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-1">
+                          <div className="flex items-center gap-1 justify-end">
                             <MapPin className="w-3 h-3" />
                             {job.location}
                           </div>
@@ -1034,7 +1080,12 @@ const CompanyDashboard = () => {
                         <TableCell>{candidate.appliedFor}</TableCell>
                         <TableCell>{candidate.experience}</TableCell>
                         <TableCell>
-                          <div className="flex flex-wrap gap-1">
+                          <div className="flex flex-wrap gap-1 justify-end">
+                            {candidate.skills.length > 2 && (
+                              <Badge variant="outline" className="text-xs">
+                                +{candidate.skills.length - 2}
+                              </Badge>
+                            )}
                             {candidate.skills.slice(0, 2).map((skill, i) => (
                               <Badge
                                 key={i}
@@ -1044,15 +1095,10 @@ const CompanyDashboard = () => {
                                 {skill}
                               </Badge>
                             ))}
-                            {candidate.skills.length > 2 && (
-                              <Badge variant="outline" className="text-xs">
-                                +{candidate.skills.length - 2}
-                              </Badge>
-                            )}
                           </div>
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 justify-end">
                             <div className="w-16 h-2 bg-muted rounded-full overflow-hidden">
                               <div
                                 className={`h-full rounded-full ${
@@ -1092,11 +1138,90 @@ const CompanyDashboard = () => {
           {/* Applications Tab */}
           <TabsContent value="applications">
             <Card>
-              <CardHeader className="text-right">
-                <CardTitle className="flex items-center justify-end gap-2">
-                  <span>طلبات التوظيف</span>
-                  <FileText className="w-5 h-5" />
-                </CardTitle>
+              <CardHeader>
+                <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                  <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                    {/* Status Filter */}
+                    <Select
+                      value={filterStatus}
+                      onValueChange={setFilterStatus}
+                    >
+                      <SelectTrigger className="w-[130px] h-8 text-xs">
+                        <SelectValue placeholder="الحالة" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">كل الحالات</SelectItem>
+                        <SelectItem value="pending">قيد المراجعة</SelectItem>
+                        <SelectItem value="reviewed">تمت المراجعة</SelectItem>
+                        <SelectItem value="accepted">مقبول</SelectItem>
+                        <SelectItem value="rejected">مرفوض</SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    {/* Job Filter */}
+                    <Select value={filterJob} onValueChange={setFilterJob}>
+                      <SelectTrigger className="w-[150px] h-8 text-xs">
+                        <SelectValue placeholder="الوظيفة" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">كل الوظائف</SelectItem>
+                        {jobs.map((job) => (
+                          <SelectItem key={job.id} value={job.title}>
+                            {job.title}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    {/* Date Filter */}
+                    <Input
+                      type="date"
+                      value={filterDate}
+                      onChange={(e) => setFilterDate(e.target.value)}
+                      className="w-[130px] h-8 text-xs"
+                    />
+
+                    {/* Match Score Filter */}
+                    <Select
+                      value={filterMatchScore}
+                      onValueChange={setFilterMatchScore}
+                    >
+                      <SelectTrigger className="w-[130px] h-8 text-xs">
+                        <SelectValue placeholder="نسبة التوافق" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">الكل</SelectItem>
+                        <SelectItem value="90">90% فما فوق</SelectItem>
+                        <SelectItem value="80">80% فما فوق</SelectItem>
+                        <SelectItem value="70">70% فما فوق</SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    {(filterStatus !== "all" ||
+                      filterJob !== "all" ||
+                      filterDate ||
+                      filterMatchScore !== "all") && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setFilterStatus("all");
+                          setFilterJob("all");
+                          setFilterDate("");
+                          setFilterMatchScore("all");
+                        }}
+                        className="h-8 text-xs text-muted-foreground"
+                      >
+                        <XCircle className="w-3 h-3 ml-1" />
+                        مسح
+                      </Button>
+                    )}
+                  </div>
+                  <CardTitle className="flex items-center gap-2">
+                    <span>طلبات التوظيف</span>
+                    <FileText className="w-5 h-5" />
+                  </CardTitle>
+                </div>
               </CardHeader>
               <CardContent>
                 <Table
@@ -1114,67 +1239,78 @@ const CompanyDashboard = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {applications.map((app) => (
-                      <TableRow key={app.id}>
-                        <TableCell>
-                          <div className="flex gap-1 justify-end">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleViewApplication(app)}
+                    {filteredApplications.length > 0 ? (
+                      filteredApplications.map((app) => (
+                        <TableRow key={app.id}>
+                          <TableCell>
+                            <div className="flex gap-1 justify-end">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleViewApplication(app)}
+                              >
+                                <Eye className="w-4 h-4" />
+                              </Button>
+                              {(app.status === "pending" ||
+                                app.status === "reviewed") && (
+                                <>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() =>
+                                      handleUpdateApplicationStatus(
+                                        app.id,
+                                        "accepted"
+                                      )
+                                    }
+                                  >
+                                    <CheckCircle className="w-4 h-4 text-emerald-500" />
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() =>
+                                      handleUpdateApplicationStatus(
+                                        app.id,
+                                        "rejected"
+                                      )
+                                    }
+                                  >
+                                    <XCircle className="w-4 h-4 text-destructive" />
+                                  </Button>
+                                </>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell>{getStatusBadge(app.status)}</TableCell>
+                          <TableCell className="text-muted-foreground">
+                            {app.appliedDate}
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={
+                                app.matchScore >= 90 ? "default" : "secondary"
+                              }
                             >
-                              <Eye className="w-4 h-4" />
-                            </Button>
-                            {(app.status === "pending" ||
-                              app.status === "reviewed") && (
-                              <>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() =>
-                                    handleUpdateApplicationStatus(
-                                      app.id,
-                                      "accepted"
-                                    )
-                                  }
-                                >
-                                  <CheckCircle className="w-4 h-4 text-emerald-500" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() =>
-                                    handleUpdateApplicationStatus(
-                                      app.id,
-                                      "rejected"
-                                    )
-                                  }
-                                >
-                                  <XCircle className="w-4 h-4 text-destructive" />
-                                </Button>
-                              </>
-                            )}
+                              {app.matchScore}%
+                            </Badge>
+                          </TableCell>
+                          <TableCell>{app.jobTitle}</TableCell>
+                          <TableCell className="font-medium">
+                            {app.candidateName}
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center py-8">
+                          <div className="flex flex-col items-center gap-3 text-muted-foreground">
+                            <Search className="w-8 h-8 opacity-20" />
+                            <p>لا توجد طلبات تطابق معايير البحث</p>
                           </div>
                         </TableCell>
-                        <TableCell>{getStatusBadge(app.status)}</TableCell>
-                        <TableCell className="text-muted-foreground">
-                          {app.appliedDate}
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            variant={
-                              app.matchScore >= 90 ? "default" : "secondary"
-                            }
-                          >
-                            {app.matchScore}%
-                          </Badge>
-                        </TableCell>
-                        <TableCell>{app.jobTitle}</TableCell>
-                        <TableCell className="font-medium">
-                          {app.candidateName}
-                        </TableCell>
                       </TableRow>
-                    ))}
+                    )}
                   </TableBody>
                 </Table>
               </CardContent>
