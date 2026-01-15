@@ -18,7 +18,9 @@ export const Header = () => {
             <span className="text-primary font-light">Career</span>
             <span className="text-foreground/90 font-extrabold">Book</span>
           </h1>
-          <p className="text-[10px] text-muted-foreground tracking-widest uppercase">كتاب المهنة</p>
+          <p className="text-[10px] text-muted-foreground tracking-widest uppercase">
+            كارير بوك
+          </p>
         </div>
       </div>
 

@@ -1,4 +1,13 @@
-import { Check, Crown, Zap, Building2, Sparkles, Shield, RefreshCw, Lock } from "lucide-react";
+import {
+  Check,
+  Crown,
+  Zap,
+  Building2,
+  Sparkles,
+  Shield,
+  RefreshCw,
+  Lock,
+} from "lucide-react";
 import { useState } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -74,16 +83,42 @@ const plans: Plan[] = [
 
 export default function Subscription() {
   const [selectedPlan, setSelectedPlan] = useState<string>("pro");
-  const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">("monthly");
+  const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">(
+    "monthly"
+  );
 
   const getPrice = (price: number) => {
     if (price === 0) return "مجاناً";
-    const finalPrice = billingPeriod === "yearly" ? Math.round(price * 0.8) : price;
+    const finalPrice =
+      billingPeriod === "yearly" ? Math.round(price * 0.8) : price;
     return `${finalPrice} ر.س`;
   };
 
   return (
     <DashboardLayout>
+      {/* Trust Badges - Highlighted Boxes */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+        <div className="flex items-center justify-center gap-3 p-4 rounded-xl bg-success/10 border border-success/20">
+          <div className="w-10 h-10 rounded-full bg-success/20 flex items-center justify-center">
+            <RefreshCw className="w-5 h-5 text-success" />
+          </div>
+          <span className="font-medium text-foreground">إلغاء في أي وقت</span>
+        </div>
+        <div className="flex items-center justify-center gap-3 p-4 rounded-xl bg-primary/10 border border-primary/20">
+          <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+            <Shield className="w-5 h-5 text-primary" />
+          </div>
+          <span className="font-medium text-foreground">
+            ضمان استرداد ١٤ يوم
+          </span>
+        </div>
+        <div className="flex items-center justify-center gap-3 p-4 rounded-xl bg-accent/10 border border-accent/20">
+          <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
+            <Lock className="w-5 h-5 text-accent" />
+          </div>
+          <span className="font-medium text-foreground">دفع آمن ومشفر</span>
+        </div>
+      </div>
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
@@ -91,7 +126,9 @@ export default function Subscription() {
             <Sparkles className="w-4 h-4" />
             <span className="text-sm font-medium">اختر الباقة المناسبة</span>
           </div>
-          <h1 className="text-3xl font-bold text-foreground mb-3">خطط الاشتراك</h1>
+          <h1 className="text-3xl font-bold text-foreground mb-3">
+            خطط الاشتراك
+          </h1>
           <p className="text-muted-foreground max-w-lg mx-auto">
             اختر الباقة التي تناسب احتياجاتك واستفد من جميع مميزات المنصة
           </p>
@@ -99,53 +136,45 @@ export default function Subscription() {
 
         {/* Billing Toggle */}
         <div className="flex items-center justify-center gap-4 mb-10">
-          <span className={cn(
-            "text-sm font-medium transition-colors",
-            billingPeriod === "monthly" ? "text-foreground" : "text-muted-foreground"
-          )}>
+          <span
+            className={cn(
+              "text-sm font-medium transition-colors",
+              billingPeriod === "monthly"
+                ? "text-foreground"
+                : "text-muted-foreground"
+            )}
+          >
             شهري
           </span>
           <button
-            onClick={() => setBillingPeriod(billingPeriod === "monthly" ? "yearly" : "monthly")}
+            onClick={() =>
+              setBillingPeriod(
+                billingPeriod === "monthly" ? "yearly" : "monthly"
+              )
+            }
             className={cn(
               "relative w-14 h-7 rounded-full transition-colors",
               billingPeriod === "yearly" ? "bg-primary" : "bg-muted"
             )}
           >
-            <div className={cn(
-              "absolute top-1 w-5 h-5 rounded-full bg-white shadow-md transition-all",
-              billingPeriod === "yearly" ? "right-1" : "right-8"
-            )} />
+            <div
+              className={cn(
+                "absolute top-1 w-5 h-5 rounded-full bg-white shadow-md transition-all",
+                billingPeriod === "yearly" ? "right-1" : "right-8"
+              )}
+            />
           </button>
-          <span className={cn(
-            "text-sm font-medium transition-colors",
-            billingPeriod === "yearly" ? "text-foreground" : "text-muted-foreground"
-          )}>
+          <span
+            className={cn(
+              "text-sm font-medium transition-colors",
+              billingPeriod === "yearly"
+                ? "text-foreground"
+                : "text-muted-foreground"
+            )}
+          >
             سنوي
             <span className="mr-1 text-xs text-success">(-٢٠٪)</span>
           </span>
-        </div>
-
-        {/* Trust Badges - Highlighted Boxes */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
-          <div className="flex items-center justify-center gap-3 p-4 rounded-xl bg-success/10 border border-success/20">
-            <div className="w-10 h-10 rounded-full bg-success/20 flex items-center justify-center">
-              <RefreshCw className="w-5 h-5 text-success" />
-            </div>
-            <span className="font-medium text-foreground">إلغاء في أي وقت</span>
-          </div>
-          <div className="flex items-center justify-center gap-3 p-4 rounded-xl bg-primary/10 border border-primary/20">
-            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-              <Shield className="w-5 h-5 text-primary" />
-            </div>
-            <span className="font-medium text-foreground">ضمان استرداد ١٤ يوم</span>
-          </div>
-          <div className="flex items-center justify-center gap-3 p-4 rounded-xl bg-accent/10 border border-accent/20">
-            <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
-              <Lock className="w-5 h-5 text-accent" />
-            </div>
-            <span className="font-medium text-foreground">دفع آمن ومشفر</span>
-          </div>
         </div>
 
         {/* Plans Grid */}
@@ -153,7 +182,7 @@ export default function Subscription() {
           {plans.map((plan) => {
             const Icon = plan.icon;
             const isSelected = selectedPlan === plan.id;
-            
+
             return (
               <div
                 key={plan.id}
@@ -161,8 +190,8 @@ export default function Subscription() {
                 className={cn(
                   "relative rounded-2xl p-6 cursor-pointer transition-all duration-300",
                   "bg-card border-2",
-                  isSelected 
-                    ? "border-primary shadow-elevated scale-[1.02]" 
+                  isSelected
+                    ? "border-primary shadow-elevated scale-[1.02]"
                     : "border-border hover:border-primary/30 hover:shadow-soft",
                   plan.popular && "ring-2 ring-primary/20"
                 )}
@@ -176,14 +205,20 @@ export default function Subscription() {
 
                 {/* Plan Header */}
                 <div className="text-center mb-6">
-                  <div className={cn(
-                    "w-14 h-14 rounded-xl mx-auto mb-4 flex items-center justify-center bg-gradient-to-br",
-                    plan.color
-                  )}>
+                  <div
+                    className={cn(
+                      "w-14 h-14 rounded-xl mx-auto mb-4 flex items-center justify-center bg-gradient-to-br",
+                      plan.color
+                    )}
+                  >
                     <Icon className="w-7 h-7 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-foreground mb-1">{plan.name}</h3>
-                  <p className="text-sm text-muted-foreground">{plan.description}</p>
+                  <h3 className="text-xl font-bold text-foreground mb-1">
+                    {plan.name}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {plan.description}
+                  </p>
                 </div>
 
                 {/* Price */}
@@ -193,7 +228,9 @@ export default function Subscription() {
                       {getPrice(plan.price)}
                     </span>
                     {plan.price > 0 && (
-                      <span className="text-muted-foreground text-sm">/ {plan.period}</span>
+                      <span className="text-muted-foreground text-sm">
+                        / {plan.period}
+                      </span>
                     )}
                   </div>
                 </div>
@@ -231,15 +268,14 @@ export default function Subscription() {
 
         {/* FAQ Section */}
         <div className="mt-16 text-center">
-          <h2 className="text-xl font-bold text-foreground mb-4">هل لديك أسئلة؟</h2>
+          <h2 className="text-xl font-bold text-foreground mb-4">
+            هل لديك أسئلة؟
+          </h2>
           <p className="text-muted-foreground mb-4">
             تواصل معنا وسنسعد بمساعدتك في اختيار الباقة المناسبة
           </p>
-          <Button variant="outline">
-            تواصل مع الدعم الفني
-          </Button>
+          <Button variant="outline">تواصل مع الدعم الفني</Button>
         </div>
-
       </div>
     </DashboardLayout>
   );

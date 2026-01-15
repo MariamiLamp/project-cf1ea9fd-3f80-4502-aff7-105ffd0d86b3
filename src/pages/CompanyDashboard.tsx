@@ -673,7 +673,7 @@ const CompanyDashboard = () => {
               <span className="text-foreground/90 font-extrabold">Book</span>
             </h1>
             <p className="text-[10px] text-muted-foreground tracking-widest uppercase">
-              كتاب المهنة
+              كارير بوك
             </p>
           </div>
         </div>

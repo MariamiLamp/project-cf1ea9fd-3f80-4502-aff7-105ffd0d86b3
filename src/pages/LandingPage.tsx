@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Briefcase,
   FileText,
@@ -13,6 +13,8 @@ import { StatCard } from "@/components/dashboard/StatCard";
 import { Footer } from "@/components/layout/Footer";
 
 const LandingPage = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-background flex flex-col" dir="rtl">
       {/* Header */}
@@ -28,7 +30,7 @@ const LandingPage = () => {
                 <span className="text-foreground/90 font-extrabold">Book</span>
               </h1>
               <p className="text-[10px] text-muted-foreground tracking-widest uppercase">
-                كتاب المهنة
+                كارير بوك
               </p>
             </div>
           </div>
@@ -39,12 +41,6 @@ const LandingPage = () => {
               className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
             >
               الوظائف
-            </Link>
-            <Link
-              to="/companies"
-              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-            >
-              الشركات
             </Link>
           </nav>
 
@@ -210,22 +206,21 @@ const LandingPage = () => {
         <section className="py-24 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-primary to-primary/80 -z-10" />
           <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-soft-light" />
-          <div className="container mx-auto px-6 text-center text-slate-900">
+          <div className="container mx-auto px-6 text-center text-slate-900 relative z-10">
             <h2 className="text-3xl md:text-5xl font-bold mb-8">
               جاهز لبدء رحلتك المهنية؟
             </h2>
             <p className="text-xl text-slate-700 mb-10 max-w-2xl mx-auto font-medium">
               انضم إلى آلاف الباحثين عن عمل والشركات التي تثق بمنصتنا.
             </p>
-            <Link to="/register">
-              <Button
-                size="lg"
-                variant="secondary"
-                className="h-14 px-10 text-lg shadow-2xl"
-              >
-                سجل الآن مجاناً
-              </Button>
-            </Link>
+            <Button
+              size="lg"
+              variant="secondary"
+              className="h-14 px-10 text-lg shadow-2xl transition-transform hover:scale-105"
+              onClick={() => navigate("/register")}
+            >
+              سجل الآن مجاناً
+            </Button>
           </div>
         </section>
       </main>
