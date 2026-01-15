@@ -10,18 +10,11 @@ interface StatCardProps {
   delay?: number;
 }
 
-const variantStyles = {
-  default: "bg-muted/30",
-  primary: "bg-primary/5",
-  success: "bg-success/5",
-  warning: "bg-warning/5",
-};
-
 const iconStyles = {
-  default: "bg-muted/50 text-muted-foreground",
-  primary: "bg-primary/10 text-primary",
-  success: "bg-success/10 text-success",
-  warning: "bg-warning/10 text-warning",
+  default: "bg-slate-500/10 text-slate-500",
+  primary: "bg-blue-500/10 text-blue-500",
+  success: "bg-emerald-500/10 text-emerald-500",
+  warning: "bg-amber-500/10 text-amber-500",
 };
 
 export const StatCard = ({
@@ -34,22 +27,28 @@ export const StatCard = ({
 }: StatCardProps) => {
   return (
     <div
-      className={cn(
-        "p-6 rounded-lg border border-border/30 opacity-0 animate-fade-up cursor-default",
-        variantStyles[variant]
-      )}
+      className="p-6 rounded-xl border border-border/50 bg-card shadow-sm opacity-0 animate-fade-up cursor-default hover:shadow-md transition-shadow"
       style={{ animationDelay: `${delay}ms`, animationFillMode: "forwards" }}
     >
-      <div className="flex items-start justify-between mb-4">
-        <div className={cn("p-2.5 rounded-lg", iconStyles[variant])}>
-          <Icon className="w-5 h-5" />
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <h3 className="text-sm font-medium text-muted-foreground mb-1">
+            {title}
+          </h3>
+          <p className="text-2xl font-bold text-foreground">{value}</p>
+          {subtitle && (
+            <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>
+          )}
+        </div>
+        <div
+          className={cn(
+            "w-12 h-12 rounded-xl flex items-center justify-center shrink-0",
+            iconStyles[variant]
+          )}
+        >
+          <Icon className="w-6 h-6" />
         </div>
       </div>
-      <h3 className="text-sm text-muted-foreground mb-1">{title}</h3>
-      <p className="text-2xl font-bold text-foreground">{value}</p>
-      {subtitle && (
-        <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>
-      )}
     </div>
   );
 };

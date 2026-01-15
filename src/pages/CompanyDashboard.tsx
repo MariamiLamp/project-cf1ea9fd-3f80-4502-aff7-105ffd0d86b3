@@ -720,7 +720,7 @@ const CompanyDashboard = () => {
         </div>
 
         {/* Tabs */}
-        <Tabs defaultValue="ads" className="space-y-4">
+        <Tabs defaultValue="jobs" className="space-y-4">
           <div className="flex flex-col items-end gap-4">
             <div className="flex items-center justify-between w-full flex-row-reverse">
               <TabsList className="bg-muted/50 flex-wrap h-auto gap-1">
@@ -1047,6 +1047,13 @@ const CompanyDashboard = () => {
                           </Button>
                         </div>
                         <div className="flex items-center gap-3">
+                          <div className="w-24 h-12 rounded overflow-hidden bg-muted">
+                            <img
+                              src={a.imageUrl}
+                              alt={a.title || "ad"}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
                           <div className="text-right">
                             <div className="font-medium">
                               {a.title || "بدون عنوان"}
@@ -1056,13 +1063,6 @@ const CompanyDashboard = () => {
                                 ? "تحت الهيرو"
                                 : "تحت فحص الـATS"}
                             </div>
-                          </div>
-                          <div className="w-24 h-12 rounded overflow-hidden bg-muted">
-                            <img
-                              src={a.imageUrl}
-                              alt={a.title || "ad"}
-                              className="w-full h-full object-cover"
-                            />
                           </div>
                         </div>
                       </div>
@@ -1340,41 +1340,6 @@ const CompanyDashboard = () => {
 
                     {/* Desktop Filters */}
                     <div className="hidden md:flex flex-wrap items-center gap-2">
-                      <Button
-                        size="sm"
-                        onClick={handleApplyFilters}
-                        className="h-8 gap-2"
-                      >
-                        <ListFilter className="w-3 h-3" />
-                        تصفية
-                      </Button>
-
-                      {(appliedFilters.status !== "all" ||
-                        appliedFilters.job !== "all" ||
-                        appliedFilters.date ||
-                        appliedFilters.matchScore !== "all") && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            setFilterStatus("all");
-                            setFilterJob("all");
-                            setFilterDate("");
-                            setFilterMatchScore("all");
-                            setAppliedFilters({
-                              status: "all",
-                              job: "all",
-                              date: "",
-                              matchScore: "all",
-                            });
-                          }}
-                          className="h-8 text-xs text-muted-foreground"
-                        >
-                          <XCircle className="w-3 h-3 ml-1" />
-                          مسح
-                        </Button>
-                      )}
-
                       <Select
                         value={filterStatus}
                         onValueChange={setFilterStatus}
@@ -1426,6 +1391,41 @@ const CompanyDashboard = () => {
                           <SelectItem value="70">70% فما فوق</SelectItem>
                         </SelectContent>
                       </Select>
+
+                      <Button
+                        size="sm"
+                        onClick={handleApplyFilters}
+                        className="h-8 gap-2"
+                      >
+                        <ListFilter className="w-3 h-3" />
+                        تصفية
+                      </Button>
+
+                      {(appliedFilters.status !== "all" ||
+                        appliedFilters.job !== "all" ||
+                        appliedFilters.date ||
+                        appliedFilters.matchScore !== "all") && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setFilterStatus("all");
+                            setFilterJob("all");
+                            setFilterDate("");
+                            setFilterMatchScore("all");
+                            setAppliedFilters({
+                              status: "all",
+                              job: "all",
+                              date: "",
+                              matchScore: "all",
+                            });
+                          }}
+                          className="h-8 text-xs text-muted-foreground"
+                        >
+                          <XCircle className="w-3 h-3 ml-1" />
+                          مسح
+                        </Button>
+                      )}
                     </div>
                   </div>
                   <CardTitle className="flex items-center gap-2">

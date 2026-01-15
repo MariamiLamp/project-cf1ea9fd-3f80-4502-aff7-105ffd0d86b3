@@ -17,7 +17,10 @@ import Auth from "./pages/Auth";
 import AdminDashboard from "./pages/AdminDashboard";
 import CompanyDashboard from "./pages/CompanyDashboard";
 import CandidateProfile from "./pages/CandidateProfile";
+import Register from "./pages/Register";
 import JobSeekerRegistration from "./pages/JobSeekerRegistration";
+import CompanyRegistration from "./pages/CompanyRegistration";
+import HRRegistration from "./pages/HRRegistration";
 import HRDashboard from "./pages/HRDashboard";
 import TemplatesMarketplace from "./pages/TemplatesMarketplace";
 import Cart from "./pages/Cart";
@@ -50,10 +53,16 @@ const App = () => (
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/company" element={<CompanyDashboard />} />
               <Route path="/candidate/:id" element={<CandidateProfile />} />
+              <Route path="/register" element={<Register />} />
               <Route
                 path="/register/jobseeker"
                 element={<JobSeekerRegistration />}
               />
+              <Route
+                path="/register/company"
+                element={<CompanyRegistration />}
+              />
+              <Route path="/register/hr" element={<HRRegistration />} />
               <Route path="/hr" element={<HRDashboard />} />
               <Route path="/templates" element={<TemplatesMarketplace />} />
               <Route path="/cart" element={<Cart />} />
