@@ -8,6 +8,17 @@ import {
   CheckCircle,
   ArrowLeft,
   BookOpen,
+  Sparkles,
+  Target,
+  Zap,
+  TrendingUp,
+  Shield,
+  Award,
+  Clock,
+  Search,
+  Filter,
+  Bell,
+  MessageCircle,
 } from "lucide-react";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { Footer } from "@/components/layout/Footer";
@@ -18,43 +29,59 @@ const LandingPage = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col" dir="rtl">
       {/* Header */}
-      <header className="h-16 border-b border-border/40 fixed top-0 w-full bg-background/80 backdrop-blur-md z-50 transition-all duration-300">
+      <header className="h-20 border-b border-border/40 fixed top-0 w-full bg-background/95 backdrop-blur-xl z-50 transition-all duration-500 shadow-sm">
         <div className="container mx-auto h-full px-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary via-primary/80 to-secondary flex items-center justify-center shadow-lg shadow-primary/20">
-              <BookOpen className="w-5 h-5 text-primary-foreground" />
+          <div className="flex items-center gap-4">
+            <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-primary via-primary/80 to-secondary flex items-center justify-center shadow-lg shadow-primary/20 group hover:shadow-primary/30 transition-all duration-300">
+              <BookOpen className="w-6 h-6 text-primary-foreground" />
+              <div className="absolute -top-1 -right-1 w-5 h-5 bg-primary rounded-full flex items-center justify-center">
+                <Sparkles className="w-3 h-3 text-white" />
+              </div>
             </div>
             <div className="hidden sm:block" dir="ltr">
-              <h1 className="text-xl tracking-tight">
-                <span className="text-primary font-light">Career</span>
-                <span className="text-foreground/90 font-extrabold">Book</span>
+              <h1 className="text-2xl font-bold tracking-tight">
+                <span className="text-primary font-extralight">Career</span>
+                <span className="text-foreground font-black">Book</span>
               </h1>
-              <p className="text-[10px] text-muted-foreground tracking-widest uppercase">
-                كارير بوك
+              <p className="text-xs text-muted-foreground tracking-widest uppercase mt-1">
+                • منصة التوظيف الذكية •
               </p>
             </div>
           </div>
 
-          <nav className="hidden md:flex items-center gap-8">
-            <Link
-              to="/jobs"
-              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-            >
-              الوظائف
-            </Link>
+          <nav className="hidden md:flex items-center gap-10">
+            {[
+              { label: "الوظائف", icon: Search, path: "/jobs" },
+              { label: "تواصل معنا", icon: MessageCircle, path: "/contact" },
+            ].map((item) => (
+              <Link
+                key={item.label}
+                to={item.path}
+                className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-all duration-300 group"
+              >
+                <item.icon className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                {item.label}
+              </Link>
+            ))}
           </nav>
 
           <div className="flex items-center gap-4">
             <Link to="/auth">
-              <Button variant="ghost" size="sm" className="font-medium">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="font-medium group border border-transparent hover:border-border/50 transition-all duration-300"
+              >
+                <User className="w-4 h-4 ml-2 opacity-60 group-hover:opacity-100" />
                 تسجيل الدخول
               </Button>
             </Link>
             <Link to="/register">
               <Button
                 size="sm"
-                className="font-medium shadow-lg shadow-primary/20"
+                className="font-medium shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all duration-300 hover:scale-105"
               >
+                <Target className="w-4 h-4 ml-2" />
                 انضم إلينا
               </Button>
             </Link>
@@ -62,66 +89,101 @@ const LandingPage = () => {
         </div>
       </header>
 
-      <main className="flex-1 pt-20">
+      <main className="flex-1 pt-24">
         {/* Hero Section */}
-        <section className="relative py-20 lg:py-32 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-primary/10 to-background -z-10" />
+        <section className="relative py-24 lg:py-40 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.03] via-primary/5 to-background -z-10">
+            <div className="absolute top-20 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-20 right-1/4 w-96 h-96 bg-secondary/5 rounded-full blur-3xl"></div>
+          </div>
           <div className="container mx-auto px-6 text-center">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6 animate-fade-down">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-              </span>
-              منصة التوظيف الأولى في المنطقة
+            <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-8 animate-fade-down border border-primary/20 backdrop-blur-sm">
+              <Zap className="w-4 h-4 animate-pulse" />
+              <span>منصة التوظيف الأولى في المنطقة</span>
+              <div className="w-2 h-2 bg-primary rounded-full animate-ping"></div>
             </div>
             <h1
-              className="text-4xl md:text-6xl font-extrabold text-foreground mb-6 tracking-tight leading-tight max-w-4xl mx-auto animate-fade-up opacity-0"
+              className="text-5xl md:text-7xl lg:text-8xl font-black text-foreground mb-8 tracking-tight leading-tight max-w-6xl mx-auto animate-fade-up opacity-0"
               style={{ animationDelay: "100ms", animationFillMode: "forwards" }}
             >
-              اكتشف فرصتك الوظيفية القادمة
+              اكتشف فرصتك
               <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
-                وابدأ مسيرتك المهنية
+              <span className="relative inline-block">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
+                  الوظيفية القادمة
+                </span>
+                <div className="absolute -bottom-4 left-0 w-full h-1 bg-gradient-to-r from-primary to-secondary rounded-full"></div>
               </span>
             </h1>
             <p
-              className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed animate-fade-up opacity-0"
+              className="text-xl text-muted-foreground max-w-3xl mx-auto mb-12 leading-relaxed animate-fade-up opacity-0 font-medium"
               style={{ animationDelay: "200ms", animationFillMode: "forwards" }}
             >
-              نوصلك بأفضل الشركات في المنطقة. سواء كنت تبحث عن وظيفة أحلامك أو
-              ترغب في توظيف أفضل المواهب، نحن هنا للمساعدة.
+              نوصلك بأفضل الشركات في المنطقة باستخدام الذكاء الاصطناعي المتقدم.
+              سواء كنت تبحث عن وظيفة أحلامك أو ترغب في توظيف أفضل المواهب، نحن
+              هنا للمساعدة.
             </p>
             <div
-              className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-up opacity-0"
+              className="flex flex-col sm:flex-row items-center justify-center gap-6 animate-fade-up opacity-0"
               style={{ animationDelay: "300ms", animationFillMode: "forwards" }}
             >
-              <Link to="/jobs">
+              <Link to="/jobs" className="group">
                 <Button
                   size="lg"
-                  className="h-12 px-8 text-base shadow-xl shadow-primary/20 transition-transform hover:scale-105"
+                  className="h-14 px-10 text-lg shadow-2xl shadow-primary/30 transition-all duration-300 hover:shadow-primary/40 group-hover:scale-105"
                 >
-                  تصفح الوظائف
-                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  تصفح الوظائف الآن
+                  <ArrowLeft className="w-5 h-5 mr-3 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
-              <Link to="/register/company">
+              <Link to="/register/company" className="group">
                 <Button
                   size="lg"
                   variant="outline"
-                  className="h-12 px-8 text-base bg-background/50 backdrop-blur-sm transition-transform hover:scale-105"
-                  onClick={() => (window.location.href = "/register/company")}
+                  className="h-14 px-10 text-lg bg-background/80 backdrop-blur-sm border-2 transition-all duration-300 hover:scale-105 hover:border-primary/50"
                 >
+                  <Building2 className="w-5 h-5 ml-3" />
                   وظف المواهب
                 </Button>
               </Link>
+            </div>
+
+            {/* Floating Stats */}
+            <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+              {[
+                { label: "سرعة التوظيف", value: "2.5x", icon: Zap },
+                { label: "دقة المطابقة", value: "98%", icon: Target },
+                { label: "رضا العملاء", value: "4.9/5", icon: Award },
+                { label: "وقت الاستجابة", value: "24h", icon: Clock },
+              ].map((stat, idx) => (
+                <div
+                  key={idx}
+                  className="bg-background/50 backdrop-blur-sm p-4 rounded-2xl border border-border/50 shadow-sm"
+                >
+                  <div className="text-2xl font-bold text-foreground mb-1">
+                    {stat.value}
+                  </div>
+                  <div className="text-xs text-muted-foreground flex items-center justify-center gap-1">
+                    <stat.icon className="w-3 h-3" />
+                    {stat.label}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </section>
 
         {/* Stats Section */}
-        <section className="py-20 bg-background/50">
+        <section className="py-20 relative">
+          <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/20 to-background -z-10"></div>
           <div className="container mx-auto px-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold mb-4">أرقام تتحدث عن نفسها</h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                انضم إلى مجتمع يضم آلاف المحترفين والشركات الرائدة
+              </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               <StatCard
                 title="الوظائف النشطة"
                 value="+2,500"
@@ -155,11 +217,16 @@ const LandingPage = () => {
         </section>
 
         {/* Features Section */}
-        <section className="py-24 bg-muted/30">
+        <section className="py-24 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-muted/10 via-background to-muted/10 -z-10"></div>
           <div className="container mx-auto px-6">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl font-bold mb-4">لماذا تختار منصتنا؟</h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
+            <div className="text-center mb-20">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
+                <Sparkles className="w-4 h-4" />
+                مميزاتنا الفريدة
+              </div>
+              <h2 className="text-4xl font-bold mb-6">لماذا تختار منصتنا؟</h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
                 نقدم لك مجموعة من الأدوات والمميزات التي تساعدك في رحلتك المهنية
               </p>
             </div>
@@ -167,35 +234,54 @@ const LandingPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[
                 {
-                  title: "بناء سيرة ذاتية احترافية",
+                  title: "بناء سيرة ذاتية ذكية",
                   description:
-                    "أنشئ سيرة ذاتية متميزة باستخدام قوالبنا الاحترافية وأدوات الذكاء الاصطناعي.",
+                    "أنشئ سيرة ذاتية متميزة باستخدام قوالبنا الاحترافية وأدوات الذكاء الاصطناعي المتقدمة.",
                   icon: FileText,
+                  features: ["تحليل ذكي", "تصميم احترافي", "تحديث آلي"],
                 },
                 {
-                  title: "توصيات ذكية",
+                  title: "توصيات ذكية دقيقة",
                   description:
-                    "نستخدم خوارزميات متطورة لمطابقة مهاراتك مع الوظائف الأنسب لك.",
-                  icon: CheckCircle,
+                    "خوارزميات متطورة لمطابقة مهاراتك مع الوظائف الأنسب لك بدقة تصل إلى 98%.",
+                  icon: Target,
+                  features: ["مطابقة دقيقة", "تحديث لحظي", "توصيات مخصصة"],
                 },
                 {
-                  title: "تواصل مباشر",
+                  title: "تواصل مباشر وسريع",
                   description:
-                    "تواصل مباشرة مع مسؤولي التوظيف في كبرى الشركات.",
+                    "تواصل مباشرة مع مسؤولي التوظيف في كبرى الشركات بدون وسطاء.",
                   icon: Users,
+                  features: ["مراسلة فورية", "مقابلات افتراضية", "متابعة آلية"],
                 },
               ].map((feature, index) => (
                 <div
                   key={index}
-                  className="bg-card p-8 rounded-xl border border-border/50 transition-all duration-300 hover:border-primary/50 group"
+                  className="bg-card p-8 rounded-2xl border border-border/50 transition-all duration-500 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/10 group hover:scale-[1.02]"
                 >
-                  <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-6 text-primary group-hover:scale-110 transition-transform">
-                    <feature.icon className="w-7 h-7" />
+                  <div className="relative">
+                    <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-8 text-primary group-hover:scale-110 transition-transform duration-500 shadow-lg shadow-primary/10">
+                      <feature.icon className="w-8 h-8" />
+                    </div>
+                    <div className="absolute top-0 right-0 w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                      <TrendingUp className="w-4 h-4 text-primary" />
+                    </div>
                   </div>
-                  <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
-                  <p className="text-muted-foreground leading-relaxed">
+                  <h3 className="text-2xl font-bold mb-4">{feature.title}</h3>
+                  <p className="text-muted-foreground leading-relaxed mb-6">
                     {feature.description}
                   </p>
+                  <div className="space-y-3">
+                    {feature.features.map((feat, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center gap-3 text-sm"
+                      >
+                        <CheckCircle className="w-4 h-4 text-primary" />
+                        <span>{feat}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>
@@ -203,24 +289,64 @@ const LandingPage = () => {
         </section>
 
         {/* CTA Section */}
-        <section className="py-24 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary to-primary/80 -z-10" />
-          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-soft-light" />
-          <div className="container mx-auto px-6 text-center text-slate-900 relative z-10">
-            <h2 className="text-3xl md:text-5xl font-bold mb-8">
-              جاهز لبدء رحلتك المهنية؟
+        <section className="py-32 relative overflow-hidden">
+          <div className="absolute inset-0 bg-background -z-10">
+            <div className="absolute top-0 left-0 w-full h-full bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-multiply"></div>
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-primary/5 blur-3xl"></div>
+          </div>
+          <div className="container mx-auto px-6 text-center text-foreground relative z-10">
+            <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-secondary/5 border border-secondary/10 mb-8">
+              <Shield className="w-5 h-5 text-secondary" />
+              <span className="font-medium text-secondary">
+                منصة آمنة وموثوقة
+              </span>
+            </div>
+            <h2 className="text-4xl md:text-6xl font-black mb-10 tracking-tight text-foreground">
+              جاهز لبدء{" "}
+              <span className="text-primary relative inline-block">
+                رحلتك المهنية
+                <svg
+                  className="absolute w-full h-3 -bottom-1 left-0 text-primary/20"
+                  viewBox="0 0 100 10"
+                  preserveAspectRatio="none"
+                >
+                  <path
+                    d="M0 5 Q 50 10 100 5"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    fill="none"
+                  />
+                </svg>
+              </span>
+              ؟
             </h2>
-            <p className="text-xl text-slate-700 mb-10 max-w-2xl mx-auto font-medium">
-              انضم إلى آلاف الباحثين عن عمل والشركات التي تثق بمنصتنا.
+            <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto font-medium">
+              انضم إلى آلاف الباحثين عن عمل والشركات التي تثق بمنصتنا. ابدأ
+              رحلتك نحو النجاح المهني اليوم.
             </p>
-            <Button
-              size="lg"
-              variant="secondary"
-              className="h-14 px-10 text-lg shadow-2xl transition-transform hover:scale-105"
-              onClick={() => navigate("/register")}
-            >
-              سجل الآن مجاناً
-            </Button>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+              <Button
+                size="lg"
+                className="h-16 px-12 text-xl shadow-2xl shadow-primary/20 transition-all duration-300 hover:scale-105 hover:shadow-primary/30"
+                onClick={() => navigate("/register")}
+              >
+                <Target className="w-6 h-6 ml-3" />
+                سجل الآن مجاناً
+              </Button>
+              <Link to="/jobs">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="h-16 px-10 text-xl border-2 border-input bg-background hover:bg-accent hover:text-accent-foreground text-foreground"
+                >
+                  <Search className="w-6 h-6 ml-3" />
+                  استكشف الوظائف
+                </Button>
+              </Link>
+            </div>
+            <p className="text-muted-foreground/80 mt-8 text-sm">
+              بدون رسوم • بدون التزام • تجربة مجانية كاملة
+            </p>
           </div>
         </section>
       </main>
@@ -229,5 +355,22 @@ const LandingPage = () => {
     </div>
   );
 };
+
+// Adding missing User icon component
+const User = ({ className }: { className?: string }) => (
+  <svg
+    className={className}
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+    />
+  </svg>
+);
 
 export default LandingPage;
