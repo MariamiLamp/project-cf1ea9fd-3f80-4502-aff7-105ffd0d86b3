@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Briefcase, Mail, Phone, MapPin } from "lucide-react";
+import { Briefcase, Mail, Phone, MapPin, BookOpen } from "lucide-react";
 
 export const Footer = () => {
   return (
@@ -10,14 +10,17 @@ export const Footer = () => {
           <div>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sidebar-primary to-accent flex items-center justify-center">
-                <Briefcase className="w-5 h-5 text-white" />
+                <BookOpen className="w-5 h-5 text-white" />
               </div>
-              <div>
-                <h3 className="font-bold text-lg text-white">
-                  الموارد البشرية
+              <div dir="ltr">
+                <h3 className="text-lg tracking-tight flex flex-col items-start leading-none">
+                  <span className="flex items-baseline gap-0.5">
+                    <span className="text-white font-light">Career</span>
+                    <span className="text-white font-extrabold">Book</span>
+                  </span>
                 </h3>
-                <p className="text-xs text-sidebar-foreground/60">
-                  منصة التوظيف الذكية
+                <p className="text-[10px] text-sidebar-foreground/60 tracking-widest uppercase mt-1">
+                  كارير بوك
                 </p>
               </div>
             </div>

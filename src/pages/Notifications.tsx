@@ -61,18 +61,22 @@ const Notifications = () => {
   return (
     <DashboardLayout>
       <div className="container py-6 space-y-6" dir="rtl">
+        {/* Header */}
         <div className="flex items-center justify-between">
-          <div className="space-y-1">
+          {/* Title - RIGHT */}
+          <div className="space-y-1 text-right">
             <h2 className="text-2xl font-bold tracking-tight">الإشعارات</h2>
             <p className="text-muted-foreground">
-              تابع آخر التحديثات والتبيهات الخاصة بك
+              تابع آخر التحديثات والتنبيهات الخاصة بك
             </p>
           </div>
+
+          {/* Button - LEFT */}
           {unreadCount > 0 && (
             <Button
               variant="outline"
               onClick={handleMarkAllRead}
-              className="gap-2"
+              className="gap-2 flex-row-reverse"
             >
               <CheckCircle2 className="w-4 h-4" />
               تحديد الكل كمقروء
@@ -80,9 +84,9 @@ const Notifications = () => {
           )}
         </div>
 
+        {/* Tabs */}
         <Tabs defaultValue="all" className="w-full">
-          <TabsList className="mb-4">
-            <TabsTrigger value="all">كل الإشعارات</TabsTrigger>
+          <TabsList className="mb-4 justify-end">
             <TabsTrigger value="unread" className="relative">
               غير مقروءة
               {unreadCount > 0 && (
@@ -91,6 +95,7 @@ const Notifications = () => {
                 </span>
               )}
             </TabsTrigger>
+            <TabsTrigger value="all">كل الإشعارات</TabsTrigger>
           </TabsList>
 
           <TabsContent value="all" className="space-y-4">
@@ -140,24 +145,26 @@ const NotificationItem = ({
       !notification.read ? "bg-primary/5 border-primary/20" : ""
     }`}
   >
-    <div className="p-4 flex items-start gap-4">
+    <div className="p-4 flex flex-row-reverse items-start gap-4">
+      {/* Icon */}
       <div
         className={`
-        w-10 h-10 rounded-full flex items-center justify-center shrink-0
-        ${
-          notification.type === "success"
-            ? "bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400"
-            : notification.type === "warning"
-            ? "bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400"
-            : "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
-        }
-      `}
+          w-10 h-10 rounded-full flex items-center justify-center shrink-0
+          ${
+            notification.type === "success"
+              ? "bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400"
+              : notification.type === "warning"
+              ? "bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400"
+              : "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
+          }
+        `}
       >
         <Bell className="w-5 h-5" />
       </div>
 
-      <div className="flex-1 space-y-1">
-        <div className="flex items-start justify-between">
+      {/* Content */}
+      <div className="flex-1 space-y-1 text-right">
+        <div className="flex flex-row-reverse items-start justify-between gap-2">
           <p
             className={`font-medium ${
               !notification.read ? "text-foreground" : "text-muted-foreground"
@@ -165,16 +172,19 @@ const NotificationItem = ({
           >
             {notification.title}
           </p>
-          <span className="text-xs text-muted-foreground flex items-center gap-1">
+
+          <span className="text-xs text-muted-foreground flex flex-row-reverse items-center gap-1 shrink-0">
             <Clock className="w-3 h-3" />
             {notification.time}
           </span>
         </div>
+
         <p className="text-sm text-muted-foreground leading-relaxed">
           {notification.message}
         </p>
       </div>
 
+      {/* Unread Indicator */}
       {!notification.read && (
         <Button
           variant="ghost"

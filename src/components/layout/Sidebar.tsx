@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils";
 import { useSidebarState } from "@/contexts/SidebarContext";
 
 const navItems = [
-  { icon: LayoutDashboard, label: "لوحة التحكم", path: "/" },
+  { icon: LayoutDashboard, label: "لوحة التحكم", path: "/dashboard" },
   { icon: User, label: "الملف الشخصي", path: "/candidate/1" },
   { icon: FileText, label: "فحص السيرة الذاتية", path: "/cv-check" },
   { icon: Sparkles, label: "خطاب التقديم", path: "/cover-letter" },
@@ -57,7 +57,9 @@ export const Sidebar = () => {
           {!collapsed && (
             <div className="animate-fade-in">
               <h1 className="font-bold text-lg text-white">الموارد البشرية</h1>
-              <p className="text-xs text-sidebar-foreground/60">منصة التوظيف الذكية</p>
+              <p className="text-xs text-sidebar-foreground/60">
+                منصة التوظيف الذكية
+              </p>
             </div>
           )}
         </div>
@@ -77,10 +79,14 @@ export const Sidebar = () => {
                 collapsed && "justify-center px-2"
               )}
             >
-              <item.icon className={cn(
-                "w-5 h-5 transition-colors shrink-0",
-                isActive ? "text-sidebar-primary" : "text-sidebar-foreground/70 group-hover:text-sidebar-foreground"
-              )} />
+              <item.icon
+                className={cn(
+                  "w-5 h-5 transition-colors shrink-0",
+                  isActive
+                    ? "text-sidebar-primary"
+                    : "text-sidebar-foreground/70 group-hover:text-sidebar-foreground"
+                )}
+              />
               {!collapsed && (
                 <span className="animate-fade-in">{item.label}</span>
               )}
@@ -91,7 +97,6 @@ export const Sidebar = () => {
           );
         })}
       </nav>
-
 
       {/* Bottom Navigation */}
       <div className="p-4 border-t border-sidebar-border space-y-2">
