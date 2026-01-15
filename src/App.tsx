@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import Index from "./pages/Index";
+import UserDashboard from "./pages/UserDashboard";
 import CVCheck from "./pages/CVCheck";
 import CoverLetter from "./pages/CoverLetter";
 import Jobs from "./pages/Jobs";
@@ -42,6 +43,7 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/dashboard" element={<UserDashboard />} />
               <Route path="/cv-check" element={<CVCheck />} />
               <Route path="/cover-letter" element={<CoverLetter />} />
               <Route path="/jobs" element={<Jobs />} />
