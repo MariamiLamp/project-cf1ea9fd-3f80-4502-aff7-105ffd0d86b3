@@ -35,7 +35,7 @@ export const StatCard = ({
   return (
     <div
       className={cn(
-        "p-5 rounded-xl border border-border/30 opacity-0 animate-fade-up cursor-default",
+        "p-6 rounded-lg border border-border/30 opacity-0 animate-fade-up cursor-default",
         variantStyles[variant]
       )}
       style={{ animationDelay: `${delay}ms`, animationFillMode: "forwards" }}
