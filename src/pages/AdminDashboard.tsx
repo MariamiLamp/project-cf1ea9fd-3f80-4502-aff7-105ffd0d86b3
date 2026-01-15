@@ -359,7 +359,7 @@ const AdminDashboard = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeTab, setActiveTab] = useState("users");
+  const [activeTab, setActiveTab] = useState("active_ads");
 
   // Plans state
   const [plans, setPlans] = useState(mockPlans);
@@ -801,17 +801,17 @@ const AdminDashboard = () => {
           {stats.map((stat, index) => (
             <Card key={index} className="border-border/50">
               <CardContent className="p-6">
-                <div className="flex items-center gap-4">
-                  <div
-                    className={`w-12 h-12 rounded-xl ${stat.bg} flex items-center justify-center shrink-0`}
-                  >
-                    <stat.icon className={`w-6 h-6 ${stat.color}`} />
-                  </div>
+                <div className="flex items-center justify-between gap-4">
                   <div>
                     <p className="text-sm text-muted-foreground">
                       {stat.label}
                     </p>
                     <p className="text-2xl font-bold mt-1">{stat.value}</p>
+                  </div>
+                  <div
+                    className={`w-12 h-12 rounded-xl ${stat.bg} flex items-center justify-center shrink-0`}
+                  >
+                    <stat.icon className={`w-6 h-6 ${stat.color}`} />
                   </div>
                 </div>
               </CardContent>
@@ -827,37 +827,37 @@ const AdminDashboard = () => {
         >
           <div className="flex flex-col items-end gap-4">
             <TabsList className="bg-muted/50 flex-wrap h-auto gap-1 p-1">
-              <TabsTrigger value="users" className="gap-2">
-                <Users className="w-4 h-4" />
-                الباحثين عن عمل
-              </TabsTrigger>
-              <TabsTrigger value="companies" className="gap-2">
-                <Building2 className="w-4 h-4" />
-                الشركات
-              </TabsTrigger>
-              <TabsTrigger value="hr" className="gap-2">
-                <UserCheck className="w-4 h-4" />
-                موظفي HR
-              </TabsTrigger>
-              <TabsTrigger value="subscriptions" className="gap-2">
-                <CreditCard className="w-4 h-4" />
-                خطط الاشتراك
-              </TabsTrigger>
-              <TabsTrigger value="templates" className="gap-2">
-                <LayoutTemplate className="w-4 h-4" />
-                القوالب
-              </TabsTrigger>
-              <TabsTrigger value="ads" className="gap-2">
-                <Megaphone className="w-4 h-4" />
-                طلبات الإعلانات
+              <TabsTrigger value="active_ads" className="gap-2">
+                <CheckCircle className="w-4 h-4" />
+                الإعلانات النشطة
               </TabsTrigger>
               <TabsTrigger value="create_ad" className="gap-2">
                 <Plus className="w-4 h-4" />
                 إضافة إعلان
               </TabsTrigger>
-              <TabsTrigger value="active_ads" className="gap-2">
-                <CheckCircle className="w-4 h-4" />
-                الإعلانات النشطة
+              <TabsTrigger value="ads" className="gap-2">
+                <Megaphone className="w-4 h-4" />
+                طلبات الإعلانات
+              </TabsTrigger>
+              <TabsTrigger value="templates" className="gap-2">
+                <LayoutTemplate className="w-4 h-4" />
+                القوالب
+              </TabsTrigger>
+              <TabsTrigger value="subscriptions" className="gap-2">
+                <CreditCard className="w-4 h-4" />
+                خطط الاشتراك
+              </TabsTrigger>
+              <TabsTrigger value="hr" className="gap-2">
+                <UserCheck className="w-4 h-4" />
+                موظفي HR
+              </TabsTrigger>
+              <TabsTrigger value="companies" className="gap-2">
+                <Building2 className="w-4 h-4" />
+                الشركات
+              </TabsTrigger>
+              <TabsTrigger value="users" className="gap-2">
+                <Users className="w-4 h-4" />
+                الباحثين عن عمل
               </TabsTrigger>
             </TabsList>
 
@@ -1685,12 +1685,13 @@ const AdminDashboard = () => {
                         <TableRow key={ad.id}>
                           <TableCell>
                             <Button
-                              variant="ghost"
-                              size="icon"
+                              variant="destructive"
+                              size="sm"
                               onClick={() => handleDeclineAd(ad.id)}
-                              title="إيقاف الإعلان"
+                              className="gap-2"
                             >
-                              <Ban className="w-4 h-4 text-destructive" />
+                              <Ban className="w-4 h-4" />
+                              إيقاف
                             </Button>
                           </TableCell>
                           <TableCell className="font-medium text-destructive">
