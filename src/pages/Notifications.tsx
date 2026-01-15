@@ -62,41 +62,41 @@ const Notifications = () => {
     <DashboardLayout>
       <div className="container py-6 space-y-6" dir="rtl">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          {/* Title - RIGHT */}
-          <div className="space-y-1 text-right">
-            <h2 className="text-2xl font-bold tracking-tight">الإشعارات</h2>
-            <p className="text-muted-foreground">
-              تابع آخر التحديثات والتنبيهات الخاصة بك
-            </p>
-          </div>
-
-          {/* Button - LEFT */}
-          {unreadCount > 0 && (
-            <Button
-              variant="outline"
-              onClick={handleMarkAllRead}
-              className="gap-2 flex-row-reverse"
-            >
-              <CheckCircle2 className="w-4 h-4" />
-              تحديد الكل كمقروء
-            </Button>
-          )}
+        <div className="space-y-1 text-right">
+          <h2 className="text-2xl font-bold tracking-tight">الإشعارات</h2>
+          <p className="text-muted-foreground">
+            تابع آخر التحديثات والتنبيهات الخاصة بك
+          </p>
         </div>
 
-        {/* Tabs */}
+        {/* Tabs with Button */}
         <Tabs defaultValue="all" className="w-full">
-          <TabsList className="mb-4 justify-end">
-            <TabsTrigger value="unread" className="relative">
-              غير مقروءة
-              {unreadCount > 0 && (
-                <span className="mr-2 bg-destructive text-destructive-foreground text-[10px] px-1.5 py-0.5 rounded-full">
-                  {unreadCount}
-                </span>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="all">كل الإشعارات</TabsTrigger>
-          </TabsList>
+          <div className="flex items-center justify-between mb-4">
+            {/* Button - LEFT */}
+            {unreadCount > 0 && (
+              <Button
+                variant="outline"
+                onClick={handleMarkAllRead}
+                className="gap-2 flex-row-reverse"
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                تحديد الكل كمقروء
+              </Button>
+            )}
+
+            {/* Tabs - RIGHT */}
+            <TabsList className="flex flex-row-reverse w-fit">
+              <TabsTrigger value="all">كل الإشعارات</TabsTrigger>
+              <TabsTrigger value="unread" className="relative">
+                غير مقروءة
+                {unreadCount > 0 && (
+                  <span className="mr-2 bg-destructive text-destructive-foreground text-[10px] px-1.5 py-0.5 rounded-full">
+                    {unreadCount}
+                  </span>
+                )}
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="all" className="space-y-4">
             {notifications.length > 0 ? (
