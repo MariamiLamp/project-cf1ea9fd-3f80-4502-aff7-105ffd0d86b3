@@ -11,6 +11,7 @@ import {
   TrendingUp,
   ArrowLeft,
   Check,
+  Scan,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -142,10 +143,8 @@ export function AdPlacementSelector({
             >
               {label}
             </span>
-            <Badge
-              variant="secondary"
-              className="relative z-20 mt-1 font-normal dir-ltr"
-            >
+            <Badge className="relative z-20 mt-2 text-sm px-3 py-1.5 font-bold shadow-sm dir-ltr bg-yellow-100 text-yellow-800 hover:bg-yellow-200 border-yellow-200 gap-2">
+              <Scan className="w-4 h-4" />
               {dimensions}
             </Badge>
           </>
