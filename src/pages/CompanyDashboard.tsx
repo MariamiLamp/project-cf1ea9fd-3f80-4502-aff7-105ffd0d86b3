@@ -72,6 +72,7 @@ import {
   ListFilter,
 } from "lucide-react";
 import { AdPlacementSelector } from "@/components/dashboard/AdPlacementSelector";
+import { StatCard } from "@/components/dashboard/StatCard";
 
 // Mock data
 const initialJobs = [
@@ -698,27 +699,35 @@ const CompanyDashboard = () => {
       <main className="p-6 space-y-6">
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {stats.map((stat, index) => (
-            <Card key={index} className="border-border/50">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-4">
-                  <div
-                    className={`w-12 h-12 rounded-xl ${stat.bg} flex items-center justify-center shrink-0`}
-                  >
-                    <stat.icon className={`w-6 h-6 ${stat.color}`} />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">
-                      {stat.label}
-                    </p>
-                    <p className="text-2xl font-bold mt-1">{stat.value}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+          <StatCard
+            title="الوظائف النشطة"
+            value="12"
+            icon={Briefcase}
+            variant="primary"
+            delay={100}
+          />
+          <StatCard
+            title="إجمالي الطلبات"
+            value="156"
+            icon={FileText}
+            variant="success"
+            delay={200}
+          />
+          <StatCard
+            title="المرشحون المتوافقون"
+            value="48"
+            icon={Users}
+            variant="info"
+            delay={300}
+          />
+          <StatCard
+            title="معدل القبول"
+            value="32%"
+            icon={TrendingUp}
+            variant="warning"
+            delay={400}
+          />
         </div>
-
         {/* Tabs */}
         <Tabs defaultValue="jobs" className="space-y-4">
           <div className="flex flex-col items-end gap-4">
@@ -1339,93 +1348,101 @@ const CompanyDashboard = () => {
                     </div>
 
                     {/* Desktop Filters */}
-                    <div className="hidden md:flex flex-wrap items-center gap-2">
-                      <Select
-                        value={filterStatus}
-                        onValueChange={setFilterStatus}
-                      >
-                        <SelectTrigger className="w-[130px] h-8 text-xs">
-                          <SelectValue placeholder="الحالة" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">كل الحالات</SelectItem>
-                          <SelectItem value="pending">قيد المراجعة</SelectItem>
-                          <SelectItem value="reviewed">تمت المراجعة</SelectItem>
-                          <SelectItem value="accepted">مقبول</SelectItem>
-                          <SelectItem value="rejected">مرفوض</SelectItem>
-                        </SelectContent>
-                      </Select>
-
-                      <Select value={filterJob} onValueChange={setFilterJob}>
-                        <SelectTrigger className="w-[150px] h-8 text-xs">
-                          <SelectValue placeholder="الوظيفة" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">كل الوظائف</SelectItem>
-                          {jobs.map((job) => (
-                            <SelectItem key={job.id} value={job.title}>
-                              {job.title}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-
-                      <Input
-                        type="date"
-                        value={filterDate}
-                        onChange={(e) => setFilterDate(e.target.value)}
-                        className="w-[150px] h-8 text-xs"
-                      />
-
-                      <Select
-                        value={filterMatchScore}
-                        onValueChange={setFilterMatchScore}
-                      >
-                        <SelectTrigger className="w-[130px] h-8 text-xs">
-                          <SelectValue placeholder="نسبة التوافق" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">الكل</SelectItem>
-                          <SelectItem value="90">90% فما فوق</SelectItem>
-                          <SelectItem value="80">80% فما فوق</SelectItem>
-                          <SelectItem value="70">70% فما فوق</SelectItem>
-                        </SelectContent>
-                      </Select>
-
-                      <Button
-                        size="sm"
-                        onClick={handleApplyFilters}
-                        className="h-8 gap-2"
-                      >
-                        <ListFilter className="w-3 h-3" />
-                        تصفية
-                      </Button>
-
-                      {(appliedFilters.status !== "all" ||
-                        appliedFilters.job !== "all" ||
-                        appliedFilters.date ||
-                        appliedFilters.matchScore !== "all") && (
+                    <div className="hidden md:flex flex-wrap items-center justify-between gap-2 w-full">
+                      <div className="flex items-center gap-2">
                         <Button
-                          variant="ghost"
                           size="sm"
-                          onClick={() => {
-                            setFilterStatus("all");
-                            setFilterJob("all");
-                            setFilterDate("");
-                            setFilterMatchScore("all");
-                            setAppliedFilters({
-                              status: "all",
-                              job: "all",
-                              date: "",
-                              matchScore: "all",
-                            });
-                          }}
-                          className="h-8 text-xs text-muted-foreground"
+                          onClick={handleApplyFilters}
+                          className="h-8 gap-2"
                         >
-                          <XCircle className="w-3 h-3 ml-1" />
-                          مسح
+                          <ListFilter className="w-3 h-3" />
+                          تصفية
                         </Button>
-                      )}
+
+                        {(appliedFilters.status !== "all" ||
+                          appliedFilters.job !== "all" ||
+                          appliedFilters.date ||
+                          appliedFilters.matchScore !== "all") && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setFilterStatus("all");
+                              setFilterJob("all");
+                              setFilterDate("");
+                              setFilterMatchScore("all");
+                              setAppliedFilters({
+                                status: "all",
+                                job: "all",
+                                date: "",
+                                matchScore: "all",
+                              });
+                            }}
+                            className="h-8"
+                          >
+                            <X className="w-3 h-3 ml-2" />
+                            مسح
+                          </Button>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <Select
+                          value={filterStatus}
+                          onValueChange={setFilterStatus}
+                        >
+                          <SelectTrigger className="w-[130px] h-8 text-xs">
+                            <SelectValue placeholder="الحالة" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">كل الحالات</SelectItem>
+                            <SelectItem value="pending">
+                              قيد المراجعة
+                            </SelectItem>
+                            <SelectItem value="reviewed">
+                              تمت المراجعة
+                            </SelectItem>
+                            <SelectItem value="accepted">مقبول</SelectItem>
+                            <SelectItem value="rejected">مرفوض</SelectItem>
+                          </SelectContent>
+                        </Select>
+
+                        <Select value={filterJob} onValueChange={setFilterJob}>
+                          <SelectTrigger className="w-[150px] h-8 text-xs">
+                            <SelectValue placeholder="الوظيفة" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">كل الوظائف</SelectItem>
+                            {jobs.map((job) => (
+                              <SelectItem key={job.id} value={job.title}>
+                                {job.title}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+
+                        <Input
+                          type="date"
+                          value={filterDate}
+                          onChange={(e) => setFilterDate(e.target.value)}
+                          className="w-[150px] h-8 text-xs"
+                        />
+
+                        <Select
+                          value={filterMatchScore}
+                          onValueChange={setFilterMatchScore}
+                        >
+                          <SelectTrigger className="w-[130px] h-8 text-xs">
+                            <SelectValue placeholder="نسبة التوافق" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">الكل</SelectItem>
+                            <SelectItem value="90">90% فما فوق</SelectItem>
+                            <SelectItem value="80">80% فما فوق</SelectItem>
+                            <SelectItem value="70">70% فما فوق</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
                   </div>
                   <CardTitle className="flex items-center gap-2">
@@ -1726,7 +1743,6 @@ const CompanyDashboard = () => {
             </div>
           </TabsContent>
         </Tabs>
-
         {/* Edit Job Dialog */}
         <Dialog open={isEditJobOpen} onOpenChange={setIsEditJobOpen}>
           <DialogContent className="max-w-lg" dir="rtl">
@@ -1830,7 +1846,6 @@ const CompanyDashboard = () => {
             </div>
           </DialogContent>
         </Dialog>
-
         {/* View Application Dialog */}
         <Dialog
           open={isViewApplicationOpen}

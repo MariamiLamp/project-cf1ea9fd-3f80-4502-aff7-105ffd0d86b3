@@ -29,7 +29,7 @@ import { useNavigate } from "react-router-dom";
 const CompanyRegistration = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 4;
+  const totalSteps = 2;
 
   // Step 1: Basic Info
   const [name, setName] = useState("");
@@ -47,22 +47,22 @@ const CompanyRegistration = () => {
   const [skills, setSkills] = useState<string[]>([]);
   const [newSkill, setNewSkill] = useState("");
 
-  // Step 3: Documents
-  const [cvFile, setCvFile] = useState<File | null>(null);
-  const [certificates, setCertificates] = useState<File[]>([]);
+  // Step 3: Documents (Removed)
+  // const [cvFile, setCvFile] = useState<File | null>(null);
+  // const [certificates, setCertificates] = useState<File[]>([]);
 
-  // Step 4: Experience & Languages
-  const [languages, setLanguages] = useState<
-    { language: string; level: string }[]
-  >([]);
-  const [newLanguage, setNewLanguage] = useState("");
-  const [newLanguageLevel, setNewLanguageLevel] = useState("متوسط");
-  const [experiences, setExperiences] = useState<
-    { title: string; company: string; duration: string }[]
-  >([]);
-  const [newExpTitle, setNewExpTitle] = useState("");
-  const [newExpCompany, setNewExpCompany] = useState("");
-  const [newExpDuration, setNewExpDuration] = useState("");
+  // Step 4: Experience & Languages (Removed)
+  // const [languages, setLanguages] = useState<
+  //   { language: string; level: string }[]
+  // >([]);
+  // const [newLanguage, setNewLanguage] = useState("");
+  // const [newLanguageLevel, setNewLanguageLevel] = useState("متوسط");
+  // const [experiences, setExperiences] = useState<
+  //   { title: string; company: string; duration: string }[]
+  // >([]);
+  // const [newExpTitle, setNewExpTitle] = useState("");
+  // const [newExpCompany, setNewExpCompany] = useState("");
+  // const [newExpDuration, setNewExpDuration] = useState("");
 
   const handleProfilePictureChange = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -78,69 +78,7 @@ const CompanyRegistration = () => {
     }
   };
 
-  const handleCvChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setCvFile(file);
-    }
-  };
-
-  const handleCertificatesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files) {
-      setCertificates([...certificates, ...Array.from(files)]);
-    }
-  };
-
-  const addSkill = () => {
-    if (newSkill.trim() && !skills.includes(newSkill.trim())) {
-      setSkills([...skills, newSkill.trim()]);
-      setNewSkill("");
-    }
-  };
-
-  const removeSkill = (skill: string) => {
-    setSkills(skills.filter((s) => s !== skill));
-  };
-
-  const addLanguage = () => {
-    if (newLanguage.trim()) {
-      setLanguages([
-        ...languages,
-        { language: newLanguage.trim(), level: newLanguageLevel },
-      ]);
-      setNewLanguage("");
-      setNewLanguageLevel("متوسط");
-    }
-  };
-
-  const removeLanguage = (index: number) => {
-    setLanguages(languages.filter((_, i) => i !== index));
-  };
-
-  const addExperience = () => {
-    if (newExpTitle.trim() && newExpCompany.trim()) {
-      setExperiences([
-        ...experiences,
-        {
-          title: newExpTitle.trim(),
-          company: newExpCompany.trim(),
-          duration: newExpDuration.trim(),
-        },
-      ]);
-      setNewExpTitle("");
-      setNewExpCompany("");
-      setNewExpDuration("");
-    }
-  };
-
-  const removeExperience = (index: number) => {
-    setExperiences(experiences.filter((_, i) => i !== index));
-  };
-
-  const removeCertificate = (index: number) => {
-    setCertificates(certificates.filter((_, i) => i !== index));
-  };
+  /* Removed unused handlers for Steps 3 & 4 */
 
   const nextStep = () => {
     if (currentStep < totalSteps) {
@@ -164,8 +102,6 @@ const CompanyRegistration = () => {
   const steps = [
     { number: 1, title: "المعلومات الأساسية", icon: Building2 },
     { number: 2, title: "الملف التعريفي", icon: Camera },
-    { number: 3, title: "المستندات", icon: FileText },
-    { number: 4, title: "التفاصيل", icon: Briefcase },
   ];
 
   return (
@@ -361,71 +297,6 @@ const CompanyRegistration = () => {
                       placeholder="اكتب نبذة مختصرة عن الشركة ومجال عملها..."
                       className="mt-1 min-h-[100px]"
                     />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Step 3: Documents */}
-            {currentStep === 3 && (
-              <div className="space-y-6">
-                <h2 className="text-xl font-semibold text-foreground flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-primary" />
-                  المستندات القانونية
-                </h2>
-
-                <div className="space-y-6">
-                  {/* CR Upload */}
-                  <div>
-                    <Label>السجل التجاري</Label>
-                    <div className="mt-2">
-                      <label
-                        htmlFor="cv"
-                        className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-lg cursor-pointer bg-muted/30 hover:bg-muted/50 transition-colors"
-                      >
-                        {cvFile ? (
-                          <div className="flex items-center gap-2 text-primary">
-                            <FileText className="w-8 h-8" />
-                            <span className="text-sm font-medium">
-                              {cvFile.name}
-                            </span>
-                          </div>
-                        ) : (
-                          <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                            <Upload className="w-8 h-8" />
-                            <span className="text-sm">
-                              اضغط لرفع السجل التجاري
-                            </span>
-                            <span className="text-xs">
-                              PDF, DOC, JPG (حد أقصى 10MB)
-                            </span>
-                          </div>
-                        )}
-                      </label>
-                      <input
-                        id="cv"
-                        type="file"
-                        accept=".pdf,.doc,.docx,.jpg,.png"
-                        onChange={handleCvChange}
-                        className="hidden"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Step 4: Experience & Languages */}
-            {currentStep === 4 && (
-              <div className="space-y-6">
-                <h2 className="text-xl font-semibold text-foreground flex items-center gap-2">
-                  <Briefcase className="w-5 h-5 text-primary" />
-                  معلومات إضافية
-                </h2>
-
-                <div className="space-y-6">
-                  <div className="p-4 bg-muted/30 rounded-lg text-center text-muted-foreground">
-                    <p>يمكنك استكمال باقي تفاصيل الشركة بعد إنشاء الحساب.</p>
                   </div>
                 </div>
               </div>

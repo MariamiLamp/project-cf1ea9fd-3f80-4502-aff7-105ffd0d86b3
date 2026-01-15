@@ -6,7 +6,7 @@ interface StatCardProps {
   value: string | number;
   subtitle?: string;
   icon: LucideIcon;
-  variant?: "default" | "primary" | "success" | "warning";
+  variant?: "default" | "primary" | "success" | "warning" | "info";
   delay?: number;
 }
 
@@ -15,6 +15,7 @@ const iconStyles = {
   primary: "bg-blue-500/10 text-blue-500",
   success: "bg-emerald-500/10 text-emerald-500",
   warning: "bg-amber-500/10 text-amber-500",
+  info: "bg-purple-500/10 text-purple-500",
 };
 
 export const StatCard = ({
@@ -27,7 +28,7 @@ export const StatCard = ({
 }: StatCardProps) => {
   return (
     <div
-      className="p-6 rounded-xl border border-border/50 bg-card shadow-sm opacity-0 animate-fade-up cursor-default hover:shadow-md transition-shadow"
+      className="p-6 rounded-xl border border-border/50 bg-card opacity-0 animate-fade-up cursor-default"
       style={{ animationDelay: `${delay}ms`, animationFillMode: "forwards" }}
     >
       <div className="flex items-center justify-between gap-4">
