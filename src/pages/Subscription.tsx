@@ -1,4 +1,4 @@
-import { Check, Crown, Zap, Building2, Sparkles } from "lucide-react";
+import { Check, Crown, Zap, Building2, Sparkles, Shield, RefreshCw, Lock } from "lucide-react";
 import { useState } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -126,6 +126,28 @@ export default function Subscription() {
           </span>
         </div>
 
+        {/* Trust Badges - Highlighted Boxes */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+          <div className="flex items-center justify-center gap-3 p-4 rounded-xl bg-success/10 border border-success/20">
+            <div className="w-10 h-10 rounded-full bg-success/20 flex items-center justify-center">
+              <RefreshCw className="w-5 h-5 text-success" />
+            </div>
+            <span className="font-medium text-foreground">إلغاء في أي وقت</span>
+          </div>
+          <div className="flex items-center justify-center gap-3 p-4 rounded-xl bg-primary/10 border border-primary/20">
+            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+              <Shield className="w-5 h-5 text-primary" />
+            </div>
+            <span className="font-medium text-foreground">ضمان استرداد ١٤ يوم</span>
+          </div>
+          <div className="flex items-center justify-center gap-3 p-4 rounded-xl bg-accent/10 border border-accent/20">
+            <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
+              <Lock className="w-5 h-5 text-accent" />
+            </div>
+            <span className="font-medium text-foreground">دفع آمن ومشفر</span>
+          </div>
+        </div>
+
         {/* Plans Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {plans.map((plan) => {
@@ -218,21 +240,6 @@ export default function Subscription() {
           </Button>
         </div>
 
-        {/* Trust Badges */}
-        <div className="mt-12 flex flex-wrap items-center justify-center gap-8 text-muted-foreground text-sm">
-          <div className="flex items-center gap-2">
-            <Check className="w-4 h-4 text-success" />
-            <span>إلغاء في أي وقت</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Check className="w-4 h-4 text-success" />
-            <span>ضمان استرداد ١٤ يوم</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Check className="w-4 h-4 text-success" />
-            <span>دفع آمن ومشفر</span>
-          </div>
-        </div>
       </div>
     </DashboardLayout>
   );
