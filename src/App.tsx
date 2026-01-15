@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import Index from "./pages/Index";
+import Landing from "./pages/Landing";
 import CVCheck from "./pages/CVCheck";
 import CoverLetter from "./pages/CoverLetter";
 import Jobs from "./pages/Jobs";
@@ -35,7 +36,8 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<Index />} />
+              <Route path="/" element={<Landing />} />
+              <Route path="/dashboard" element={<Index />} />
               <Route path="/cv-check" element={<CVCheck />} />
               <Route path="/cover-letter" element={<CoverLetter />} />
               <Route path="/jobs" element={<Jobs />} />
