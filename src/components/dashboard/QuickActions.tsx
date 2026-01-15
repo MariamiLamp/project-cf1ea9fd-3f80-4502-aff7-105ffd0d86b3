@@ -46,10 +46,10 @@ export const QuickActions = () => {
         <Link
           key={action.path}
           to={action.path}
-          className="group card-elevated p-5 hover:border-primary/30 opacity-0 animate-fade-up"
+          className="group card-elevated p-6 rounded-lg hover:border-primary/30 opacity-0 animate-fade-up"
           style={{ animationDelay: `${(index + 1) * 100}ms`, animationFillMode: "forwards" }}
         >
-          <div className={`w-12 h-12 rounded-xl ${colorStyles[action.color as keyof typeof colorStyles]} flex items-center justify-center mb-4 transition-colors`}>
+          <div className={`w-12 h-12 rounded-lg ${colorStyles[action.color as keyof typeof colorStyles]} flex items-center justify-center mb-4 transition-colors`}>
             <action.icon className="w-5 h-5" />
           </div>
           <h3 className="font-semibold text-foreground mb-1 group-hover:text-primary transition-colors">
@@ -58,7 +58,7 @@ export const QuickActions = () => {
           <p className="text-sm text-muted-foreground mb-3">
             {action.description}
           </p>
-          <span className="flex items-center gap-1 text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+          <span className="flex items-center gap-1 text-sm font-medium text-primary">
             ابدأ الآن
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           </span>

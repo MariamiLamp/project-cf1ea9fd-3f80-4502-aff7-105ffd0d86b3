@@ -107,7 +107,7 @@ const CVBuilder = () => {
   const initialName = searchParams.get("name") || "";
   const initialTitle = searchParams.get("title") || "";
 
-  const [activeSection, setActiveSection] = useState("personal");
+  const [currentStep, setCurrentStep] = useState(0);
   const [showPreview, setShowPreview] = useState(false);
   const [showUploadDialog, setShowUploadDialog] = useState(false);
   const [showTemplateDialog, setShowTemplateDialog] = useState(false);
@@ -475,6 +475,20 @@ const CVBuilder = () => {
     { id: "certificates", label: "الشهادات", icon: Award },
   ];
 
+  const activeSection = sections[currentStep]?.id || "personal";
+
+  const nextStep = () => {
+    if (currentStep < sections.length - 1) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const prevStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
   const skillLevelColors: Record<string, string> = {
     مبتدئ: "bg-muted text-muted-foreground",
     متوسط: "bg-accent/20 text-accent",
@@ -708,25 +722,57 @@ const CVBuilder = () => {
         >
           {/* Editor Section */}
           <div className="space-y-6">
-            {/* Section Navigation */}
+            {/* Step Progress Indicator */}
             <Card className="card-elevated">
-              <CardContent className="p-2">
-                <div className="flex flex-wrap gap-2">
-                  {sections.map((section) => (
-                    <button
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-sm font-medium text-muted-foreground">
+                    الخطوة {currentStep + 1} من {sections.length}
+                  </span>
+                  <span className="text-sm font-medium text-primary">
+                    {sections[currentStep]?.label}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  {sections.map((section, index) => (
+                    <div key={section.id} className="flex-1 flex items-center">
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all ${
+                          index < currentStep
+                            ? "bg-success text-success-foreground"
+                            : index === currentStep
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-muted text-muted-foreground"
+                        }`}
+                      >
+                        {index < currentStep ? (
+                          <Check className="w-4 h-4" />
+                        ) : (
+                          index + 1
+                        )}
+                      </div>
+                      {index < sections.length - 1 && (
+                        <div
+                          className={`flex-1 h-1 mx-2 rounded-full transition-all ${
+                            index < currentStep ? "bg-success" : "bg-muted"
+                          }`}
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <div className="flex justify-between mt-2">
+                  {sections.map((section, index) => (
+                    <span
                       key={section.id}
-                      onClick={() => setActiveSection(section.id)}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
-                        activeSection === section.id
-                          ? "bg-primary text-primary-foreground"
-                          : "hover:bg-muted text-muted-foreground hover:text-foreground"
+                      className={`text-xs text-center flex-1 ${
+                        index === currentStep
+                          ? "text-primary font-medium"
+                          : "text-muted-foreground"
                       }`}
                     >
-                      <section.icon className="w-4 h-4" />
-                      <span className="text-sm font-medium">
-                        {section.label}
-                      </span>
-                    </button>
+                      {section.label}
+                    </span>
                   ))}
                 </div>
               </CardContent>
@@ -1419,6 +1465,67 @@ const CVBuilder = () => {
                 </CardContent>
               </Card>
             )}
+
+            {/* Navigation Buttons */}
+            <div className="flex items-center justify-between pt-4">
+              <Button
+                variant="outline"
+                onClick={prevStep}
+                disabled={currentStep === 0}
+                className="gap-2"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="rotate-180"
+                >
+                  <path d="m9 18 6-6-6-6" />
+                </svg>
+                السابق
+              </Button>
+
+              <div className="flex items-center gap-2">
+                {sections.map((_, index) => (
+                  <div
+                    key={index}
+                    className={`w-2 h-2 rounded-full transition-all ${
+                      index === currentStep ? "bg-primary w-6" : "bg-muted"
+                    }`}
+                  />
+                ))}
+              </div>
+
+              {currentStep === sections.length - 1 ? (
+                <Button variant="gradient" className="gap-2">
+                  <Download className="w-4 h-4" />
+                  تحميل PDF
+                </Button>
+              ) : (
+                <Button onClick={nextStep} className="gap-2">
+                  التالي
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="m9 18 6-6-6-6" />
+                  </svg>
+                </Button>
+              )}
+            </div>
           </div>
 
           {/* Live Preview */}

@@ -7,45 +7,9 @@ import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  ArrowRight,
-  Mail,
-  Phone,
-  MapPin,
-  GraduationCap,
-  Briefcase,
-  FileText,
-  Calendar,
-  Award,
-  Target,
-  Download,
-  Eye,
-  Clock,
-  CheckCircle,
-  XCircle,
-  FileEdit,
-  Building,
-  Sparkles,
-  Loader2,
-  Copy,
-  Check,
-  PenTool,
-} from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ArrowRight, Mail, Phone, MapPin, GraduationCap, Briefcase, FileText, Calendar, Award, Target, Download, Eye, Clock, CheckCircle, XCircle, FileEdit, Building, Sparkles, Loader2, Copy, Check, PenTool } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
@@ -319,9 +283,13 @@ const candidatesData = [
 ];
 
 const CandidateProfile = () => {
-  const { id } = useParams();
+  const {
+    id
+  } = useParams();
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const [searchParams] = useSearchParams();
   const isCompanyView = searchParams.get("view") === "company";
 
@@ -332,12 +300,11 @@ const CandidateProfile = () => {
   const [coverLetterForm, setCoverLetterForm] = useState({
     tone: "professional",
     targetRole: "",
-    highlights: "",
+    highlights: ""
   });
   const [generatedCoverLetter, setGeneratedCoverLetter] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
-
   const handleGenerateCoverLetter = async () => {
     if (!candidate) return;
 
@@ -376,11 +343,9 @@ ${
 ${candidate.name}
 ${candidate.email}
 ${candidate.phone}`;
-
     setGeneratedCoverLetter(mockLetter);
     setIsGenerating(false);
   };
-
   const handleCopyLetter = () => {
     navigator.clipboard.writeText(generatedCoverLetter);
     setCopied(true);
@@ -390,7 +355,6 @@ ${candidate.phone}`;
       description: "تم نسخ خطاب التقديم إلى الحافظة",
     });
   };
-
   const handleSaveCoverLetter = () => {
     toast({
       title: "تم الحفظ",
@@ -398,7 +362,6 @@ ${candidate.phone}`;
     });
     setIsCoverLetterDialogOpen(false);
   };
-
   if (!candidate) {
     return (
       <div
@@ -413,9 +376,11 @@ ${candidate.phone}`;
             العودة للوحة التحكم
           </Button>
         </Card>
-      </div>
-    );
+      </div>;
   }
+  return <div className="min-h-screen bg-background" dir="rtl">
+      {/* Header */}
+      
 
   return (
     <DashboardLayout>
@@ -460,8 +425,7 @@ ${candidate.phone}`;
                         }`}
                       >
                         نسبة التوافق: {candidate.matchScore}%
-                      </Badge>
-                    )}
+                      </Badge>}
                   </div>
                   <p className="text-muted-foreground mt-1">
                     {candidate.appliedFor}
@@ -501,8 +465,7 @@ ${candidate.phone}`;
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {candidate.workHistory.map((job, index) => (
-                  <div key={index} className="relative">
+                {candidate.workHistory.map((job, index) => <div key={index} className="relative">
                     {index > 0 && <Separator className="mb-4" />}
                     <div className="flex gap-4">
                       <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center shrink-0">
@@ -520,8 +483,7 @@ ${candidate.phone}`;
                         <p className="text-sm mt-2">{job.description}</p>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  </div>)}
               </CardContent>
             </Card>
 
@@ -534,8 +496,7 @@ ${candidate.phone}`;
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {candidate.educationHistory.map((edu, index) => (
-                  <div key={index} className="relative">
+                {candidate.educationHistory.map((edu, index) => <div key={index} className="relative">
                     {index > 0 && <Separator className="mb-4" />}
                     <div className="flex gap-4">
                       <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center shrink-0">
@@ -552,8 +513,7 @@ ${candidate.phone}`;
                         </p>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  </div>)}
               </CardContent>
             </Card>
 
@@ -613,8 +573,7 @@ ${candidate.phone}`;
                         ? "مقبول"
                         : "مرفوض"}
                     </Badge>
-                  </div>
-                ))}
+                  </div>)}
               </CardContent>
             </Card>
 
@@ -711,12 +670,10 @@ ${candidate.phone}`;
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2">
-                  {candidate.certifications.map((cert, index) => (
-                    <li key={index} className="flex items-start gap-2 text-sm">
+                  {candidate.certifications.map((cert, index) => <li key={index} className="flex items-start gap-2 text-sm">
                       <FileText className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
                       {cert}
-                    </li>
-                  ))}
+                    </li>)}
                 </ul>
               </CardContent>
             </Card>
@@ -839,19 +796,15 @@ ${candidate.phone}`;
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
                     جاري التوليد...
-                  </>
-                ) : (
-                  <>
+                  </> : <>
                     <Sparkles className="w-4 h-4" />
                     توليد خطاب التقديم
-                  </>
-                )}
+                  </>}
               </Button>
             </div>
 
             {/* Generated Letter */}
-            {generatedCoverLetter && (
-              <div className="space-y-3">
+            {generatedCoverLetter && <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <Label>خطاب التقديم المُولَّد</Label>
                   <Button
@@ -868,14 +821,8 @@ ${candidate.phone}`;
                     {copied ? "تم النسخ" : "نسخ"}
                   </Button>
                 </div>
-                <Textarea
-                  value={generatedCoverLetter}
-                  onChange={(e) => setGeneratedCoverLetter(e.target.value)}
-                  rows={12}
-                  className="resize-none"
-                />
-              </div>
-            )}
+                <Textarea value={generatedCoverLetter} onChange={e => setGeneratedCoverLetter(e.target.value)} rows={12} className="resize-none" />
+              </div>}
           </div>
 
           <DialogFooter>
@@ -885,17 +832,14 @@ ${candidate.phone}`;
             >
               إلغاء
             </Button>
-            {generatedCoverLetter && (
-              <Button onClick={handleSaveCoverLetter} className="gap-2">
+            {generatedCoverLetter && <Button onClick={handleSaveCoverLetter} className="gap-2">
                 <FileEdit className="w-4 h-4" />
                 حفظ كخطاب عام
-              </Button>
-            )}
+              </Button>}
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </DashboardLayout>
   );
 };
-
 export default CandidateProfile;

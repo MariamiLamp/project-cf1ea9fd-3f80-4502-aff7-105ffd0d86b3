@@ -6,23 +6,19 @@ interface StatCardProps {
   value: string | number;
   subtitle?: string;
   icon: LucideIcon;
-  trend?: {
-    value: number;
-    isPositive: boolean;
-  };
   variant?: "default" | "primary" | "success" | "warning";
   delay?: number;
 }
 
 const variantStyles = {
-  default: "from-muted/50 to-transparent",
-  primary: "from-primary/10 to-transparent",
-  success: "from-success/10 to-transparent",
-  warning: "from-warning/10 to-transparent",
+  default: "bg-muted/30",
+  primary: "bg-primary/5",
+  success: "bg-success/5",
+  warning: "bg-warning/5",
 };
 
 const iconStyles = {
-  default: "bg-muted text-muted-foreground",
+  default: "bg-muted/50 text-muted-foreground",
   primary: "bg-primary/10 text-primary",
   success: "bg-success/10 text-success",
   warning: "bg-warning/10 text-warning",
@@ -33,34 +29,21 @@ export const StatCard = ({
   value,
   subtitle,
   icon: Icon,
-  trend,
   variant = "default",
   delay = 0,
 }: StatCardProps) => {
   return (
     <div
       className={cn(
-        "stat-card opacity-0 animate-fade-up",
-        `bg-gradient-to-br ${variantStyles[variant]}`
+        "p-6 rounded-lg border border-border/30 opacity-0 animate-fade-up cursor-default",
+        variantStyles[variant]
       )}
       style={{ animationDelay: `${delay}ms`, animationFillMode: "forwards" }}
     >
       <div className="flex items-start justify-between mb-4">
-        <div className={cn("p-3 rounded-xl", iconStyles[variant])}>
+        <div className={cn("p-2.5 rounded-lg", iconStyles[variant])}>
           <Icon className="w-5 h-5" />
         </div>
-        {trend && (
-          <span
-            className={cn(
-              "text-xs font-medium px-2 py-1 rounded-full",
-              trend.isPositive
-                ? "bg-success/10 text-success"
-                : "bg-destructive/10 text-destructive"
-            )}
-          >
-            {trend.isPositive ? "+" : "-"}{Math.abs(trend.value)}%
-          </span>
-        )}
       </div>
       <h3 className="text-sm text-muted-foreground mb-1">{title}</h3>
       <p className="text-2xl font-bold text-foreground">{value}</p>
