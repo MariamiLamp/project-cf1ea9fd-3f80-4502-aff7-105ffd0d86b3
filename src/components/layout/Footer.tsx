@@ -13,8 +13,12 @@ export const Footer = () => {
                 <Briefcase className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h3 className="font-bold text-lg text-white">الموارد البشرية</h3>
-                <p className="text-xs text-sidebar-foreground/60">منصة التوظيف الذكية</p>
+                <h3 className="font-bold text-lg text-white">
+                  الموارد البشرية
+                </h3>
+                <p className="text-xs text-sidebar-foreground/60">
+                  منصة التوظيف الذكية
+                </p>
               </div>
             </div>
             <p className="text-sm text-sidebar-foreground/70 leading-relaxed">
@@ -27,22 +31,34 @@ export const Footer = () => {
             <h4 className="font-semibold text-white mb-4">روابط سريعة</h4>
             <ul className="space-y-2">
               <li>
-                <Link to="/jobs" className="text-sm text-sidebar-foreground/70 hover:text-white transition-colors">
+                <Link
+                  to="/jobs"
+                  className="text-sm text-sidebar-foreground/70 hover:text-white transition-colors"
+                >
                   فرص العمل
                 </Link>
               </li>
               <li>
-                <Link to="/cv-builder" className="text-sm text-sidebar-foreground/70 hover:text-white transition-colors">
+                <Link
+                  to="/cv-builder"
+                  className="text-sm text-sidebar-foreground/70 hover:text-white transition-colors"
+                >
                   منشئ السيرة الذاتية
                 </Link>
               </li>
               <li>
-                <Link to="/cv-check" className="text-sm text-sidebar-foreground/70 hover:text-white transition-colors">
+                <Link
+                  to="/cv-check"
+                  className="text-sm text-sidebar-foreground/70 hover:text-white transition-colors"
+                >
                   فحص السيرة الذاتية
                 </Link>
               </li>
               <li>
-                <Link to="/interview" className="text-sm text-sidebar-foreground/70 hover:text-white transition-colors">
+                <Link
+                  to="/interview"
+                  className="text-sm text-sidebar-foreground/70 hover:text-white transition-colors"
+                >
                   أسئلة المقابلات
                 </Link>
               </li>
@@ -54,22 +70,34 @@ export const Footer = () => {
             <h4 className="font-semibold text-white mb-4">خدماتنا</h4>
             <ul className="space-y-2">
               <li>
-                <Link to="/cover-letter" className="text-sm text-sidebar-foreground/70 hover:text-white transition-colors">
+                <Link
+                  to="/cover-letter"
+                  className="text-sm text-sidebar-foreground/70 hover:text-white transition-colors"
+                >
                   خطاب التقديم
                 </Link>
               </li>
               <li>
-                <Link to="/career-path" className="text-sm text-sidebar-foreground/70 hover:text-white transition-colors">
+                <Link
+                  to="/career-path"
+                  className="text-sm text-sidebar-foreground/70 hover:text-white transition-colors"
+                >
                   المسار المهني
                 </Link>
               </li>
               <li>
-                <Link to="/templates" className="text-sm text-sidebar-foreground/70 hover:text-white transition-colors">
+                <Link
+                  to="/templates"
+                  className="text-sm text-sidebar-foreground/70 hover:text-white transition-colors"
+                >
                   سوق القوالب
                 </Link>
               </li>
               <li>
-                <Link to="/subscription" className="text-sm text-sidebar-foreground/70 hover:text-white transition-colors">
+                <Link
+                  to="/subscription"
+                  className="text-sm text-sidebar-foreground/70 hover:text-white transition-colors"
+                >
                   الاشتراكات
                 </Link>
               </li>
@@ -90,7 +118,7 @@ export const Footer = () => {
               </li>
               <li className="flex items-center gap-2 text-sm text-sidebar-foreground/70">
                 <MapPin className="w-4 h-4" />
-                <span>الرياض، المملكة العربية السعودية</span>
+                <span>مصر</span>
               </li>
             </ul>
           </div>
@@ -102,10 +130,16 @@ export const Footer = () => {
             © {new Date().getFullYear()} الموارد البشرية. جميع الحقوق محفوظة
           </p>
           <div className="flex items-center gap-4">
-            <Link to="/settings" className="text-sm text-sidebar-foreground/60 hover:text-white transition-colors">
+            <Link
+              to="/settings"
+              className="text-sm text-sidebar-foreground/60 hover:text-white transition-colors"
+            >
               سياسة الخصوصية
             </Link>
-            <Link to="/settings" className="text-sm text-sidebar-foreground/60 hover:text-white transition-colors">
+            <Link
+              to="/settings"
+              className="text-sm text-sidebar-foreground/60 hover:text-white transition-colors"
+            >
               شروط الاستخدام
             </Link>
           </div>

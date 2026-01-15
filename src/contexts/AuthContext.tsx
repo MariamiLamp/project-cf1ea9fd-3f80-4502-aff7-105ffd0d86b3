@@ -46,13 +46,22 @@ const mockUsers: Record<string, User & { password: string }> = {
 };
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(() => {
+    // Read from localStorage on init
+    try {
+      const stored = localStorage.getItem("auth_user");
+      return stored ? JSON.parse(stored) : null;
+    } catch (e) {
+      return null;
+    }
+  });
 
   const login = (email: string, password: string, role: UserRole): boolean => {
     const mockUser = mockUsers[email];
     if (mockUser && mockUser.password === password && mockUser.role === role) {
       const { password: _, ...userWithoutPassword } = mockUser;
       setUser(userWithoutPassword);
+      localStorage.setItem("auth_user", JSON.stringify(userWithoutPassword));
       return true;
     }
     return false;
@@ -60,6 +69,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = () => {
     setUser(null);
+    localStorage.removeItem("auth_user");
   };
 
   return (

@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import Index from "./pages/Index";
-import Landing from "./pages/Landing";
+import UserDashboard from "./pages/UserDashboard";
 import CVCheck from "./pages/CVCheck";
 import CoverLetter from "./pages/CoverLetter";
 import Jobs from "./pages/Jobs";
@@ -18,12 +18,18 @@ import Auth from "./pages/Auth";
 import AdminDashboard from "./pages/AdminDashboard";
 import CompanyDashboard from "./pages/CompanyDashboard";
 import CandidateProfile from "./pages/CandidateProfile";
+import Register from "./pages/Register";
 import JobSeekerRegistration from "./pages/JobSeekerRegistration";
+import CompanyRegistration from "./pages/CompanyRegistration";
+import HRRegistration from "./pages/HRRegistration";
 import HRDashboard from "./pages/HRDashboard";
 import TemplatesMarketplace from "./pages/TemplatesMarketplace";
+import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
 import PostsPlanner from "./pages/PostsPlanner";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import Notifications from "./pages/Notifications";
 
 const queryClient = new QueryClient();
 
@@ -36,8 +42,8 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<Landing />} />
-              <Route path="/dashboard" element={<Index />} />
+              <Route path="/" element={<Index />} />
+              <Route path="/dashboard" element={<UserDashboard />} />
               <Route path="/cv-check" element={<CVCheck />} />
               <Route path="/cover-letter" element={<CoverLetter />} />
               <Route path="/jobs" element={<Jobs />} />
@@ -49,11 +55,23 @@ const App = () => (
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/company" element={<CompanyDashboard />} />
               <Route path="/candidate/:id" element={<CandidateProfile />} />
-              <Route path="/register/jobseeker" element={<JobSeekerRegistration />} />
+              <Route path="/register" element={<Register />} />
+              <Route
+                path="/register/jobseeker"
+                element={<JobSeekerRegistration />}
+              />
+              <Route
+                path="/register/company"
+                element={<CompanyRegistration />}
+              />
+              <Route path="/register/hr" element={<HRRegistration />} />
               <Route path="/hr" element={<HRDashboard />} />
               <Route path="/templates" element={<TemplatesMarketplace />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/checkout" element={<Checkout />} />
               <Route path="/posts-planner" element={<PostsPlanner />} />
               <Route path="/settings" element={<Settings />} />
+              <Route path="/notifications" element={<Notifications />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

@@ -1,5 +1,10 @@
 import { useState } from "react";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -48,6 +53,8 @@ import {
   Plus,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
+import useCart from "@/hooks/use-cart";
 
 // Template categories
 const categories = [
@@ -62,11 +69,11 @@ const categories = [
 // Mock templates data
 const templatesData = [
   // CV Templates
-  { 
-    id: 1, 
-    name: "سيرة ذاتية احترافية", 
-    category: "cv", 
-    price: 0, 
+  {
+    id: 1,
+    name: "سيرة ذاتية احترافية",
+    category: "cv",
+    price: 0,
     isPremium: false,
     rating: 4.8,
     downloads: 12500,
@@ -74,11 +81,11 @@ const templatesData = [
     description: "تصميم عصري ونظيف مناسب لجميع المجالات المهنية",
     features: ["تصميم متجاوب", "سهل التعديل", "متعدد الصفحات"],
   },
-  { 
-    id: 2, 
-    name: "سيرة ذاتية تقنية", 
-    category: "cv", 
-    price: 29, 
+  {
+    id: 2,
+    name: "سيرة ذاتية تقنية",
+    category: "cv",
+    price: 29,
     isPremium: true,
     rating: 4.9,
     downloads: 8300,
@@ -86,11 +93,11 @@ const templatesData = [
     description: "مصممة خصيصاً للمطورين ومهندسي البرمجيات",
     features: ["قسم للمهارات التقنية", "عرض المشاريع", "روابط GitHub"],
   },
-  { 
-    id: 3, 
-    name: "سيرة ذاتية إبداعية", 
-    category: "cv", 
-    price: 39, 
+  {
+    id: 3,
+    name: "سيرة ذاتية إبداعية",
+    category: "cv",
+    price: 39,
     isPremium: true,
     rating: 4.7,
     downloads: 5600,
@@ -98,11 +105,11 @@ const templatesData = [
     description: "تصميم إبداعي للمصممين والفنانين",
     features: ["تصميم فريد", "معرض أعمال", "ألوان قابلة للتخصيص"],
   },
-  { 
-    id: 4, 
-    name: "سيرة ذاتية بسيطة", 
-    category: "cv", 
-    price: 0, 
+  {
+    id: 4,
+    name: "سيرة ذاتية بسيطة",
+    category: "cv",
+    price: 0,
     isPremium: false,
     rating: 4.5,
     downloads: 20100,
@@ -111,11 +118,11 @@ const templatesData = [
     features: ["تصميم نظيف", "سهل القراءة", "صفحة واحدة"],
   },
   // Cover Letter Templates
-  { 
-    id: 5, 
-    name: "خطاب تقديم رسمي", 
-    category: "cover-letter", 
-    price: 0, 
+  {
+    id: 5,
+    name: "خطاب تقديم رسمي",
+    category: "cover-letter",
+    price: 0,
     isPremium: false,
     rating: 4.6,
     downloads: 9800,
@@ -123,11 +130,11 @@ const templatesData = [
     description: "خطاب تقديم رسمي مناسب لجميع الوظائف",
     features: ["صيغة رسمية", "هيكل واضح", "نصائح للكتابة"],
   },
-  { 
-    id: 6, 
-    name: "خطاب تقديم حديث", 
-    category: "cover-letter", 
-    price: 19, 
+  {
+    id: 6,
+    name: "خطاب تقديم حديث",
+    category: "cover-letter",
+    price: 19,
     isPremium: true,
     rating: 4.8,
     downloads: 6200,
@@ -136,11 +143,11 @@ const templatesData = [
     features: ["تصميم جذاب", "أقسام مميزة", "قابل للتخصيص"],
   },
   // Business Templates
-  { 
-    id: 7, 
-    name: "خطة عمل شاملة", 
-    category: "business", 
-    price: 49, 
+  {
+    id: 7,
+    name: "خطة عمل شاملة",
+    category: "business",
+    price: 49,
     isPremium: true,
     rating: 4.9,
     downloads: 3400,
@@ -148,11 +155,11 @@ const templatesData = [
     description: "نموذج شامل لخطة عمل احترافية",
     features: ["تحليل السوق", "الخطة المالية", "استراتيجية التسويق"],
   },
-  { 
-    id: 8, 
-    name: "عرض تقديمي للمستثمرين", 
-    category: "business", 
-    price: 59, 
+  {
+    id: 8,
+    name: "عرض تقديمي للمستثمرين",
+    category: "business",
+    price: 59,
     isPremium: true,
     rating: 4.8,
     downloads: 2100,
@@ -160,11 +167,11 @@ const templatesData = [
     description: "عرض احترافي لجذب المستثمرين",
     features: ["30+ شريحة", "رسوم بيانية", "تصميم أنيق"],
   },
-  { 
-    id: 9, 
-    name: "فاتورة تجارية", 
-    category: "business", 
-    price: 0, 
+  {
+    id: 9,
+    name: "فاتورة تجارية",
+    category: "business",
+    price: 0,
     isPremium: false,
     rating: 4.4,
     downloads: 15600,
@@ -173,11 +180,11 @@ const templatesData = [
     features: ["حسابات تلقائية", "شعار الشركة", "متعدد العملات"],
   },
   // Legal Templates
-  { 
-    id: 10, 
-    name: "عقد عمل", 
-    category: "legal", 
-    price: 79, 
+  {
+    id: 10,
+    name: "عقد عمل",
+    category: "legal",
+    price: 79,
     isPremium: true,
     rating: 4.9,
     downloads: 4500,
@@ -185,11 +192,11 @@ const templatesData = [
     description: "عقد عمل شامل متوافق مع نظام العمل السعودي",
     features: ["بنود قانونية", "حقوق الطرفين", "قابل للتعديل"],
   },
-  { 
-    id: 11, 
-    name: "اتفاقية سرية", 
-    category: "legal", 
-    price: 49, 
+  {
+    id: 11,
+    name: "اتفاقية سرية",
+    category: "legal",
+    price: 49,
     isPremium: true,
     rating: 4.7,
     downloads: 3200,
@@ -197,11 +204,11 @@ const templatesData = [
     description: "اتفاقية عدم إفشاء المعلومات السرية",
     features: ["حماية المعلومات", "مدة السرية", "العقوبات"],
   },
-  { 
-    id: 12, 
-    name: "عقد إيجار", 
-    category: "legal", 
-    price: 39, 
+  {
+    id: 12,
+    name: "عقد إيجار",
+    category: "legal",
+    price: 39,
     isPremium: true,
     rating: 4.6,
     downloads: 7800,
@@ -210,11 +217,11 @@ const templatesData = [
     features: ["شروط الإيجار", "حقوق المؤجر والمستأجر", "فسخ العقد"],
   },
   // Academic Templates
-  { 
-    id: 13, 
-    name: "بحث أكاديمي", 
-    category: "academic", 
-    price: 0, 
+  {
+    id: 13,
+    name: "بحث أكاديمي",
+    category: "academic",
+    price: 0,
     isPremium: false,
     rating: 4.5,
     downloads: 11200,
@@ -222,11 +229,11 @@ const templatesData = [
     description: "قالب بحث علمي بتنسيق APA",
     features: ["تنسيق صحيح", "مراجع تلقائية", "فهرس المحتويات"],
   },
-  { 
-    id: 14, 
-    name: "رسالة ماجستير", 
-    category: "academic", 
-    price: 29, 
+  {
+    id: 14,
+    name: "رسالة ماجستير",
+    category: "academic",
+    price: 29,
     isPremium: true,
     rating: 4.8,
     downloads: 4100,
@@ -237,7 +244,7 @@ const templatesData = [
 ];
 
 type CartItem = {
-  template: typeof templatesData[0];
+  template: (typeof templatesData)[0];
   quantity: number;
 };
 
@@ -246,14 +253,18 @@ const TemplatesMarketplace = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [selectedTemplate, setSelectedTemplate] = useState<typeof templatesData[0] | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<
+    (typeof templatesData)[0] | null
+  >(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  
-  // Cart state
-  const [cart, setCart] = useState<CartItem[]>([]);
+
+  // Cart state (shared via hook)
+  const cartHook = useCart();
+  const { items: cart, add, remove, clear, total: cartTotal } = cartHook;
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-  
+  const navigate = useNavigate();
+
   // Payment form state
   const [paymentForm, setPaymentForm] = useState({
     cardNumber: "",
@@ -264,19 +275,21 @@ const TemplatesMarketplace = () => {
   });
 
   // Filter templates
-  const filteredTemplates = templatesData.filter(template => {
-    const matchesSearch = template.name.includes(searchQuery) || 
-                         template.description.includes(searchQuery);
-    const matchesCategory = selectedCategory === "all" || template.category === selectedCategory;
+  const filteredTemplates = templatesData.filter((template) => {
+    const matchesSearch =
+      template.name.includes(searchQuery) ||
+      template.description.includes(searchQuery);
+    const matchesCategory =
+      selectedCategory === "all" || template.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
-  const handlePreview = (template: typeof templatesData[0]) => {
+  const handlePreview = (template: (typeof templatesData)[0]) => {
     setSelectedTemplate(template);
     setIsPreviewOpen(true);
   };
 
-  const handleDownload = (template: typeof templatesData[0]) => {
+  const handleDownload = (template: (typeof templatesData)[0]) => {
     if (template.isPremium) {
       toast({
         title: "قالب مميز",
@@ -290,15 +303,23 @@ const TemplatesMarketplace = () => {
     }
   };
 
-  const handleAddToCart = (template: typeof templatesData[0]) => {
-    const existingItem = cart.find(item => item.template.id === template.id);
-    if (existingItem) {
+  const handleAddToCart = (template: (typeof templatesData)[0]) => {
+    // add to local cart (mapped to useCart shape)
+    const exists = cart.find((i) => i.id === template.id);
+    if (exists) {
       toast({
         title: "موجود في السلة",
         description: `${template.name} موجود بالفعل في سلة المشتريات`,
       });
     } else {
-      setCart([...cart, { template, quantity: 1 }]);
+      add({
+        id: template.id,
+        name: template.name,
+        price: template.price,
+        quantity: 1,
+        preview: template.preview,
+        description: template.description,
+      });
       toast({
         title: "تمت الإضافة للسلة",
         description: `تم إضافة ${template.name} إلى سلة المشتريات`,
@@ -307,32 +328,13 @@ const TemplatesMarketplace = () => {
   };
 
   const handleRemoveFromCart = (templateId: number) => {
-    setCart(cart.filter(item => item.template.id !== templateId));
+    remove(templateId);
   };
 
-  const cartTotal = cart.reduce((sum, item) => sum + item.template.price * item.quantity, 0);
   const cartCount = cart.length;
 
   const handleCheckout = () => {
-    setIsCartOpen(false);
-    setIsCheckoutOpen(true);
-  };
-
-  const handlePayment = () => {
-    // Mock payment processing
-    toast({
-      title: "تمت عملية الدفع بنجاح!",
-      description: `تم شراء ${cart.length} قالب. سيتم إرسال روابط التحميل إلى بريدك الإلكتروني.`,
-    });
-    setCart([]);
-    setIsCheckoutOpen(false);
-    setPaymentForm({
-      cardNumber: "",
-      cardName: "",
-      expiry: "",
-      cvv: "",
-      email: "",
-    });
+    navigate("/cart");
   };
 
   return (
@@ -343,13 +345,15 @@ const TemplatesMarketplace = () => {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold">سوق القوالب</h1>
-              <p className="text-muted-foreground">اكتشف مجموعة واسعة من القوالب الاحترافية</p>
+              <p className="text-muted-foreground">
+                اكتشف مجموعة واسعة من القوالب الاحترافية
+              </p>
             </div>
-            {/* Cart Button */}
-            <Button 
-              variant="outline" 
+            {/* Cart Button - navigate to /cart */}
+            <Button
+              variant="outline"
               className="relative gap-2"
-              onClick={() => setIsCartOpen(true)}
+              onClick={() => navigate("/cart")}
             >
               <ShoppingCart className="w-5 h-5" />
               السلة
@@ -415,11 +419,14 @@ const TemplatesMarketplace = () => {
         {viewMode === "grid" ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {filteredTemplates.map((template) => (
-              <Card key={template.id} className="group overflow-hidden hover:shadow-lg transition-shadow">
+              <Card
+                key={template.id}
+                className="group overflow-hidden hover:shadow-lg transition-shadow"
+              >
                 {/* Preview Image */}
                 <div className="relative aspect-[3/4] bg-muted overflow-hidden">
-                  <img 
-                    src={template.preview} 
+                  <img
+                    src={template.preview}
                     alt={template.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
@@ -436,7 +443,11 @@ const TemplatesMarketplace = () => {
                   )}
                   {/* Overlay */}
                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                    <Button size="sm" variant="secondary" onClick={() => handlePreview(template)}>
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => handlePreview(template)}
+                    >
                       <Eye className="w-4 h-4 ml-1" />
                       معاينة
                     </Button>
@@ -444,7 +455,9 @@ const TemplatesMarketplace = () => {
                 </div>
                 <CardContent className="p-4">
                   <h3 className="font-semibold truncate">{template.name}</h3>
-                  <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{template.description}</p>
+                  <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                    {template.description}
+                  </p>
                   <div className="flex items-center gap-2 mt-2">
                     <div className="flex items-center gap-1 text-amber-500">
                       <Star className="w-3 h-3 fill-current" />
@@ -453,7 +466,9 @@ const TemplatesMarketplace = () => {
                     <span className="text-xs text-muted-foreground">•</span>
                     <div className="flex items-center gap-1 text-muted-foreground">
                       <Download className="w-3 h-3" />
-                      <span className="text-xs">{template.downloads.toLocaleString()}</span>
+                      <span className="text-xs">
+                        {template.downloads.toLocaleString()}
+                      </span>
                     </div>
                   </div>
                 </CardContent>
@@ -461,10 +476,14 @@ const TemplatesMarketplace = () => {
                   <span className="font-bold text-lg">
                     {template.price === 0 ? "مجاني" : `${template.price} ر.س`}
                   </span>
-                  <Button 
-                    size="sm" 
+                  <Button
+                    size="sm"
                     variant={template.isPremium ? "default" : "outline"}
-                    onClick={() => template.isPremium ? handleAddToCart(template) : handleDownload(template)}
+                    onClick={() =>
+                      template.isPremium
+                        ? handleAddToCart(template)
+                        : handleDownload(template)
+                    }
                   >
                     {template.isPremium ? (
                       <>
@@ -485,12 +504,15 @@ const TemplatesMarketplace = () => {
         ) : (
           <div className="space-y-4">
             {filteredTemplates.map((template) => (
-              <Card key={template.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+              <Card
+                key={template.id}
+                className="overflow-hidden hover:shadow-lg transition-shadow"
+              >
                 <div className="flex flex-col md:flex-row">
                   {/* Preview Image */}
                   <div className="relative w-full md:w-48 aspect-video md:aspect-auto bg-muted shrink-0">
-                    <img 
-                      src={template.preview} 
+                    <img
+                      src={template.preview}
                       alt={template.name}
                       className="w-full h-full object-cover"
                     />
@@ -504,10 +526,16 @@ const TemplatesMarketplace = () => {
                   <div className="flex-1 p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="space-y-2">
                       <h3 className="font-semibold">{template.name}</h3>
-                      <p className="text-sm text-muted-foreground">{template.description}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {template.description}
+                      </p>
                       <div className="flex flex-wrap gap-2">
                         {template.features.map((feature, index) => (
-                          <Badge key={index} variant="secondary" className="text-xs">
+                          <Badge
+                            key={index}
+                            variant="secondary"
+                            className="text-xs"
+                          >
                             <Check className="w-3 h-3 ml-1" />
                             {feature}
                           </Badge>
@@ -516,26 +544,40 @@ const TemplatesMarketplace = () => {
                       <div className="flex items-center gap-3">
                         <div className="flex items-center gap-1 text-amber-500">
                           <Star className="w-4 h-4 fill-current" />
-                          <span className="text-sm font-medium">{template.rating}</span>
+                          <span className="text-sm font-medium">
+                            {template.rating}
+                          </span>
                         </div>
                         <div className="flex items-center gap-1 text-muted-foreground">
                           <Download className="w-4 h-4" />
-                          <span className="text-sm">{template.downloads.toLocaleString()} تحميل</span>
+                          <span className="text-sm">
+                            {template.downloads.toLocaleString()} تحميل
+                          </span>
                         </div>
                       </div>
                     </div>
                     <div className="flex flex-col items-end gap-2">
                       <span className="font-bold text-xl">
-                        {template.price === 0 ? "مجاني" : `${template.price} ر.س`}
+                        {template.price === 0
+                          ? "مجاني"
+                          : `${template.price} ر.س`}
                       </span>
                       <div className="flex gap-2">
-                        <Button variant="outline" size="sm" onClick={() => handlePreview(template)}>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handlePreview(template)}
+                        >
                           <Eye className="w-4 h-4 ml-1" />
                           معاينة
                         </Button>
-                        <Button 
+                        <Button
                           size="sm"
-                          onClick={() => template.isPremium ? handleAddToCart(template) : handleDownload(template)}
+                          onClick={() =>
+                            template.isPremium
+                              ? handleAddToCart(template)
+                              : handleDownload(template)
+                          }
                         >
                           {template.isPremium ? (
                             <>
@@ -562,14 +604,19 @@ const TemplatesMarketplace = () => {
           <div className="text-center py-12">
             <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="font-semibold text-lg">لا توجد قوالب</h3>
-            <p className="text-muted-foreground">جرب البحث بكلمات مختلفة أو تغيير الفئة</p>
+            <p className="text-muted-foreground">
+              جرب البحث بكلمات مختلفة أو تغيير الفئة
+            </p>
           </div>
         )}
       </div>
 
       {/* Preview Dialog */}
       <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" dir="rtl">
+        <DialogContent
+          className="max-w-4xl max-h-[90vh] overflow-y-auto"
+          dir="rtl"
+        >
           {selectedTemplate && (
             <>
               <DialogHeader>
@@ -582,14 +629,16 @@ const TemplatesMarketplace = () => {
                     </Badge>
                   )}
                 </DialogTitle>
-                <DialogDescription>{selectedTemplate.description}</DialogDescription>
+                <DialogDescription>
+                  {selectedTemplate.description}
+                </DialogDescription>
               </DialogHeader>
 
               <div className="grid md:grid-cols-2 gap-6 mt-4">
                 {/* Preview Image */}
                 <div className="aspect-[3/4] bg-muted rounded-lg overflow-hidden">
-                  <img 
-                    src={selectedTemplate.preview} 
+                  <img
+                    src={selectedTemplate.preview}
                     alt={selectedTemplate.name}
                     className="w-full h-full object-cover"
                   />
@@ -601,7 +650,10 @@ const TemplatesMarketplace = () => {
                     <h4 className="font-semibold mb-2">المميزات</h4>
                     <ul className="space-y-2">
                       {selectedTemplate.features.map((feature, index) => (
-                        <li key={index} className="flex items-center gap-2 text-sm">
+                        <li
+                          key={index}
+                          className="flex items-center gap-2 text-sm"
+                        >
                           <Check className="w-4 h-4 text-emerald-500" />
                           {feature}
                         </li>
@@ -612,28 +664,43 @@ const TemplatesMarketplace = () => {
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-1 text-amber-500">
                       <Star className="w-5 h-5 fill-current" />
-                      <span className="font-semibold">{selectedTemplate.rating}</span>
+                      <span className="font-semibold">
+                        {selectedTemplate.rating}
+                      </span>
                     </div>
                     <div className="flex items-center gap-1 text-muted-foreground">
                       <Download className="w-5 h-5" />
-                      <span>{selectedTemplate.downloads.toLocaleString()} تحميل</span>
+                      <span>
+                        {selectedTemplate.downloads.toLocaleString()} تحميل
+                      </span>
                     </div>
                   </div>
 
                   <div className="pt-4 border-t border-border">
                     <div className="flex items-center justify-between mb-4">
                       <span className="text-2xl font-bold">
-                        {selectedTemplate.price === 0 ? "مجاني" : `${selectedTemplate.price} ر.س`}
+                        {selectedTemplate.price === 0
+                          ? "مجاني"
+                          : `${selectedTemplate.price} ر.س`}
                       </span>
                     </div>
                     <div className="flex gap-2">
                       {selectedTemplate.isPremium ? (
-                        <Button className="flex-1 gap-2" onClick={() => { handleAddToCart(selectedTemplate); setIsPreviewOpen(false); }}>
+                        <Button
+                          className="flex-1 gap-2"
+                          onClick={() => {
+                            handleAddToCart(selectedTemplate);
+                            setIsPreviewOpen(false);
+                          }}
+                        >
                           <ShoppingCart className="w-4 h-4" />
                           إضافة للسلة
                         </Button>
                       ) : (
-                        <Button className="flex-1 gap-2" onClick={() => handleDownload(selectedTemplate)}>
+                        <Button
+                          className="flex-1 gap-2"
+                          onClick={() => handleDownload(selectedTemplate)}
+                        >
                           <Download className="w-4 h-4" />
                           تحميل مجاني
                         </Button>
@@ -666,34 +733,48 @@ const TemplatesMarketplace = () => {
               {cart.length === 0 ? (
                 <div className="text-center py-12">
                   <ShoppingCart className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground">لا توجد عناصر في السلة</p>
-                  <Button variant="outline" className="mt-4" onClick={() => setIsCartOpen(false)}>
+                  <p className="text-muted-foreground">
+                    لا توجد عناصر في السلة
+                  </p>
+                  <Button
+                    variant="outline"
+                    className="mt-4"
+                    onClick={() => setIsCartOpen(false)}
+                  >
                     تصفح القوالب
                   </Button>
                 </div>
               ) : (
                 cart.map((item) => (
-                  <Card key={item.template.id} className="p-4">
+                  <Card key={item.id} className="p-4">
                     <div className="flex gap-4">
-                      <div className="w-20 h-24 bg-muted rounded-lg overflow-hidden shrink-0">
-                        <img 
-                          src={item.template.preview} 
-                          alt={item.template.name}
-                          className="w-full h-full object-cover"
-                        />
+                      <div className="w-20 h-24 bg-muted rounded-lg overflow-hidden shrink-0 flex items-center justify-center">
+                        {item.preview ? (
+                          <img
+                            src={item.preview}
+                            alt={item.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="text-sm text-muted-foreground">
+                            معاينة
+                          </div>
+                        )}
                       </div>
                       <div className="flex-1 space-y-1">
-                        <h4 className="font-semibold text-sm">{item.template.name}</h4>
+                        <h4 className="font-semibold text-sm">{item.name}</h4>
                         <p className="text-xs text-muted-foreground line-clamp-2">
-                          {item.template.description}
+                          {item.description}
                         </p>
-                        <p className="font-bold text-primary">{item.template.price} ر.س</p>
+                        <p className="font-bold text-primary">
+                          {item.price} ر.س
+                        </p>
                       </div>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
+                      <Button
+                        variant="ghost"
+                        size="icon"
                         className="shrink-0 text-destructive hover:text-destructive"
-                        onClick={() => handleRemoveFromCart(item.template.id)}
+                        onClick={() => handleRemoveFromCart(item.id)}
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -708,7 +789,9 @@ const TemplatesMarketplace = () => {
               <div className="border-t border-border pt-4 space-y-4">
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">المجموع الفرعي</span>
+                    <span className="text-muted-foreground">
+                      المجموع الفرعي
+                    </span>
                     <span>{cartTotal} ر.س</span>
                   </div>
                   <div className="flex justify-between text-sm">
@@ -721,7 +804,11 @@ const TemplatesMarketplace = () => {
                     <span>{(cartTotal * 1.15).toFixed(2)} ر.س</span>
                   </div>
                 </div>
-                <Button className="w-full gap-2" size="lg" onClick={handleCheckout}>
+                <Button
+                  className="w-full gap-2"
+                  size="lg"
+                  onClick={handleCheckout}
+                >
                   <CreditCard className="w-5 h-5" />
                   إتمام الشراء
                 </Button>
@@ -750,9 +837,9 @@ const TemplatesMarketplace = () => {
               <h4 className="font-semibold mb-3">ملخص الطلب</h4>
               <div className="space-y-2 text-sm">
                 {cart.map((item) => (
-                  <div key={item.template.id} className="flex justify-between">
-                    <span className="text-muted-foreground">{item.template.name}</span>
-                    <span>{item.template.price} ر.س</span>
+                  <div key={item.id} className="flex justify-between">
+                    <span className="text-muted-foreground">{item.name}</span>
+                    <span>{item.price} ر.س</span>
                   </div>
                 ))}
                 <Separator className="my-2" />
@@ -766,7 +853,9 @@ const TemplatesMarketplace = () => {
                 </div>
                 <div className="flex justify-between font-bold text-base pt-2">
                   <span>الإجمالي</span>
-                  <span className="text-primary">{(cartTotal * 1.15).toFixed(2)} ر.س</span>
+                  <span className="text-primary">
+                    {(cartTotal * 1.15).toFixed(2)} ر.س
+                  </span>
                 </div>
               </div>
             </Card>
@@ -780,7 +869,9 @@ const TemplatesMarketplace = () => {
                   type="email"
                   placeholder="example@email.com"
                   value={paymentForm.email}
-                  onChange={(e) => setPaymentForm({ ...paymentForm, email: e.target.value })}
+                  onChange={(e) =>
+                    setPaymentForm({ ...paymentForm, email: e.target.value })
+                  }
                 />
               </div>
 
@@ -791,7 +882,12 @@ const TemplatesMarketplace = () => {
                     id="cardNumber"
                     placeholder="1234 5678 9012 3456"
                     value={paymentForm.cardNumber}
-                    onChange={(e) => setPaymentForm({ ...paymentForm, cardNumber: e.target.value })}
+                    onChange={(e) =>
+                      setPaymentForm({
+                        ...paymentForm,
+                        cardNumber: e.target.value,
+                      })
+                    }
                     className="pl-12"
                   />
                   <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -804,7 +900,9 @@ const TemplatesMarketplace = () => {
                   id="cardName"
                   placeholder="محمد أحمد"
                   value={paymentForm.cardName}
-                  onChange={(e) => setPaymentForm({ ...paymentForm, cardName: e.target.value })}
+                  onChange={(e) =>
+                    setPaymentForm({ ...paymentForm, cardName: e.target.value })
+                  }
                 />
               </div>
 
@@ -815,7 +913,9 @@ const TemplatesMarketplace = () => {
                     id="expiry"
                     placeholder="MM/YY"
                     value={paymentForm.expiry}
-                    onChange={(e) => setPaymentForm({ ...paymentForm, expiry: e.target.value })}
+                    onChange={(e) =>
+                      setPaymentForm({ ...paymentForm, expiry: e.target.value })
+                    }
                   />
                 </div>
                 <div className="space-y-2">
@@ -826,14 +926,20 @@ const TemplatesMarketplace = () => {
                     type="password"
                     maxLength={4}
                     value={paymentForm.cvv}
-                    onChange={(e) => setPaymentForm({ ...paymentForm, cvv: e.target.value })}
+                    onChange={(e) =>
+                      setPaymentForm({ ...paymentForm, cvv: e.target.value })
+                    }
                   />
                 </div>
               </div>
             </div>
 
             {/* Payment Button */}
-            <Button className="w-full gap-2" size="lg" onClick={handlePayment}>
+            <Button
+              className="w-full gap-2"
+              size="lg"
+              onClick={() => navigate("/checkout")}
+            >
               <Lock className="w-4 h-4" />
               ادفع {(cartTotal * 1.15).toFixed(2)} ر.س
             </Button>
