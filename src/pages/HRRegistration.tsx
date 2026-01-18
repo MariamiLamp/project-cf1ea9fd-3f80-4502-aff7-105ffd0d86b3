@@ -155,8 +155,8 @@ const HRRegistration = () => {
   };
 
   const handleSubmit = () => {
-    // For now, just navigate to dashboard
-    navigate("/");
+    // Navigate to login page after successful registration
+    navigate("/auth");
   };
 
   const progress = (currentStep / totalSteps) * 100;
