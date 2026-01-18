@@ -70,6 +70,7 @@ import {
   X,
   Search,
   ListFilter,
+  Download,
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { AdPlacementSelector } from "@/components/dashboard/AdPlacementSelector";
@@ -163,6 +164,7 @@ const initialCandidates = [
 const initialApplications = [
   {
     id: 1,
+    candidateId: 1,
     candidateName: "أحمد محمد",
     jobTitle: "مطور واجهات أمامية",
     status: "pending",
@@ -171,6 +173,7 @@ const initialApplications = [
   },
   {
     id: 2,
+    candidateId: 2,
     candidateName: "سارة علي",
     jobTitle: "محلل بيانات",
     status: "reviewed",
@@ -179,6 +182,7 @@ const initialApplications = [
   },
   {
     id: 3,
+    candidateId: 3,
     candidateName: "محمد خالد",
     jobTitle: "مطور واجهات أمامية",
     status: "accepted",
@@ -187,6 +191,7 @@ const initialApplications = [
   },
   {
     id: 4,
+    candidateId: 4,
     candidateName: "فاطمة أحمد",
     jobTitle: "مدير مشاريع",
     status: "rejected",
@@ -195,7 +200,8 @@ const initialApplications = [
   },
   {
     id: 5,
-    candidateName: "عمر حسن",
+    candidateId: 1, // Ahmed Mohamed again for testing
+    candidateName: "أحمد محمد",
     jobTitle: "مطور واجهات أمامية",
     status: "pending",
     appliedDate: "2024-01-21",
@@ -1569,7 +1575,14 @@ const CompanyDashboard = () => {
                           </TableCell>
                           <TableCell>{app.jobTitle}</TableCell>
                           <TableCell className="font-medium">
-                            {app.candidateName}
+                            <button
+                              onClick={() =>
+                                handleViewCandidate(app.candidateId)
+                              }
+                              className="text-primary hover:underline cursor-pointer font-medium"
+                            >
+                              {app.candidateName}
+                            </button>
                           </TableCell>
                         </TableRow>
                       ))
@@ -1895,76 +1908,200 @@ const CompanyDashboard = () => {
           open={isViewApplicationOpen}
           onOpenChange={setIsViewApplicationOpen}
         >
-          <DialogContent className="max-w-lg" dir="rtl">
+          <DialogContent className="max-w-3xl" dir="rtl">
             <DialogHeader>
-              <DialogTitle>تفاصيل طلب التوظيف</DialogTitle>
+              <DialogTitle className="text-right">
+                تفاصيل طلب التوظيف
+              </DialogTitle>
             </DialogHeader>
             {selectedApplication && (
-              <div className="space-y-4 mt-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-bold text-lg">
-                      {selectedApplication.candidateName}
-                    </h3>
-                    <p className="text-muted-foreground">
-                      {selectedApplication.jobTitle}
-                    </p>
-                  </div>
-                  {getStatusBadge(selectedApplication.status)}
-                </div>
+              <Tabs defaultValue="details" className="w-full mt-4">
+                <TabsList className="grid w-full grid-cols-3 mb-4">
+                  <TabsTrigger value="details">التفاصيل</TabsTrigger>
+                  <TabsTrigger value="cv">السيرة الذاتية (CV)</TabsTrigger>
+                  <TabsTrigger value="cover-letter">خطاب التقديم</TabsTrigger>
+                </TabsList>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-3 bg-muted/50 rounded-lg">
-                    <p className="text-sm text-muted-foreground">
-                      تاريخ التقديم
-                    </p>
-                    <p className="font-medium">
-                      {selectedApplication.appliedDate}
-                    </p>
+                <TabsContent value="details" className="space-y-4 text-right">
+                  <div className="flex items-center justify-between">
+                    {getStatusBadge(selectedApplication.status)}
+                    <div>
+                      <h3 className="font-bold text-lg">
+                        {selectedApplication.candidateName}
+                      </h3>
+                      <p className="text-muted-foreground">
+                        {selectedApplication.jobTitle}
+                      </p>
+                    </div>
                   </div>
-                  <div className="p-3 bg-muted/50 rounded-lg">
-                    <p className="text-sm text-muted-foreground">
-                      نسبة التوافق
-                    </p>
-                    <p className="font-bold text-lg">
-                      {selectedApplication.matchScore}%
-                    </p>
-                  </div>
-                </div>
 
-                {(selectedApplication.status === "pending" ||
-                  selectedApplication.status === "reviewed") && (
-                  <div className="flex gap-2">
-                    <Button
-                      onClick={() => {
-                        handleUpdateApplicationStatus(
-                          selectedApplication.id,
-                          "accepted"
-                        );
-                        setIsViewApplicationOpen(false);
-                      }}
-                      className="flex-1 gap-2 bg-emerald-500 hover:bg-emerald-600"
-                    >
-                      <CheckCircle className="w-4 h-4" />
-                      قبول الطلب
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      onClick={() => {
-                        handleUpdateApplicationStatus(
-                          selectedApplication.id,
-                          "rejected"
-                        );
-                        setIsViewApplicationOpen(false);
-                      }}
-                      className="flex-1 gap-2"
-                    >
-                      <XCircle className="w-4 h-4" />
-                      رفض الطلب
-                    </Button>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-3 bg-muted/50 rounded-lg">
+                      <p className="text-sm text-muted-foreground">
+                        تاريخ التقديم
+                      </p>
+                      <p className="font-medium">
+                        {selectedApplication.appliedDate}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-muted/50 rounded-lg">
+                      <p className="text-sm text-muted-foreground">
+                        نسبة التوافق
+                      </p>
+                      <p className="font-bold text-lg">
+                        {selectedApplication.matchScore}%
+                      </p>
+                    </div>
                   </div>
-                )}
-              </div>
+
+                  <Button
+                    variant="outline"
+                    className="w-full gap-2"
+                    onClick={() =>
+                      handleViewCandidate(selectedApplication.candidateId)
+                    }
+                  >
+                    <Users className="w-4 h-4" />
+                    عرض الملف الشخصي الكامل للمرشح
+                  </Button>
+
+                  {(selectedApplication.status === "pending" ||
+                    selectedApplication.status === "reviewed") && (
+                    <div className="flex gap-2 pt-4 border-t">
+                      <Button
+                        onClick={() => {
+                          handleUpdateApplicationStatus(
+                            selectedApplication.id,
+                            "accepted"
+                          );
+                          setIsViewApplicationOpen(false);
+                        }}
+                        className="flex-1 gap-2 bg-emerald-500 hover:bg-emerald-600"
+                      >
+                        <CheckCircle className="w-4 h-4" />
+                        قبول الطلب
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        onClick={() => {
+                          handleUpdateApplicationStatus(
+                            selectedApplication.id,
+                            "rejected"
+                          );
+                          setIsViewApplicationOpen(false);
+                        }}
+                        className="flex-1 gap-2"
+                      >
+                        <XCircle className="w-4 h-4" />
+                        رفض الطلب
+                      </Button>
+                    </div>
+                  )}
+                </TabsContent>
+
+                <TabsContent value="cv" className="space-y-4">
+                  <div className="bg-muted/30 border rounded-xl p-4 min-h-[500px] flex flex-col">
+                    <div className="flex justify-between items-center mb-4">
+                      <Button variant="outline" size="sm" className="gap-2 h-8">
+                        <Download className="w-3 h-3" />
+                        تحميل
+                      </Button>
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded bg-primary/10 flex items-center justify-center">
+                          <FileText className="w-4 h-4 text-primary" />
+                        </div>
+                        <span className="text-sm font-medium">
+                          CV_
+                          {selectedApplication.candidateName.replace(" ", "_")}
+                          .pdf
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* CV Document Skeleton Preview */}
+                    <div className="flex-1 bg-background rounded-lg border shadow-sm p-8 space-y-6">
+                      <div className="flex justify-between items-start border-b pb-6">
+                        <div className="space-y-2">
+                          <div className="h-6 w-48 bg-muted rounded animate-pulse" />
+                          <div className="h-4 w-32 bg-muted/60 rounded animate-pulse" />
+                        </div>
+                        <div className="h-16 w-16 bg-muted rounded-full animate-pulse" />
+                      </div>
+
+                      <div className="space-y-4">
+                        <div className="h-4 w-24 bg-primary/20 rounded mb-2" />
+                        <div className="space-y-2">
+                          <div className="h-3 w-full bg-muted/40 rounded" />
+                          <div className="h-3 w-full bg-muted/40 rounded" />
+                          <div className="h-3 w-2/3 bg-muted/40 rounded" />
+                        </div>
+                      </div>
+
+                      <div className="space-y-4 pt-4">
+                        <div className="h-4 w-32 bg-primary/20 rounded mb-2" />
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <div className="h-3 w-4/5 bg-muted/40 rounded" />
+                            <div className="h-3 w-3/4 bg-muted/40 rounded" />
+                          </div>
+                          <div className="space-y-2">
+                            <div className="h-3 w-4/5 bg-muted/40 rounded" />
+                            <div className="h-3 w-3/4 bg-muted/40 rounded" />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="mt-8 pt-8 text-center border-t border-dashed">
+                        <p className="text-xs text-muted-foreground uppercase tracking-widest">
+                          Candidate Resume Preview
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="cover-letter" className="space-y-4">
+                  <div className="bg-muted/30 border rounded-xl p-4 min-h-[500px] flex flex-col">
+                    <div className="bg-background rounded-lg border shadow-sm p-10 flex-1 flex flex-col">
+                      <div className="mb-8 border-b pb-6">
+                        <h4 className="text-xl font-bold text-primary mb-1 text-right">
+                          خطاب التقديم
+                        </h4>
+                        <p className="text-sm text-muted-foreground text-right">
+                          تاريخ التقديم: {selectedApplication.appliedDate}
+                        </p>
+                      </div>
+
+                      <div className="flex-1 text-right">
+                        <p className="text-sm leading-relaxed whitespace-pre-line text-foreground/80 font-serif text-right">
+                          السادة المحترمين في فريق التوظيف،{"\n\n"}
+                          أتقدم إليكم بطلب للانضمام إلى فريقكم الموقر في وظيفة{" "}
+                          {selectedApplication.jobTitle}.{"\n\n"}
+                          لدي شغف كبير وخبرة عملية في هذا المجال، وأتطلع بحماس
+                          للمساهمة في تحقيق أهداف شركتكم. لقد تابعت إنجازات
+                          شركتكم بإعجاب، وأرى أن مهاراتي تتناسب تماماً مع
+                          متطلبات الوظيفة المعلنة.{"\n\n"}
+                          خلال مسيرتي المهنية، قمت بالعديد من المشاريع الناجحة
+                          التي أثبتت قدرتي على العمل الجاد والالتزام بأعلى
+                          معايير الجودة. I believe strongly in teamwork and
+                          continuous improvement.{"\n\n"}
+                          أتطلع لمناقشة كيف يمكنني أن أكون إضافة قيمة لفريقكم.
+                          {"\n\n"}
+                          مع خالص التحية والتقدير،{"\n\n"}
+                          <span className="font-bold text-lg text-primary block text-right">
+                            {selectedApplication.candidateName}
+                          </span>
+                        </p>
+                      </div>
+
+                      <div className="mt-12 pt-6 border-t border-dashed flex justify-between items-center text-[10px] text-muted-foreground uppercase tracking-widest">
+                        <span>CareerBook Platform Verified</span>
+                        <span>Ref: APP-{selectedApplication.id}</span>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+              </Tabs>
             )}
           </DialogContent>
         </Dialog>
