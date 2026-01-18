@@ -65,14 +65,12 @@ import {
   Megaphone,
   BookOpen,
   Loader2,
-  Copy,
-  Check,
   X,
   Search,
   ListFilter,
   Download,
 } from "lucide-react";
-import { Switch } from "@/components/ui/switch";
+
 import { AdPlacementSelector } from "@/components/dashboard/AdPlacementSelector";
 import { StatCard } from "@/components/dashboard/StatCard";
 
@@ -167,18 +165,22 @@ const initialApplications = [
     candidateId: 1,
     candidateName: "أحمد محمد",
     jobTitle: "مطور واجهات أمامية",
-    status: "pending",
+    status: "shortlisted",
     appliedDate: "2024-01-20",
     matchScore: 95,
+    rejectionReason: "",
+    notes: "مرشح متميز جداً، نحتاج لتحديد موعد مقابلة تقنية ثانية.",
   },
   {
     id: 2,
     candidateId: 2,
     candidateName: "سارة علي",
     jobTitle: "محلل بيانات",
-    status: "reviewed",
+    status: "viewed",
     appliedDate: "2024-01-19",
     matchScore: 88,
+    rejectionReason: "",
+    notes: "",
   },
   {
     id: 3,
@@ -188,6 +190,8 @@ const initialApplications = [
     status: "accepted",
     appliedDate: "2024-01-18",
     matchScore: 82,
+    rejectionReason: "",
+    notes: "",
   },
   {
     id: 4,
@@ -197,15 +201,19 @@ const initialApplications = [
     status: "rejected",
     appliedDate: "2024-01-17",
     matchScore: 78,
+    rejectionReason: "الخبرة في إدارة المشاريع التقنية أقل من المطلوب",
+    notes: "",
   },
   {
     id: 5,
-    candidateId: 1, // Ahmed Mohamed again for testing
+    candidateId: 1,
     candidateName: "أحمد محمد",
     jobTitle: "مطور واجهات أمامية",
     status: "pending",
     appliedDate: "2024-01-21",
     matchScore: 91,
+    rejectionReason: "",
+    notes: "",
   },
 ];
 
@@ -222,6 +230,8 @@ const CompanyDashboard = () => {
   const [isAddJobOpen, setIsAddJobOpen] = useState(false);
   const [isEditJobOpen, setIsEditJobOpen] = useState(false);
   const [isViewApplicationOpen, setIsViewApplicationOpen] = useState(false);
+  const [rejectionReasonInput, setRejectionReasonInput] = useState("");
+  const [notesInput, setNotesInput] = useState("");
   const [selectedJob, setSelectedJob] = useState<
     (typeof initialJobs)[0] | null
   >(null);
@@ -442,18 +452,59 @@ const CompanyDashboard = () => {
 
   const handleViewApplication = (app: (typeof initialApplications)[0]) => {
     setSelectedApplication(app);
+    setRejectionReasonInput(app.rejectionReason || "");
+    setNotesInput(app.notes || "");
     setIsViewApplicationOpen(true);
+
+    // Automatically mark as viewed if it was pending
+    if (app.status === "pending") {
+      handleUpdateApplicationStatus(app.id, "viewed");
+    }
   };
 
-  const handleUpdateApplicationStatus = (appId: number, status: string) => {
+  const handleUpdateApplicationStatus = (
+    appId: number,
+    status: string,
+    additionalData: { rejectionReason?: string; notes?: string } = {}
+  ) => {
     setApplications(
-      applications.map((app) => (app.id === appId ? { ...app, status } : app))
+      applications.map((app) =>
+        app.id === appId ? { ...app, status, ...additionalData } : app
+      )
     );
-    toast({
-      title: status === "accepted" ? "تم القبول" : "تم الرفض",
-      description:
-        status === "accepted" ? "تم قبول طلب التوظيف" : "تم رفض طلب التوظيف",
-    });
+
+    let title = "تم التحديث";
+    let description = "تم تحديث حالة الطلب بنجاح";
+
+    switch (status) {
+      case "accepted":
+        title = "تم القبول";
+        description = "تم قبول طلب التوظيف";
+        break;
+      case "rejected":
+        title = "تم الرفض";
+        description = "تم رفض طلب التوظيف";
+        break;
+      case "shortlisted":
+        title = "تمت الإضافة";
+        description = "تمت إضافة المرشح للقائمة المختصرة";
+        break;
+      case "reviewed":
+        title = "تمت المراجعة";
+        description = "تم تعليم الطلب كمراجع";
+        break;
+      case "viewed":
+        title = "تم العرض";
+        description = "تم عرض الطلب";
+        break;
+    }
+
+    if (additionalData.notes) {
+      title = "تم حفظ الملاحظات";
+      description = "تم تحديث ملاحظات الشركة للمرشح";
+    }
+
+    toast({ title, description });
   };
 
   // Mock AI Job Description Generator
@@ -627,10 +678,25 @@ const CompanyDashboard = () => {
             <Clock className="w-3 h-3" /> قيد المراجعة
           </Badge>
         );
+      case "viewed":
+        return (
+          <Badge
+            variant="secondary"
+            className="gap-1 bg-blue-50 text-blue-700 border-blue-200"
+          >
+            <Eye className="w-3 h-3" /> تم العرض
+          </Badge>
+        );
       case "reviewed":
         return (
           <Badge variant="secondary" className="gap-1">
-            <Eye className="w-3 h-3" /> تمت المراجعة
+            <CheckCircle className="w-3 h-3" /> تمت المراجعة
+          </Badge>
+        );
+      case "shortlisted":
+        return (
+          <Badge className="gap-1 bg-amber-500 hover:bg-amber-600">
+            <Star className="w-3 h-3" /> قائمة المختصرة
           </Badge>
         );
       case "accepted":
@@ -1279,8 +1345,14 @@ const CompanyDashboard = () => {
                                     <SelectItem value="pending">
                                       قيد المراجعة
                                     </SelectItem>
+                                    <SelectItem value="viewed">
+                                      تم العرض
+                                    </SelectItem>
                                     <SelectItem value="reviewed">
                                       تمت المراجعة
+                                    </SelectItem>
+                                    <SelectItem value="shortlisted">
+                                      القائمة المختصرة
                                     </SelectItem>
                                     <SelectItem value="accepted">
                                       مقبول
@@ -1398,45 +1470,8 @@ const CompanyDashboard = () => {
                     </div>
 
                     {/* Desktop Filters */}
-                    <div className="hidden md:flex flex-wrap items-center justify-between gap-2 w-full">
-                      <div className="flex items-center gap-2">
-                        <Button
-                          size="sm"
-                          onClick={handleApplyFilters}
-                          className="h-8 gap-2"
-                        >
-                          <ListFilter className="w-3 h-3" />
-                          تصفية
-                        </Button>
-
-                        {(appliedFilters.status !== "all" ||
-                          appliedFilters.job !== "all" ||
-                          appliedFilters.date ||
-                          appliedFilters.matchScore !== "all") && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              setFilterStatus("all");
-                              setFilterJob("all");
-                              setFilterDate("");
-                              setFilterMatchScore("all");
-                              setAppliedFilters({
-                                status: "all",
-                                job: "all",
-                                date: "",
-                                matchScore: "all",
-                              });
-                            }}
-                            className="h-8"
-                          >
-                            <X className="w-3 h-3 ml-2" />
-                            مسح
-                          </Button>
-                        )}
-                      </div>
-
-                      <div className="flex items-center gap-2">
+                    <div className="hidden md:flex flex-wrap items-center justify-start gap-3 w-full">
+                      <div className="flex flex-wrap items-center gap-2">
                         <Select
                           value={filterStatus}
                           onValueChange={setFilterStatus}
@@ -1449,8 +1484,12 @@ const CompanyDashboard = () => {
                             <SelectItem value="pending">
                               قيد المراجعة
                             </SelectItem>
+                            <SelectItem value="viewed">تم العرض</SelectItem>
                             <SelectItem value="reviewed">
                               تمت المراجعة
+                            </SelectItem>
+                            <SelectItem value="shortlisted">
+                              القائمة المختصرة
                             </SelectItem>
                             <SelectItem value="accepted">مقبول</SelectItem>
                             <SelectItem value="rejected">مرفوض</SelectItem>
@@ -1493,6 +1532,43 @@ const CompanyDashboard = () => {
                           </SelectContent>
                         </Select>
                       </div>
+
+                      <div className="flex items-center gap-2 border-r pr-3 mr-1">
+                        <Button
+                          size="sm"
+                          onClick={handleApplyFilters}
+                          className="h-8 w-[130px] gap-2"
+                        >
+                          <ListFilter className="w-3 h-3" />
+                          تصفية
+                        </Button>
+
+                        {(appliedFilters.status !== "all" ||
+                          appliedFilters.job !== "all" ||
+                          appliedFilters.date ||
+                          appliedFilters.matchScore !== "all") && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setFilterStatus("all");
+                              setFilterJob("all");
+                              setFilterDate("");
+                              setFilterMatchScore("all");
+                              setAppliedFilters({
+                                status: "all",
+                                job: "all",
+                                date: "",
+                                matchScore: "all",
+                              });
+                            }}
+                            className="h-8 w-[130px] min-w-fit gap-2"
+                          >
+                            <X className="w-3 h-3" />
+                            مسح
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   </div>
                   <CardTitle className="flex items-center gap-2">
@@ -1524,40 +1600,13 @@ const CompanyDashboard = () => {
                             <div className="flex gap-1 justify-end">
                               <Button
                                 variant="ghost"
-                                size="icon"
+                                size="sm"
                                 onClick={() => handleViewApplication(app)}
+                                className="gap-2 h-8 px-3"
                               >
                                 <Eye className="w-4 h-4" />
+                                <span>عرض التفاصيل</span>
                               </Button>
-                              {(app.status === "pending" ||
-                                app.status === "reviewed") && (
-                                <>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() =>
-                                      handleUpdateApplicationStatus(
-                                        app.id,
-                                        "accepted"
-                                      )
-                                    }
-                                  >
-                                    <CheckCircle className="w-4 h-4 text-emerald-500" />
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() =>
-                                      handleUpdateApplicationStatus(
-                                        app.id,
-                                        "rejected"
-                                      )
-                                    }
-                                  >
-                                    <XCircle className="w-4 h-4 text-destructive" />
-                                  </Button>
-                                </>
-                              )}
                             </div>
                           </TableCell>
                           <TableCell>{getStatusBadge(app.status)}</TableCell>
@@ -1965,36 +2014,129 @@ const CompanyDashboard = () => {
                     عرض الملف الشخصي الكامل للمرشح
                   </Button>
 
+                  {selectedApplication.status === "rejected" &&
+                    selectedApplication.rejectionReason && (
+                      <div className="p-4 bg-red-50 border border-red-100 rounded-lg space-y-2">
+                        <p className="text-sm font-bold text-red-700">
+                          سبب الرفض:
+                        </p>
+                        <p className="text-sm text-red-600 italic">
+                          "{selectedApplication.rejectionReason}"
+                        </p>
+                      </div>
+                    )}
+
+                  {selectedApplication.status === "shortlisted" && (
+                    <div className="p-4 bg-amber-50 border border-amber-100 rounded-lg space-y-3">
+                      <Label className="text-amber-800 font-bold">
+                        ملاحظات الشركة عن المرشح:
+                      </Label>
+                      <Textarea
+                        placeholder="أضف ملاحظاتك هنا..."
+                        className="bg-white border-amber-200 focus:ring-amber-500"
+                        value={notesInput}
+                        onChange={(e) => setNotesInput(e.target.value)}
+                      />
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="w-full border-amber-300 text-amber-700 hover:bg-amber-100"
+                        onClick={() =>
+                          handleUpdateApplicationStatus(
+                            selectedApplication.id,
+                            "shortlisted",
+                            { notes: notesInput }
+                          )
+                        }
+                      >
+                        حفظ الملاحظات
+                      </Button>
+                    </div>
+                  )}
+
                   {(selectedApplication.status === "pending" ||
-                    selectedApplication.status === "reviewed") && (
-                    <div className="flex gap-2 pt-4 border-t">
-                      <Button
-                        onClick={() => {
-                          handleUpdateApplicationStatus(
-                            selectedApplication.id,
-                            "accepted"
-                          );
-                          setIsViewApplicationOpen(false);
-                        }}
-                        className="flex-1 gap-2 bg-emerald-500 hover:bg-emerald-600"
-                      >
-                        <CheckCircle className="w-4 h-4" />
-                        قبول الطلب
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        onClick={() => {
-                          handleUpdateApplicationStatus(
-                            selectedApplication.id,
-                            "rejected"
-                          );
-                          setIsViewApplicationOpen(false);
-                        }}
-                        className="flex-1 gap-2"
-                      >
-                        <XCircle className="w-4 h-4" />
-                        رفض الطلب
-                      </Button>
+                    selectedApplication.status === "viewed" ||
+                    selectedApplication.status === "reviewed" ||
+                    selectedApplication.status === "shortlisted") && (
+                    <div className="flex flex-col gap-3 pt-4 border-t">
+                      {/* Optional Rejection Reason Input */}
+                      <div className="space-y-2">
+                        <Label className="text-xs text-muted-foreground mr-1">
+                          سبب الرفض (اختياري - يظهر فقط في حال الرفض):
+                        </Label>
+                        <Input
+                          placeholder="مثال: الخبرة غير كافية..."
+                          className="h-8 text-xs bg-muted/20"
+                          value={rejectionReasonInput}
+                          onChange={(e) =>
+                            setRejectionReasonInput(e.target.value)
+                          }
+                        />
+                      </div>
+
+                      <div className="flex gap-2 w-full">
+                        <Button
+                          onClick={() => {
+                            handleUpdateApplicationStatus(
+                              selectedApplication.id,
+                              "accepted"
+                            );
+                            setIsViewApplicationOpen(false);
+                          }}
+                          className="flex-1 gap-2 bg-emerald-500 hover:bg-emerald-600"
+                        >
+                          <CheckCircle className="w-4 h-4" />
+                          قبول الطلب
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          onClick={() => {
+                            handleUpdateApplicationStatus(
+                              selectedApplication.id,
+                              "rejected",
+                              { rejectionReason: rejectionReasonInput }
+                            );
+                            setIsViewApplicationOpen(false);
+                          }}
+                          className="flex-1 gap-2"
+                        >
+                          <XCircle className="w-4 h-4" />
+                          رفض الطلب
+                        </Button>
+                      </div>
+
+                      <div className="flex gap-2 w-full">
+                        {selectedApplication.status !== "shortlisted" && (
+                          <Button
+                            variant="outline"
+                            onClick={() => {
+                              handleUpdateApplicationStatus(
+                                selectedApplication.id,
+                                "shortlisted"
+                              );
+                            }}
+                            className="flex-1 gap-2 border-amber-200 text-amber-600 hover:bg-amber-50"
+                          >
+                            <Star className="w-4 h-4" />
+                            إضافة للقائمة المختصرة
+                          </Button>
+                        )}
+                        {selectedApplication.status !== "reviewed" && (
+                          <Button
+                            variant="outline"
+                            onClick={() => {
+                              handleUpdateApplicationStatus(
+                                selectedApplication.id,
+                                "reviewed"
+                              );
+                            }}
+                            className="flex-1 gap-2"
+                          >
+                            <CheckCircle className="w-4 h-4" />
+                            تعليم كمراجع
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   )}
                 </TabsContent>
