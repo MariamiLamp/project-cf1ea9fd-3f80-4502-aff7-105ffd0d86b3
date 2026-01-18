@@ -551,92 +551,96 @@ ${candidate.phone}`;
               </CardContent>
             </Card>
 
-            {/* Applied Jobs */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Briefcase className="w-5 h-5 text-primary" />
-                  الوظائف المتقدم عليها
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {candidate.appliedJobs.map((job, index) => (
-                  <div
-                    key={job.id}
-                    className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-border/50"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center shrink-0">
-                        <Building className="w-5 h-5 text-muted-foreground" />
-                      </div>
-                      <div>
-                        <h4 className="font-medium text-sm">{job.title}</h4>
-                        <p className="text-xs text-muted-foreground">
-                          {job.company}
-                        </p>
-                        <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-                          <Calendar className="w-3 h-3" />
-                          {job.appliedDate}
-                        </p>
-                      </div>
-                    </div>
-                    <Badge
-                      variant={
-                        job.status === "accepted"
-                          ? "default"
-                          : job.status === "rejected"
-                          ? "destructive"
-                          : "secondary"
-                      }
-                      className={`flex items-center gap-1 ${
-                        job.status === "accepted" ? "bg-emerald-500" : ""
-                      }`}
+            {/* Applied Jobs - Hidden for Company View */}
+            {!isCompanyView && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Briefcase className="w-5 h-5 text-primary" />
+                    الوظائف المتقدم عليها
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {candidate.appliedJobs.map((job, index) => (
+                    <div
+                      key={job.id}
+                      className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-border/50"
                     >
-                      {job.status === "pending" && (
-                        <Clock className="w-3 h-3" />
-                      )}
-                      {job.status === "accepted" && (
-                        <CheckCircle className="w-3 h-3" />
-                      )}
-                      {job.status === "rejected" && (
-                        <XCircle className="w-3 h-3" />
-                      )}
-                      {job.status === "pending"
-                        ? "قيد المراجعة"
-                        : job.status === "accepted"
-                        ? "مقبول"
-                        : "مرفوض"}
-                    </Badge>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                          <Building className="w-5 h-5 text-muted-foreground" />
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-sm">{job.title}</h4>
+                          <p className="text-xs text-muted-foreground">
+                            {job.company}
+                          </p>
+                          <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                            <Calendar className="w-3 h-3" />
+                            {job.appliedDate}
+                          </p>
+                        </div>
+                      </div>
+                      <Badge
+                        variant={
+                          job.status === "accepted"
+                            ? "default"
+                            : job.status === "rejected"
+                            ? "destructive"
+                            : "secondary"
+                        }
+                        className={`flex items-center gap-1 ${
+                          job.status === "accepted" ? "bg-emerald-500" : ""
+                        }`}
+                      >
+                        {job.status === "pending" && (
+                          <Clock className="w-3 h-3" />
+                        )}
+                        {job.status === "accepted" && (
+                          <CheckCircle className="w-3 h-3" />
+                        )}
+                        {job.status === "rejected" && (
+                          <XCircle className="w-3 h-3" />
+                        )}
+                        {job.status === "pending"
+                          ? "قيد المراجعة"
+                          : job.status === "accepted"
+                          ? "مقبول"
+                          : "مرفوض"}
+                      </Badge>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            )}
 
-            {/* Cover Letter Section with Generator */}
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <FileEdit className="w-5 h-5 text-primary" />
-                  خطاب التقديم العام
-                </CardTitle>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsCoverLetterDialogOpen(true)}
-                  className="gap-2"
-                >
-                  <PenTool className="w-4 h-4" />
-                  إنشاء خطاب جديد
-                </Button>
-              </CardHeader>
-              <CardContent>
-                <div className="p-4 bg-muted/30 rounded-lg border border-border/50">
-                  <p className="text-sm leading-relaxed">
-                    {candidate.coverLetter}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Cover Letter Section with Generator - Hidden for Company View */}
+            {!isCompanyView && (
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <FileEdit className="w-5 h-5 text-primary" />
+                    خطاب التقديم العام
+                  </CardTitle>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsCoverLetterDialogOpen(true)}
+                    className="gap-2"
+                  >
+                    <PenTool className="w-4 h-4" />
+                    إنشاء خطاب جديد
+                  </Button>
+                </CardHeader>
+                <CardContent>
+                  <div className="p-4 bg-muted/30 rounded-lg border border-border/50">
+                    <p className="text-sm leading-relaxed">
+                      {candidate.coverLetter}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           {/* Sidebar */}
