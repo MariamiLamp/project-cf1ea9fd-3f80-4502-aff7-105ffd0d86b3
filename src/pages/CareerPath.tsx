@@ -62,45 +62,50 @@ const CareerPath = () => {
   );
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
 
-  const toggleResourceCompletion = (itemId: string, idx: number) => {
-    const resourceKey = `${itemId}-resource-${idx}`;
+  const toggleResourceCompletion = (resourceKey: string) => {
     setCompletedResources((prev) => {
       const newSet = new Set(prev);
-      const isMarkingDone = !newSet.has(resourceKey);
-
-      if (isMarkingDone) {
-        newSet.add(resourceKey);
-
-        // Check if all resources for this item are now done
-        const item = roadmap
-          ?.flatMap((p) => p.items)
-          .find((i) => i.id === itemId);
-        if (item && item.resources) {
-          const allDocsDone = item.resources.every((_, i2) =>
-            i2 === idx ? true : newSet.has(`${itemId}-resource-${i2}`)
-          );
-          if (allDocsDone) {
-            setCompletedItems((prevItems) => {
-              const s = new Set(prevItems);
-              s.add(itemId);
-              return s;
-            });
-          }
-        }
-      } else {
+      if (newSet.has(resourceKey)) {
         newSet.delete(resourceKey);
-        // If unmarking a resource, we should logically unmark the item as it's no longer 'fully' done
-        setCompletedItems((prevItems) => {
-          const s = new Set(prevItems);
-          s.delete(itemId);
-          return s;
-        });
+      } else {
+        newSet.add(resourceKey);
       }
       return newSet;
     });
   };
 
-  const handleOpenResource = (resource: string) => {
+  const handleOpenResource = (
+    itemId: string,
+    idx: number,
+    resource: string,
+    type: string
+  ) => {
+    const resourceKey = `${itemId}-resource-${idx}`;
+
+    setCompletedResources((prev) => {
+      const newSet = new Set(prev);
+      newSet.add(resourceKey);
+
+      // If all resources for this item are completed, mark the item completed
+      const item = roadmap
+        ?.flatMap((p) => p.items)
+        .find((i) => i.id === itemId);
+      if (item && item.resources) {
+        const allDone = item.resources.every((_, i2) =>
+          newSet.has(`${itemId}-resource-${i2}`)
+        );
+        if (allDone) {
+          setCompletedItems((prevItems) => {
+            const s = new Set(prevItems);
+            s.add(itemId);
+            return s;
+          });
+        }
+      }
+
+      return newSet;
+    });
+
     // Open an external search (Google) for the resource in a new tab
     const url = `https://www.google.com/search?q=${encodeURIComponent(
       resource
@@ -688,63 +693,39 @@ const CareerPath = () => {
                                                     completedResources.has(
                                                       resourceKey
                                                     );
+                                                  const basePath =
+                                                    item.type === "course"
+                                                      ? "/courses"
+                                                      : "/articles";
+
                                                   return (
                                                     <div
                                                       key={idx}
-                                                      className={`flex items-center justify-between p-2 rounded-lg border transition-all ${
+                                                      className={`flex items-center gap-3 p-2 rounded-lg border transition-all ${
                                                         isResourceCompleted
-                                                          ? "bg-success/5 border-success/20"
+                                                          ? "bg-success/10 border-success/30"
                                                           : "bg-card border-border hover:border-primary/30"
                                                       }`}
                                                     >
-                                                      <div className="flex items-center gap-2">
-                                                        <Button
-                                                          variant="ghost"
-                                                          size="icon"
-                                                          className={`h-8 w-8 rounded-full ${
-                                                            isResourceCompleted
-                                                              ? "text-success bg-success/10"
-                                                              : "text-muted-foreground hover:text-primary hover:bg-primary/5"
-                                                          }`}
-                                                          onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            toggleResourceCompletion(
-                                                              item.id,
-                                                              idx
-                                                            );
-                                                          }}
-                                                        >
-                                                          {isResourceCompleted ? (
-                                                            <CheckCircle2 className="h-4 w-4" />
-                                                          ) : (
-                                                            <Circle className="h-4 w-4" />
-                                                          )}
-                                                        </Button>
-                                                        <a
-                                                          onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            handleOpenResource(
-                                                              resource
-                                                            );
-                                                          }}
-                                                          href="#"
-                                                          className={`text-sm text-right hover:text-primary hover:underline transition-colors ${
-                                                            isResourceCompleted
-                                                              ? "line-through text-muted-foreground"
-                                                              : "text-foreground font-medium"
-                                                          }`}
-                                                        >
-                                                          {resource}
-                                                        </a>
-                                                      </div>
-                                                      {isResourceCompleted && (
-                                                        <Badge
-                                                          variant="secondary"
-                                                          className="text-[10px] bg-success/10 text-success border-none h-5"
-                                                        >
-                                                          مكتمل
-                                                        </Badge>
-                                                      )}
+                                                      <a
+                                                        onClick={(e) => {
+                                                          e.stopPropagation();
+                                                          handleOpenResource(
+                                                            item.id,
+                                                            idx,
+                                                            resource,
+                                                            item.type
+                                                          );
+                                                        }}
+                                                        href="#"
+                                                        className={`text-sm w-full text-right ${
+                                                          isResourceCompleted
+                                                            ? "line-through text-muted-foreground"
+                                                            : "text-foreground"
+                                                        }`}
+                                                      >
+                                                        {resource}
+                                                      </a>
                                                     </div>
                                                   );
                                                 }
