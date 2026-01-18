@@ -71,6 +71,7 @@ import {
   Search,
   ListFilter,
 } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { AdPlacementSelector } from "@/components/dashboard/AdPlacementSelector";
 import { StatCard } from "@/components/dashboard/StatCard";
 
@@ -410,6 +411,22 @@ const CompanyDashboard = () => {
     toast({
       title: "تم الحذف",
       description: "تم حذف الوظيفة بنجاح",
+    });
+  };
+
+  const handleToggleJobStatus = (jobId: number) => {
+    setJobs(
+      jobs.map((job) => {
+        if (job.id === jobId) {
+          const newStatus = job.status === "active" ? "paused" : "active";
+          return { ...job, status: newStatus };
+        }
+        return job;
+      })
+    );
+    toast({
+      title: "تم تحديث الحالة",
+      description: "تم تحديث حالة الوظيفة بنجاح",
     });
   };
 
@@ -970,6 +987,18 @@ const CompanyDashboard = () => {
                         <TableCell>
                           <div className="flex gap-1 justify-end">
                             <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleToggleJobStatus(job.id)}
+                              className={
+                                job.status === "active"
+                                  ? "text-red-600 border-red-200 hover:bg-red-50 h-8 px-3 text-xs"
+                                  : "text-emerald-600 border-emerald-200 hover:bg-emerald-50 h-8 px-3 text-xs"
+                              }
+                            >
+                              {job.status === "active" ? "إيقاف" : "تنشيط"}
+                            </Button>
+                            <Button
                               variant="ghost"
                               size="icon"
                               onClick={() => handleEditJob(job)}
@@ -991,10 +1020,25 @@ const CompanyDashboard = () => {
                         <TableCell>
                           <Badge
                             variant={
-                              job.status === "active" ? "default" : "outline"
+                              job.status === "active"
+                                ? "default"
+                                : job.status === "paused"
+                                ? "secondary"
+                                : "outline"
+                            }
+                            className={
+                              job.status === "active"
+                                ? "bg-emerald-500 hover:bg-emerald-600"
+                                : job.status === "paused"
+                                ? "bg-amber-500 hover:bg-amber-600 text-white"
+                                : ""
                             }
                           >
-                            {job.status === "active" ? "نشطة" : "مغلقة"}
+                            {job.status === "active"
+                              ? "نشطة"
+                              : job.status === "paused"
+                              ? "متوقفة"
+                              : "مغلقة"}
                           </Badge>
                         </TableCell>
                         <TableCell>
