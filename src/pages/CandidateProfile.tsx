@@ -119,6 +119,12 @@ const candidatesData = [
         appliedDate: "2024-02-15",
       },
     ],
+    profileViews: [
+      { company: "شركة التقنية المتقدمة", date: "منذ ساعتين", initials: "A" },
+      { company: "حلول البرمجيات الدولية", date: "منذ ٥ ساعات", initials: "I" },
+      { company: "بنك الاستثمار العربي", date: "منذ يوم واحد", initials: "B" },
+      { company: "قطاع الاتصالات", date: "منذ يومين", initials: "T" },
+    ],
     coverLetter:
       "أنا مطور واجهات أمامية متحمس ولدي خبرة تزيد عن 5 سنوات في بناء تطبيقات ويب حديثة وقابلة للتطوير. أتقن React و TypeScript وأسعى دائماً لتقديم تجارب مستخدم استثنائية. أبحث عن فرصة للانضمام إلى فريق مبتكر حيث يمكنني المساهمة بمهاراتي وتطوير قدراتي المهنية.",
   },
@@ -439,6 +445,17 @@ ${candidate.phone}`;
                         نسبة التوافق: {candidate.matchScore}%
                       </Badge>
                     )}
+                    {!isCompanyView && (
+                      <Badge
+                        variant="outline"
+                        className="gap-1 border-blue-200 text-blue-600 bg-blue-50"
+                      >
+                        <Eye className="w-3 h-3" />
+                        {((candidate as any).profileViews?.length || 0) +
+                          52}{" "}
+                        مشاهدة للملف
+                      </Badge>
+                    )}
                   </div>
                   <p className="text-muted-foreground mt-1">
                     {candidate.appliedFor}
@@ -733,6 +750,9 @@ ${candidate.phone}`;
                 </div>
               </CardContent>
             </Card>
+
+            {/* Profile Views - Only for Candidate's own view */}
+            {/* Removed as per instruction */}
           </div>
         </div>
       </main>
