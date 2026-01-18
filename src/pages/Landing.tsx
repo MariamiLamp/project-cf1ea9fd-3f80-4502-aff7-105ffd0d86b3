@@ -66,7 +66,14 @@ const testimonials = [
 
 const Landing = () => {
   return (
-    <div className="min-h-screen bg-background" dir="rtl">
+    <div className="min-h-screen bg-background relative" dir="rtl">
+      {/* Background Pattern */}
+      <div className="fixed inset-0 -z-10 overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_hsl(var(--primary)/0.08)_0%,_transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_hsl(var(--secondary)/0.06)_0%,_transparent_50%)]" />
+        <div className="absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMyMDk0NzQiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-50" />
+      </div>
+      
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -89,7 +96,7 @@ const Landing = () => {
 
       {/* Hero Section */}
       <section className="py-20 lg:py-32 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-secondary/5" />
         <div className="container mx-auto px-4 relative">
           <div className="max-w-4xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
@@ -244,21 +251,21 @@ const Landing = () => {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 bg-card border-t border-border">
+      <footer className="py-12 bg-sidebar text-sidebar-foreground">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-primary-foreground" />
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-sidebar-primary to-accent flex items-center justify-center">
+                <Sparkles className="w-4 h-4 text-white" />
               </div>
-              <span className="font-bold text-foreground">وظيفتي</span>
+              <span className="font-bold text-white">وظيفتي</span>
             </div>
-            <div className="flex items-center gap-6 text-sm text-muted-foreground">
-              <Link to="/jobs" className="hover:text-foreground transition-colors">الوظائف</Link>
-              <Link to="/subscription" className="hover:text-foreground transition-colors">الأسعار</Link>
-              <Link to="/auth" className="hover:text-foreground transition-colors">تسجيل الدخول</Link>
+            <div className="flex items-center gap-6 text-sm text-sidebar-foreground/70">
+              <Link to="/jobs" className="hover:text-white transition-colors">الوظائف</Link>
+              <Link to="/subscription" className="hover:text-white transition-colors">الأسعار</Link>
+              <Link to="/auth" className="hover:text-white transition-colors">تسجيل الدخول</Link>
             </div>
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-sidebar-foreground/60">
               © ٢٠٢٥ وظيفتي. جميع الحقوق محفوظة
             </div>
           </div>
