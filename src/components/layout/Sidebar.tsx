@@ -15,6 +15,7 @@ import {
   Crown,
   ShoppingBag,
   CalendarDays,
+  BookOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSidebarState } from "@/contexts/SidebarContext";
@@ -48,21 +49,23 @@ export const Sidebar = () => {
         collapsed ? "w-20" : "w-64"
       )}
     >
-      {/* Logo */}
-      <div className="p-6 border-b border-sidebar-border">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sidebar-primary to-accent flex items-center justify-center shrink-0">
-            <Briefcase className="w-5 h-5 text-white" />
-          </div>
-          {!collapsed && (
-            <div className="animate-fade-in">
-              <h1 className="font-bold text-lg text-white">الموارد البشرية</h1>
-              <p className="text-xs text-sidebar-foreground/60">
-                منصة التوظيف الذكية
-              </p>
-            </div>
-          )}
+      {/* Logo & Brand */}
+      {/* Logo & Brand */}
+      <div className="p-6 border-b border-sidebar-border flex items-center gap-3 overflow-hidden">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary via-primary/80 to-secondary flex items-center justify-center shadow-lg shadow-primary/20 shrink-0">
+          <BookOpen className="w-5 h-5 text-primary-foreground" />
         </div>
+        {!collapsed && (
+          <div dir="ltr" className="animate-fade-in">
+            <h1 className="text-2xl tracking-tight leading-none">
+              <span className="text-emerald-400 font-bold">Career</span>
+              <span className="text-white font-black">Book</span>
+            </h1>
+            <p className="text-[10px] text-sidebar-foreground/80 tracking-widest uppercase mt-0.5 font-medium">
+              كارير بوك
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Navigation */}
@@ -115,7 +118,7 @@ export const Sidebar = () => {
           className={cn("nav-item w-full", collapsed && "justify-center px-2")}
         >
           <LogOut className="w-5 h-5 text-sidebar-foreground/70 shrink-0" />
-          {!collapsed && <span>تسجيل الدخول</span>}
+          {!collapsed && <span>تسجيل الخروج</span>}
         </Link>
       </div>
 
@@ -125,9 +128,9 @@ export const Sidebar = () => {
         className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-sidebar-accent border border-sidebar-border flex items-center justify-center text-sidebar-foreground hover:bg-sidebar-primary hover:text-white transition-colors"
       >
         {collapsed ? (
-          <ChevronRight className="w-4 h-4" />
-        ) : (
           <ChevronLeft className="w-4 h-4" />
+        ) : (
+          <ChevronRight className="w-4 h-4" />
         )}
       </button>
     </aside>
