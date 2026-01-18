@@ -29,10 +29,34 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col" dir="rtl">
-      <div className="fixed inset-0 pointer-events-none -z-50">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-background to-background"></div>
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-primary/10 blur-[120px] rounded-full mix-blend-screen opacity-60"></div>
-        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-secondary/5 blur-[120px] rounded-full mix-blend-screen opacity-60"></div>
+      <div
+        className="fixed inset-0 pointer-events-none -z-50 overflow-hidden"
+        aria-hidden="true"
+      >
+        {/* Base gradient */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-background to-background" />
+
+        {/* Moving gradient orbs (more visible movement) */}
+        <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[900px] h-[700px] mix-blend-screen opacity-70">
+          <div className="w-full h-full bg-primary/12 blur-[140px] rounded-full animate-[orb-drift-1_18s_ease-in-out_infinite]" />
+        </div>
+        <div className="absolute top-1/3 -left-24 w-[520px] h-[520px] mix-blend-screen opacity-60">
+          <div className="w-full h-full bg-secondary/10 blur-[130px] rounded-full animate-[orb-drift-2_16s_ease-in-out_infinite]" />
+        </div>
+        <div className="absolute bottom-0 -right-24 w-[560px] h-[560px] mix-blend-screen opacity-55">
+          <div className="w-full h-full bg-accent/10 blur-[140px] rounded-full animate-[orb-drift-3_17s_ease-in-out_infinite]" />
+        </div>
+
+        {/* Subtle particles */}
+        <div className="absolute top-28 right-24 w-2 h-2 rounded-full bg-primary/30 animate-pulse-soft" />
+        <div
+          className="absolute top-52 left-40 w-3 h-3 rounded-full bg-accent/25 animate-pulse-soft"
+          style={{ animationDelay: "1s" }}
+        />
+        <div
+          className="absolute bottom-40 right-1/3 w-2.5 h-2.5 rounded-full bg-secondary/25 animate-pulse-soft"
+          style={{ animationDelay: "0.5s" }}
+        />
       </div>
 
       {/* Header */}
