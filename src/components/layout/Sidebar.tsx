@@ -50,7 +50,6 @@ export const Sidebar = () => {
       )}
     >
       {/* Logo & Brand */}
-      {/* Logo & Brand */}
       <div className="p-6 border-b border-sidebar-border flex items-center gap-3 overflow-hidden">
         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary via-primary/80 to-secondary flex items-center justify-center shadow-lg shadow-primary/20 shrink-0">
           <BookOpen className="w-5 h-5 text-primary-foreground" />
