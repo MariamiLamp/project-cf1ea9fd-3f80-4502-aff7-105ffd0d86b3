@@ -10,6 +10,7 @@ import {
   Check,
   Briefcase,
   HelpCircle,
+  ChevronsUpDown,
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -30,6 +31,8 @@ import {
 } from "@/components/ui/popover";
 import {
   Command,
+  CommandInput,
+  CommandEmpty,
   CommandGroup,
   CommandItem,
   CommandList,
@@ -301,6 +304,24 @@ const questionsByJobTitle: Record<string, GeneratedQuestion[]> = {
   ],
 };
 
+const jobTitles = [
+  { value: "frontend-developer", label: "مطور واجهات أمامية" },
+  { value: "backend-developer", label: "مطور واجهات خلفية" },
+  { value: "fullstack-developer", label: "مطور برمجيات كامل" },
+  { value: "ui-ux-designer", label: "مصمم تجربة مستخدم" },
+  { value: "project-manager", label: "مدير مشاريع" },
+  { value: "data-analyst", label: "محلل بيانات" },
+  { value: "software-engineer", label: "مهندس برمجيات" },
+  { value: "hr-specialist", label: "أخصائي موارد بشرية" },
+  { value: "marketing-manager", label: "مدير تسويق" },
+  { value: "sales-representative", label: "مندوب مبيعات" },
+  { value: "customer-service", label: "خدمة عملاء" },
+  { value: "digital-marketing", label: "تسويق رقمي" },
+  { value: "content-writer", label: "كاتب محتوى" },
+  { value: "quality-assurance", label: "مهندس جودة برمجيات" },
+  { value: "mobile-developer", label: "مطور تطبيقات جوال" },
+];
+
 const topicQuestions: Record<string, GeneratedQuestion[]> = {
   react: [
     {
@@ -397,6 +418,7 @@ const InterviewPage = () => {
   const [questionCount, setQuestionCount] = useState("5");
   const [openType, setOpenType] = useState(false);
   const [openCount, setOpenCount] = useState(false);
+  const [openJobSearch, setOpenJobSearch] = useState(false);
 
   const searchTypeOptions = [
     { value: "job", label: "مسمى وظيفي", icon: Briefcase },
@@ -431,7 +453,7 @@ const InterviewPage = () => {
     if (searchType === "job") {
       // Check if we have predefined questions for this job
       const matchedJob = Object.keys(questionsByJobTitle).find(
-        (job) => job.includes(searchQuery) || searchQuery.includes(job)
+        (job) => job.includes(searchQuery) || searchQuery.includes(job),
       );
 
       if (matchedJob) {
@@ -481,7 +503,7 @@ const InterviewPage = () => {
       const matchedTopic = Object.keys(topicQuestions).find(
         (topic) =>
           topic.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          searchQuery.toLowerCase().includes(topic.toLowerCase())
+          searchQuery.toLowerCase().includes(topic.toLowerCase()),
       );
 
       if (matchedTopic) {
@@ -648,7 +670,7 @@ const InterviewPage = () => {
                                 "h-4 w-4",
                                 searchType === option.value
                                   ? "opacity-100"
-                                  : "opacity-0"
+                                  : "opacity-0",
                               )}
                             />
                           </CommandItem>
@@ -664,19 +686,76 @@ const InterviewPage = () => {
               <Label>
                 {searchType === "job" ? "المسمى الوظيفي" : "الموضوع"}
               </Label>
-              <div className="relative">
-                <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  placeholder={
-                    searchType === "job"
-                      ? "مثال: مطور واجهات أمامية"
-                      : "مثال: React, JavaScript, SQL"
-                  }
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pr-10"
-                />
-              </div>
+              {searchType === "job" ? (
+                <Popover open={openJobSearch} onOpenChange={setOpenJobSearch}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={openJobSearch}
+                      className="w-full h-11 justify-between bg-muted/50 border-transparent hover:bg-muted/70 px-4 font-normal"
+                    >
+                      {searchQuery
+                        ? jobTitles.find((job) => job.label === searchQuery)
+                            ?.label || searchQuery
+                        : "ابحث عن مسمى وظيفي..."}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    className="w-[var(--radix-popover-trigger-width)] p-0"
+                    align="start"
+                  >
+                    <Command>
+                      <CommandInput
+                        placeholder="ابحث عن مسمى وظيفي..."
+                        className="h-9"
+                      />
+                      <CommandList>
+                        <CommandEmpty>
+                          لم يتم العثور على مسمى وظيفي.
+                        </CommandEmpty>
+                        <CommandGroup>
+                          {jobTitles.map((job) => (
+                            <CommandItem
+                              key={job.value}
+                              value={job.label}
+                              onSelect={(currentValue) => {
+                                setSearchQuery(
+                                  currentValue === searchQuery
+                                    ? ""
+                                    : currentValue,
+                                );
+                                setOpenJobSearch(false);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  searchQuery === job.label
+                                    ? "opacity-100"
+                                    : "opacity-0",
+                                )}
+                              />
+                              {job.label}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              ) : (
+                <div className="relative">
+                  <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    placeholder="مثال: React, JavaScript, SQL"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pr-10"
+                  />
+                </div>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -691,7 +770,7 @@ const InterviewPage = () => {
                   >
                     {
                       questionCountOptions.find(
-                        (o) => o.value === questionCount
+                        (o) => o.value === questionCount,
                       )?.label
                     }
                     <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -720,7 +799,7 @@ const InterviewPage = () => {
                                 "h-4 w-4",
                                 questionCount === option.value
                                   ? "opacity-100"
-                                  : "opacity-0"
+                                  : "opacity-0",
                               )}
                             />
                           </CommandItem>
@@ -795,7 +874,7 @@ const InterviewPage = () => {
                   <button
                     onClick={() =>
                       setExpandedGenIndex(
-                        expandedGenIndex === index ? null : index
+                        expandedGenIndex === index ? null : index,
                       )
                     }
                     className="w-full p-5 flex items-start justify-between gap-4 text-right"

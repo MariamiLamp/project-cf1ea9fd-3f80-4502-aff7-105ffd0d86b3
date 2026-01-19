@@ -9,6 +9,39 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Check, ChevronsUpDown, Search } from "lucide-react";
+import { cn } from "@/lib/utils";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+const jobTitles = [
+  { value: "frontend-developer", label: "مطور واجهات أمامية" },
+  { value: "backend-developer", label: "مطور واجهات خلفية" },
+  { value: "fullstack-developer", label: "مطور برمجيات كامل" },
+  { value: "ui-ux-designer", label: "مصمم تجربة مستخدم" },
+  { value: "project-manager", label: "مدير مشاريع" },
+  { value: "data-analyst", label: "محلل بيانات" },
+  { value: "software-engineer", label: "مهندس برمجيات" },
+  { value: "hr-specialist", label: "أخصائي موارد بشرية" },
+  { value: "marketing-manager", label: "مدير تسويق" },
+  { value: "sales-representative", label: "مندوب مبيعات" },
+  { value: "customer-service", label: "خدمة عملاء" },
+  { value: "digital-marketing", label: "تسويق رقمي" },
+  { value: "content-writer", label: "كاتب محتوى" },
+  { value: "quality-assurance", label: "مهندس جودة برمجيات" },
+  { value: "mobile-developer", label: "مطور تطبيقات جوال" },
+];
 
 const CoverLetterPage = () => {
   const [jobTitle, setJobTitle] = useState("");
@@ -16,6 +49,7 @@ const CoverLetterPage = () => {
   const [language, setLanguage] = useState("ar");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedLetter, setGeneratedLetter] = useState("");
+  const [open, setOpen] = useState(false);
 
   const handleGenerate = () => {
     setIsGenerating(true);
@@ -105,13 +139,60 @@ Ahmed Mohamed`;
               <label className="block text-sm font-medium text-foreground mb-2">
                 المسمى الوظيفي
               </label>
-              <input
-                type="text"
-                value={jobTitle}
-                onChange={(e) => setJobTitle(e.target.value)}
-                placeholder="مثال: مطور واجهات أمامية"
-                className="w-full h-11 px-4 rounded-lg bg-muted/50 border border-transparent focus:border-primary/30 focus:bg-card focus:outline-none transition-all"
-              />
+              <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={open}
+                    className="w-full h-11 justify-between bg-muted/50 border-transparent hover:bg-muted/70 px-4 font-normal"
+                  >
+                    {jobTitle
+                      ? jobTitles.find((job) => job.label === jobTitle)
+                          ?.label || jobTitle
+                      : "ابحث عن مسمى وظيفي..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="w-[var(--radix-popover-trigger-width)] p-0"
+                  align="start"
+                >
+                  <Command>
+                    <CommandInput
+                      placeholder="ابحث عن مسمى وظيفي..."
+                      className="h-9"
+                    />
+                    <CommandList>
+                      <CommandEmpty>لم يتم العثور على مسمى وظيفي.</CommandEmpty>
+                      <CommandGroup>
+                        {jobTitles.map((job) => (
+                          <CommandItem
+                            key={job.value}
+                            value={job.label}
+                            onSelect={(currentValue) => {
+                              setJobTitle(
+                                currentValue === jobTitle ? "" : currentValue,
+                              );
+                              setOpen(false);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                jobTitle === job.label
+                                  ? "opacity-100"
+                                  : "opacity-0",
+                              )}
+                            />
+                            {job.label}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
 
             <div>
