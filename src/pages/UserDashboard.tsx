@@ -38,6 +38,7 @@ const stats = [
       isPositive: true,
     },
     variant: "success" as const,
+    link: "/profile-views",
   },
   {
     title: "نسبة الاستجابة",
