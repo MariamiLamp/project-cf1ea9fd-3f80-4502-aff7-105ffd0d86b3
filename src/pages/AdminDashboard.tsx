@@ -1422,7 +1422,9 @@ const AdminDashboard = () => {
                                       : "text-emerald-600 border-emerald-200 hover:bg-emerald-50 h-8 px-3 text-xs"
                                   }
                                 >
-                                  {template.status === "active" ? "Stop" : "Active"}
+                                  {template.status === "active"
+                                    ? "Stop"
+                                    : "Active"}
                                 </Button>
                                 <Button
                                   variant="ghost"
@@ -1716,7 +1718,11 @@ const AdminDashboard = () => {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => ad.status === "active" ? handleDeclineAd(ad.id) : handleAcceptAd(ad.id)}
+                            onClick={() =>
+                              ad.status === "active"
+                                ? handleDeclineAd(ad.id)
+                                : handleAcceptAd(ad.id)
+                            }
                             className={
                               ad.status === "active"
                                 ? "text-red-600 border-red-200 hover:bg-red-50 h-8 px-3 text-xs"
@@ -1750,24 +1756,24 @@ const AdminDashboard = () => {
                                 : "قيد المراجعة"}
                           </Badge>
                         </TableCell>
-                          <TableCell className="font-medium text-destructive">
-                            {calculateExpiry(ad.date, ad.duration)}
-                          </TableCell>
-                          <TableCell className="text-muted-foreground">
-                            {ad.date || "-"}
-                          </TableCell>
-                          <TableCell>{ad.duration || "-"}</TableCell>
-                          <TableCell>
-                            {ad.placement === "hero-bottom"
-                              ? "الصفحة الرئيسية"
-                              : "فحص السيرة الذاتية"}
-                          </TableCell>
-                          <TableCell className="font-medium">
-                            {ad.title}
-                          </TableCell>
-                          <TableCell>{ad.companyName}</TableCell>
-                        </TableRow>
-                      ))}
+                        <TableCell className="font-medium text-destructive">
+                          {calculateExpiry(ad.date, ad.duration)}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {ad.date || "-"}
+                        </TableCell>
+                        <TableCell>{ad.duration || "-"}</TableCell>
+                        <TableCell>
+                          {ad.placement === "hero-bottom"
+                            ? "الصفحة الرئيسية"
+                            : "فحص السيرة الذاتية"}
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {ad.title}
+                        </TableCell>
+                        <TableCell>{ad.companyName}</TableCell>
+                      </TableRow>
+                    ))}
                     {adsRequests.length === 0 && (
                       <TableRow>
                         <TableCell
