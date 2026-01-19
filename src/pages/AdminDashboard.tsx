@@ -1,5 +1,5 @@
 import { useState } from "react";
-import useAds from "@/hooks/use-ads";
+import useAds, { AdPlacement, AdItem } from "@/hooks/use-ads";
 
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -365,7 +365,7 @@ const AdminDashboard = () => {
   const [plans, setPlans] = useState(mockPlans);
   const [isPlanDialogOpen, setIsPlanDialogOpen] = useState(false);
   const [editingPlan, setEditingPlan] = useState<(typeof mockPlans)[0] | null>(
-    null
+    null,
   );
   const [planForm, setPlanForm] = useState({
     name: "",
@@ -392,7 +392,14 @@ const AdminDashboard = () => {
   // Ads state
   // Create Ad state
   const { add: addAd } = useAds();
-  const [adForm, setAdForm] = useState({
+  const [adForm, setAdForm] = useState<{
+    title: string;
+    description: string;
+    imageUrl: string;
+    link: string;
+    placement: AdPlacement;
+    duration: string;
+  }>({
     title: "",
     description: "",
     imageUrl: "",
@@ -449,8 +456,8 @@ const AdminDashboard = () => {
                 features: planForm.features.split("\n").filter((f) => f.trim()),
                 type: planForm.type,
               }
-            : p
-        )
+            : p,
+        ),
       );
       toast({
         title: "تم التحديث",
@@ -476,7 +483,7 @@ const AdminDashboard = () => {
 
   const handleTogglePlan = (planId: number) => {
     setPlans(
-      plans.map((p) => (p.id === planId ? { ...p, isActive: !p.isActive } : p))
+      plans.map((p) => (p.id === planId ? { ...p, isActive: !p.isActive } : p)),
     );
   };
 
@@ -522,8 +529,8 @@ const AdminDashboard = () => {
                 price: templateForm.price,
                 isPremium: templateForm.isPremium,
               }
-            : t
-        )
+            : t,
+        ),
       );
       toast({ title: "تم التحديث", description: "تم تحديث القالب بنجاح" });
     } else {
@@ -551,8 +558,8 @@ const AdminDashboard = () => {
               ...t,
               status: t.status === "active" ? "inactive" : "active",
             }
-          : t
-      )
+          : t,
+      ),
     );
   };
 
@@ -564,6 +571,15 @@ const AdminDashboard = () => {
   const handleAcceptAd = (id: number) => {
     updateAd(id, { enabled: true, status: "active" });
     toast({ title: "تم القبول", description: "تم قبول الإعلان ونشره بنجاح" });
+  };
+
+  const handleFileUpload = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64 = e.target?.result as string;
+      setAdForm({ ...adForm, imageUrl: base64 });
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleDeclineAd = (id: number) => {
@@ -588,10 +604,10 @@ const AdminDashboard = () => {
       adForm.duration === "1_week"
         ? "أسبوع"
         : adForm.duration === "2_weeks"
-        ? "أسبوعين"
-        : adForm.duration === "1_month"
-        ? "شهر"
-        : "شهر";
+          ? "أسبوعين"
+          : adForm.duration === "1_month"
+            ? "شهر"
+            : "شهر";
 
     switch (adForm.duration) {
       case "1_week":
@@ -612,7 +628,7 @@ const AdminDashboard = () => {
       description: adForm.description,
       imageUrl: adForm.imageUrl,
       link: adForm.link,
-      placement: adForm.placement as any,
+      placement: adForm.placement,
       enabled: true, // Auto-enable for admins
       status: "active" as const, // Auto-approve for admins
       companyName: "إدارة النظام", // or user?.companyName
@@ -643,7 +659,7 @@ const AdminDashboard = () => {
     setActiveTab("ads");
   };
 
-  const handleEditAdRequest = (ad: any) => {
+  const handleEditAdRequest = (ad: AdItem) => {
     setEditingAdId(ad.id);
     setAdForm({
       title: ad.title || "",
@@ -655,8 +671,8 @@ const AdminDashboard = () => {
         ad.duration === "أسبوع"
           ? "1_week"
           : ad.duration === "أسبوعين"
-          ? "2_weeks"
-          : "1_month",
+            ? "2_weeks"
+            : "1_month",
     });
     setIsAdDialogOpen(true);
   };
@@ -669,10 +685,10 @@ const AdminDashboard = () => {
         adForm.duration === "1_week"
           ? "أسبوع"
           : adForm.duration === "2_weeks"
-          ? "أسبوعين"
-          : adForm.duration === "1_month"
-          ? "شهر"
-          : "شهر";
+            ? "أسبوعين"
+            : adForm.duration === "1_month"
+              ? "شهر"
+              : "شهر";
 
       switch (adForm.duration) {
         case "1_week":
@@ -690,7 +706,7 @@ const AdminDashboard = () => {
 
       updateAd(editingAdId, {
         ...adForm,
-        placement: adForm.placement as any,
+        placement: adForm.placement,
         duration: durationLabel,
         price: price,
       });
@@ -733,16 +749,16 @@ const AdminDashboard = () => {
 
   const totalPlanRevenue = plans.reduce(
     (sum, p) => sum + p.price * p.usersCount,
-    0
+    0,
   );
   const totalTemplateDownloads = templates.reduce(
     (sum, t) => sum + t.downloads,
-    0
+    0,
   );
 
   const calculateExpiry = (
     startDate: string | undefined,
-    durationLabel: string | undefined
+    durationLabel: string | undefined,
   ) => {
     if (!startDate) return "-";
     const date = new Date(startDate);
@@ -903,7 +919,7 @@ const AdminDashboard = () => {
                       .filter(
                         (u) =>
                           u.name.includes(searchTerm) ||
-                          u.email.includes(searchTerm)
+                          u.email.includes(searchTerm),
                       )
                       .map((user) => (
                         <TableRow key={user.id}>
@@ -996,7 +1012,7 @@ const AdminDashboard = () => {
                       .filter(
                         (c) =>
                           c.name.includes(searchTerm) ||
-                          c.email.includes(searchTerm)
+                          c.email.includes(searchTerm),
                       )
                       .map((company) => (
                         <TableRow key={company.id}>
@@ -1080,7 +1096,7 @@ const AdminDashboard = () => {
                       .filter(
                         (h) =>
                           h.name.includes(searchTerm) ||
-                          h.email.includes(searchTerm)
+                          h.email.includes(searchTerm),
                       )
                       .map((hr) => (
                         <TableRow key={hr.id}>
@@ -1223,15 +1239,16 @@ const AdminDashboard = () => {
                                 <Edit className="w-4 h-4" />
                               </Button>
                               <Button
-                                variant="ghost"
-                                size="icon"
+                                variant="outline"
+                                size="sm"
                                 onClick={() => handleTogglePlan(plan.id)}
+                                className={
+                                  plan.isActive
+                                    ? "text-red-600 border-red-200 hover:bg-red-50 h-8 px-3 text-xs"
+                                    : "text-emerald-600 border-emerald-200 hover:bg-emerald-50 h-8 px-3 text-xs"
+                                }
                               >
-                                {plan.isActive ? (
-                                  <ToggleRight className="w-4 h-4 text-emerald-500" />
-                                ) : (
-                                  <ToggleLeft className="w-4 h-4" />
-                                )}
+                                {plan.isActive ? "Stop" : "Active"}
                               </Button>
                               <Button
                                 variant="ghost"
@@ -1245,6 +1262,11 @@ const AdminDashboard = () => {
                           <TableCell>
                             <Badge
                               variant={plan.isActive ? "default" : "secondary"}
+                              className={
+                                plan.isActive
+                                  ? "bg-emerald-500 hover:bg-emerald-600"
+                                  : "bg-amber-500 hover:bg-amber-600 text-white"
+                              }
                             >
                               {plan.isActive ? "نشطة" : "معطلة"}
                             </Badge>
@@ -1389,17 +1411,20 @@ const AdminDashboard = () => {
                                   <Edit className="w-4 h-4" />
                                 </Button>
                                 <Button
-                                  variant="ghost"
-                                  size="icon"
+                                  variant="outline"
+                                  size="sm"
                                   onClick={() =>
                                     handleToggleTemplate(template.id)
                                   }
+                                  className={
+                                    template.status === "active"
+                                      ? "text-red-600 border-red-200 hover:bg-red-50 h-8 px-3 text-xs"
+                                      : "text-emerald-600 border-emerald-200 hover:bg-emerald-50 h-8 px-3 text-xs"
+                                  }
                                 >
-                                  {template.status === "active" ? (
-                                    <ToggleRight className="w-4 h-4 text-emerald-500" />
-                                  ) : (
-                                    <ToggleLeft className="w-4 h-4" />
-                                  )}
+                                  {template.status === "active"
+                                    ? "Stop"
+                                    : "Active"}
                                 </Button>
                                 <Button
                                   variant="ghost"
@@ -1418,6 +1443,11 @@ const AdminDashboard = () => {
                                   template.status === "active"
                                     ? "default"
                                     : "secondary"
+                                }
+                                className={
+                                  template.status === "active"
+                                    ? "bg-emerald-500 hover:bg-emerald-600"
+                                    : "bg-amber-500 hover:bg-amber-600 text-white"
                                 }
                               >
                                 {template.status === "active" ? "نشط" : "معطل"}
@@ -1528,15 +1558,15 @@ const AdminDashboard = () => {
                               ad.status === "active"
                                 ? "default"
                                 : ad.status === "rejected"
-                                ? "destructive"
-                                : "secondary"
+                                  ? "destructive"
+                                  : "secondary"
                             }
                           >
                             {ad.status === "active"
                               ? "نشط"
                               : ad.status === "rejected"
-                              ? "مرفوض"
-                              : "قيد المراجعة"}
+                                ? "مرفوض"
+                                : "قيد المراجعة"}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-muted-foreground font-mono text-xs">
@@ -1572,7 +1602,10 @@ const AdminDashboard = () => {
                     <AdPlacementSelector
                       selectedPlacement={adForm.placement}
                       onSelect={(value) =>
-                        setAdForm({ ...adForm, placement: value })
+                        setAdForm({
+                          ...adForm,
+                          placement: value as AdPlacement,
+                        })
                       }
                       adImage={adForm.imageUrl}
                     />
@@ -1600,8 +1633,7 @@ const AdminDashboard = () => {
                         onChange={(e) => {
                           const file = e.target.files?.[0];
                           if (file) {
-                            const url = URL.createObjectURL(file);
-                            setAdForm({ ...adForm, imageUrl: url });
+                            handleFileUpload(file);
                           }
                         }}
                       />
@@ -1670,6 +1702,7 @@ const AdminDashboard = () => {
                   <TableHeader>
                     <TableRow>
                       <TableHead>الإجراءات</TableHead>
+                      <TableHead>الحالة</TableHead>
                       <TableHead>تاريخ الانتهاء</TableHead>
                       <TableHead>تاريخ البدء</TableHead>
                       <TableHead>المدة</TableHead>
@@ -1679,47 +1712,75 @@ const AdminDashboard = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {adsRequests
-                      .filter((ad) => ad.status === "active")
-                      .map((ad) => (
-                        <TableRow key={ad.id}>
-                          <TableCell>
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              onClick={() => handleDeclineAd(ad.id)}
-                              className="gap-2"
-                            >
-                              <Ban className="w-4 h-4" />
-                              إيقاف
-                            </Button>
-                          </TableCell>
-                          <TableCell className="font-medium text-destructive">
-                            {calculateExpiry(ad.date, ad.duration)}
-                          </TableCell>
-                          <TableCell className="text-muted-foreground">
-                            {ad.date || "-"}
-                          </TableCell>
-                          <TableCell>{ad.duration || "-"}</TableCell>
-                          <TableCell>
-                            {ad.placement === "hero-bottom"
-                              ? "الصفحة الرئيسية"
-                              : "فحص السيرة الذاتية"}
-                          </TableCell>
-                          <TableCell className="font-medium">
-                            {ad.title}
-                          </TableCell>
-                          <TableCell>{ad.companyName}</TableCell>
-                        </TableRow>
-                      ))}
-                    {adsRequests.filter((ad) => ad.status === "active")
-                      .length === 0 && (
+                    {adsRequests.map((ad) => (
+                      <TableRow key={ad.id}>
+                        <TableCell>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              ad.status === "active"
+                                ? handleDeclineAd(ad.id)
+                                : handleAcceptAd(ad.id)
+                            }
+                            className={
+                              ad.status === "active"
+                                ? "text-red-600 border-red-200 hover:bg-red-50 h-8 px-3 text-xs"
+                                : "text-emerald-600 border-emerald-200 hover:bg-emerald-50 h-8 px-3 text-xs"
+                            }
+                          >
+                            {ad.status === "active" ? "إيقاف" : "تنشيط"}
+                          </Button>
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={
+                              ad.status === "active"
+                                ? "default"
+                                : ad.status === "rejected"
+                                  ? "secondary"
+                                  : "outline"
+                            }
+                            className={
+                              ad.status === "active"
+                                ? "bg-emerald-500 hover:bg-emerald-600"
+                                : ad.status === "rejected"
+                                  ? "bg-amber-500 hover:bg-amber-600 text-white"
+                                  : ""
+                            }
+                          >
+                            {ad.status === "active"
+                              ? "نشط"
+                              : ad.status === "rejected"
+                                ? "مرفوض"
+                                : "قيد المراجعة"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="font-medium text-destructive">
+                          {calculateExpiry(ad.date, ad.duration)}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {ad.date || "-"}
+                        </TableCell>
+                        <TableCell>{ad.duration || "-"}</TableCell>
+                        <TableCell>
+                          {ad.placement === "hero-bottom"
+                            ? "الصفحة الرئيسية"
+                            : "فحص السيرة الذاتية"}
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {ad.title}
+                        </TableCell>
+                        <TableCell>{ad.companyName}</TableCell>
+                      </TableRow>
+                    ))}
+                    {adsRequests.length === 0 && (
                       <TableRow>
                         <TableCell
-                          colSpan={7}
+                          colSpan={8}
                           className="text-center py-8 text-muted-foreground"
                         >
-                          لا توجد إعلانات نشطة حالياً
+                          لا توجد إعلانات
                         </TableCell>
                       </TableRow>
                     )}
@@ -1984,7 +2045,9 @@ const AdminDashboard = () => {
               <Label>المكان</Label>
               <AdPlacementSelector
                 selectedPlacement={adForm.placement}
-                onSelect={(value) => setAdForm({ ...adForm, placement: value })}
+                onSelect={(value) =>
+                  setAdForm({ ...adForm, placement: value as AdPlacement })
+                }
                 adImage={adForm.imageUrl}
               />
             </div>

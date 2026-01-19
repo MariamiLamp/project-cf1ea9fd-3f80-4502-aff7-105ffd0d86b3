@@ -354,8 +354,8 @@ const CandidateProfile = () => {
       coverLetterForm.tone === "professional"
         ? "رسمي واحترافي"
         : coverLetterForm.tone === "friendly"
-        ? "ودي ومتحمس"
-        : "مباشر وموجز";
+          ? "ودي ومتحمس"
+          : "مباشر وموجز";
 
     const mockLetter = `السيد/السيدة مدير التوظيف المحترم،
 
@@ -438,8 +438,8 @@ ${candidate.phone}`;
                           candidate.matchScore >= 90
                             ? "bg-emerald-500"
                             : candidate.matchScore >= 80
-                            ? "bg-primary"
-                            : "bg-amber-500"
+                              ? "bg-primary"
+                              : "bg-amber-500"
                         }`}
                       >
                         نسبة التوافق: {candidate.matchScore}%
@@ -448,7 +448,8 @@ ${candidate.phone}`;
                     {!isCompanyView && (
                       <Badge
                         variant="outline"
-                        className="gap-1 border-blue-200 text-blue-600 bg-blue-50"
+                        className="gap-1 border-blue-200 text-blue-600 bg-blue-50 cursor-pointer hover:bg-blue-100 transition-colors"
+                        onClick={() => navigate("/profile-views")}
                       >
                         <Eye className="w-3 h-3" />
                         {((candidate as any).profileViews?.length || 0) +
@@ -586,8 +587,8 @@ ${candidate.phone}`;
                           job.status === "accepted"
                             ? "default"
                             : job.status === "rejected"
-                            ? "destructive"
-                            : "secondary"
+                              ? "destructive"
+                              : "secondary"
                         }
                         className={`flex items-center gap-1 ${
                           job.status === "accepted" ? "bg-emerald-500" : ""
@@ -605,8 +606,8 @@ ${candidate.phone}`;
                         {job.status === "pending"
                           ? "قيد المراجعة"
                           : job.status === "accepted"
-                          ? "مقبول"
-                          : "مرفوض"}
+                            ? "مقبول"
+                            : "مرفوض"}
                       </Badge>
                     </div>
                   ))}

@@ -31,6 +31,7 @@ import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import Notifications from "./pages/Notifications";
 import ContactUs from "./pages/ContactUs";
+import ProfileViews from "./pages/ProfileViews";
 
 const queryClient = new QueryClient();
 
@@ -56,6 +57,7 @@ const App = () => (
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/company" element={<CompanyDashboard />} />
               <Route path="/candidate/:id" element={<CandidateProfile />} />
+              <Route path="/profile-views" element={<ProfileViews />} />
               <Route path="/register" element={<Register />} />
               <Route
                 path="/register/jobseeker"
