@@ -24,7 +24,29 @@ const STORAGE_KEY = "site_ads";
 const readFromStorage = (): AdItem[] => {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
+    if (!raw) {
+      // Return defaults if empty
+      return [
+        {
+          id: 1,
+          title: "الباقة الاحترافية",
+          imageUrl: "/ads/hero_banner.png",
+          link: "/subscription",
+          placement: "hero-bottom",
+          enabled: true,
+          status: "active",
+        },
+        {
+          id: 2,
+          title: "خدمة تطوير المسار المهني",
+          imageUrl: "/ads/ats_banner.png",
+          link: "/career-path",
+          placement: "ats-bottom",
+          enabled: true,
+          status: "active",
+        },
+      ];
+    }
     return JSON.parse(raw) as AdItem[];
   } catch (e) {
     console.error("use-ads: failed to read storage", e);
