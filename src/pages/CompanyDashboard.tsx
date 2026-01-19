@@ -232,6 +232,7 @@ const CompanyDashboard = () => {
   const [isViewApplicationOpen, setIsViewApplicationOpen] = useState(false);
   const [rejectionReasonInput, setRejectionReasonInput] = useState("");
   const [notesInput, setNotesInput] = useState("");
+  const [pendingAction, setPendingAction] = useState<string | null>(null);
   const [selectedJob, setSelectedJob] = useState<
     (typeof initialJobs)[0] | null
   >(null);
@@ -454,6 +455,7 @@ const CompanyDashboard = () => {
     setSelectedApplication(app);
     setRejectionReasonInput(app.rejectionReason || "");
     setNotesInput(app.notes || "");
+    setPendingAction(null); // Reset pending action
     setIsViewApplicationOpen(true);
 
     // Automatically mark as viewed if it was pending
@@ -2014,7 +2016,8 @@ const CompanyDashboard = () => {
                       </div>
                     )}
 
-                  {selectedApplication.status === "shortlisted" && (
+                  {(selectedApplication.status === "shortlisted" ||
+                    pendingAction === "shortlisted") && (
                     <div className="p-4 bg-amber-50 border border-amber-100 rounded-lg space-y-3">
                       <Label className="text-amber-800 font-bold">
                         ملاحظات الشركة عن المرشح:
@@ -2025,20 +2028,6 @@ const CompanyDashboard = () => {
                         value={notesInput}
                         onChange={(e) => setNotesInput(e.target.value)}
                       />
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="w-full border-amber-300 text-amber-700 hover:bg-amber-100"
-                        onClick={() =>
-                          handleUpdateApplicationStatus(
-                            selectedApplication.id,
-                            "shortlisted",
-                            { notes: notesInput },
-                          )
-                        }
-                      >
-                        حفظ الملاحظات
-                      </Button>
                     </div>
                   )}
 
@@ -2067,19 +2056,9 @@ const CompanyDashboard = () => {
                           إجراءات الطلب:
                         </Label>
                         <Select
+                          value={pendingAction || ""}
                           onValueChange={(value) => {
-                            const additionalData =
-                              value === "rejected"
-                                ? { rejectionReason: rejectionReasonInput }
-                                : {};
-                            handleUpdateApplicationStatus(
-                              selectedApplication.id,
-                              value,
-                              additionalData,
-                            );
-                            if (value === "accepted" || value === "rejected") {
-                              setIsViewApplicationOpen(false);
-                            }
+                            setPendingAction(value);
                           }}
                         >
                           <SelectTrigger className="w-full h-10 border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors">
@@ -2118,6 +2097,45 @@ const CompanyDashboard = () => {
                           </SelectContent>
                         </Select>
                       </div>
+
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full gap-2"
+                        onClick={() => {
+                          if (pendingAction) {
+                            const additionalData =
+                              pendingAction === "rejected"
+                                ? { rejectionReason: rejectionReasonInput }
+                                : {};
+                            handleUpdateApplicationStatus(
+                              selectedApplication.id,
+                              pendingAction,
+                              additionalData,
+                            );
+                            if (
+                              pendingAction === "accepted" ||
+                              pendingAction === "rejected"
+                            ) {
+                              setIsViewApplicationOpen(false);
+                            }
+                            setPendingAction(null);
+                          } else {
+                            // Just save notes and rejection reason without changing status
+                            handleUpdateApplicationStatus(
+                              selectedApplication.id,
+                              selectedApplication.status,
+                              {
+                                rejectionReason: rejectionReasonInput,
+                                notes: notesInput,
+                              },
+                            );
+                          }
+                        }}
+                      >
+                        <Download className="w-4 h-4" />
+                        {pendingAction ? "تأكيد الإجراء وحفظ" : "حفظ"}
+                      </Button>
                     </div>
                   )}
                 </TabsContent>
