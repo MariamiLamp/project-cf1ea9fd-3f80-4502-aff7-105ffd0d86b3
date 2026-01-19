@@ -28,98 +28,120 @@ const LandingPage = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background flex flex-col relative" dir="rtl">
+    <div className="min-h-screen bg-background flex flex-col relative isolate" dir="rtl">
       {/* Animated Background */}
-      <div className="fixed inset-0 -z-10 overflow-hidden" aria-hidden="true">
-        {/* Base gradient layer */}
-        <div className="absolute inset-0 bg-gradient-to-br from-sidebar/5 via-background to-primary/5" />
-        
-        {/* Large floating orb 1 - Navy */}
-        <div 
-          className="absolute w-[600px] h-[600px] rounded-full opacity-20"
+      <div
+        className="fixed inset-0 pointer-events-none -z-10 overflow-hidden"
+        aria-hidden="true"
+      >
+        {/* Base gradient layer (slightly stronger) */}
+        <div className="absolute inset-0 bg-gradient-to-br from-sidebar/10 via-background to-primary/10" />
+
+        {/* Huge floating orbs (bigger + higher contrast + faster) */}
+        <div
+          className="absolute -top-[35%] -left-[25%] w-[1200px] h-[1200px] rounded-full mix-blend-multiply blur-3xl"
           style={{
-            background: 'radial-gradient(circle, hsl(220 50% 25%) 0%, transparent 70%)',
-            top: '-10%',
-            left: '10%',
-            animation: 'float-slow 20s ease-in-out infinite',
+            background:
+              "radial-gradient(circle, hsl(var(--sidebar-background) / 0.24) 0%, transparent 62%)",
+            animation: "float-slow 9s ease-in-out infinite",
           }}
         />
-        
-        {/* Large floating orb 2 - Green */}
-        <div 
-          className="absolute w-[500px] h-[500px] rounded-full opacity-15"
+        <div
+          className="absolute top-[5%] -right-[30%] w-[1100px] h-[1100px] rounded-full mix-blend-multiply blur-3xl"
           style={{
-            background: 'radial-gradient(circle, hsl(160 70% 25%) 0%, transparent 70%)',
-            top: '30%',
-            right: '-5%',
-            animation: 'float-medium 15s ease-in-out infinite reverse',
+            background:
+              "radial-gradient(circle, hsl(var(--primary) / 0.20) 0%, transparent 62%)",
+            animation: "float-medium 7s ease-in-out infinite reverse",
           }}
         />
-        
-        {/* Large floating orb 3 - Teal */}
-        <div 
-          className="absolute w-[700px] h-[700px] rounded-full opacity-10"
+        <div
+          className="absolute -bottom-[45%] left-[10%] w-[1400px] h-[1400px] rounded-full mix-blend-multiply blur-3xl"
           style={{
-            background: 'radial-gradient(circle, hsl(174 60% 35%) 0%, transparent 70%)',
-            bottom: '-15%',
-            left: '20%',
-            animation: 'float-slow 25s ease-in-out infinite',
+            background:
+              "radial-gradient(circle, hsl(var(--accent) / 0.18) 0%, transparent 62%)",
+            animation: "float-slow 11s ease-in-out infinite",
           }}
         />
 
-        {/* Small floating particles */}
-        <div 
+        {/* Floating particles (faster) */}
+        <div
           className="absolute w-4 h-4 rounded-full bg-primary/40"
-          style={{ top: '20%', left: '15%', animation: 'particle-float 8s ease-in-out infinite' }}
-        />
-        <div 
-          className="absolute w-3 h-3 rounded-full bg-secondary/50"
-          style={{ top: '60%', right: '20%', animation: 'particle-float 6s ease-in-out infinite 1s' }}
-        />
-        <div 
-          className="absolute w-5 h-5 rounded-full bg-accent/30"
-          style={{ top: '40%', left: '70%', animation: 'particle-float 10s ease-in-out infinite 2s' }}
-        />
-        <div 
-          className="absolute w-2 h-2 rounded-full bg-primary/60"
-          style={{ top: '80%', left: '40%', animation: 'particle-float 7s ease-in-out infinite 0.5s' }}
-        />
-        <div 
-          className="absolute w-3 h-3 rounded-full bg-secondary/40"
-          style={{ top: '10%', right: '30%', animation: 'particle-float 9s ease-in-out infinite 1.5s' }}
-        />
-        <div 
-          className="absolute w-4 h-4 rounded-full bg-accent/40"
-          style={{ bottom: '20%', right: '10%', animation: 'particle-float 11s ease-in-out infinite 3s' }}
-        />
-
-        {/* Moving gradient waves */}
-        <div 
-          className="absolute inset-0 opacity-30"
           style={{
-            background: 'linear-gradient(45deg, transparent 40%, hsl(220 50% 20% / 0.1) 50%, transparent 60%)',
-            backgroundSize: '200% 200%',
-            animation: 'wave-move 8s linear infinite',
+            top: "18%",
+            left: "12%",
+            animation: "particle-float 4s ease-in-out infinite",
           }}
         />
-        <div 
-          className="absolute inset-0 opacity-20"
+        <div
+          className="absolute w-3 h-3 rounded-full bg-secondary/50"
           style={{
-            background: 'linear-gradient(-45deg, transparent 40%, hsl(160 70% 20% / 0.1) 50%, transparent 60%)',
-            backgroundSize: '200% 200%',
-            animation: 'wave-move 12s linear infinite reverse',
+            top: "62%",
+            right: "18%",
+            animation: "particle-float 3.5s ease-in-out infinite 0.6s",
+          }}
+        />
+        <div
+          className="absolute w-5 h-5 rounded-full bg-accent/30"
+          style={{
+            top: "42%",
+            left: "72%",
+            animation: "particle-float 5s ease-in-out infinite 1.2s",
+          }}
+        />
+        <div
+          className="absolute w-2 h-2 rounded-full bg-primary/60"
+          style={{
+            top: "84%",
+            left: "38%",
+            animation: "particle-float 4.5s ease-in-out infinite 0.2s",
+          }}
+        />
+        <div
+          className="absolute w-3 h-3 rounded-full bg-secondary/40"
+          style={{
+            top: "10%",
+            right: "30%",
+            animation: "particle-float 4.2s ease-in-out infinite 0.9s",
+          }}
+        />
+        <div
+          className="absolute w-4 h-4 rounded-full bg-accent/40"
+          style={{
+            bottom: "22%",
+            right: "10%",
+            animation: "particle-float 5.5s ease-in-out infinite 1.8s",
+          }}
+        />
+
+        {/* Moving gradient waves (stronger + faster) */}
+        <div
+          className="absolute inset-0 opacity-40 mix-blend-multiply"
+          style={{
+            background:
+              "linear-gradient(45deg, transparent 35%, hsl(var(--sidebar-background) / 0.12) 50%, transparent 65%)",
+            backgroundSize: "220% 220%",
+            animation: "wave-move 4.5s linear infinite",
+          }}
+        />
+        <div
+          className="absolute inset-0 opacity-30 mix-blend-multiply"
+          style={{
+            background:
+              "linear-gradient(-45deg, transparent 35%, hsl(var(--primary) / 0.10) 50%, transparent 65%)",
+            backgroundSize: "240% 240%",
+            animation: "wave-move 6s linear infinite reverse",
           }}
         />
 
         {/* Subtle grid pattern */}
-        <div 
-          className="absolute inset-0 opacity-[0.03]"
+        <div
+          className="absolute inset-0 opacity-[0.05]"
           style={{
             backgroundImage: `
-              linear-gradient(hsl(220 50% 30%) 1px, transparent 1px),
-              linear-gradient(90deg, hsl(220 50% 30%) 1px, transparent 1px)
+              linear-gradient(hsl(var(--sidebar-background) / 0.10) 1px, transparent 1px),
+              linear-gradient(90deg, hsl(var(--sidebar-background) / 0.10) 1px, transparent 1px)
             `,
-            backgroundSize: '60px 60px',
+            backgroundSize: "72px 72px",
           }}
         />
       </div>

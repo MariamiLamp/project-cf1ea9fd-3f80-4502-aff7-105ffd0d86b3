@@ -353,59 +353,59 @@
     }
   }
 
-  /* Landing animated background - floating orbs */
+  /* Landing animated background - floating orbs (more dramatic) */
   @keyframes float-slow {
-    0%, 100% { 
-      transform: translate(0, 0) scale(1); 
+    0%, 100% {
+      transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
     }
-    25% { 
-      transform: translate(50px, 30px) scale(1.05); 
+    25% {
+      transform: translate3d(140px, 90px, 0) scale(1.18) rotate(6deg);
     }
-    50% { 
-      transform: translate(20px, 60px) scale(1.02); 
+    50% {
+      transform: translate3d(70px, 180px, 0) scale(1.08) rotate(-6deg);
     }
-    75% { 
-      transform: translate(-30px, 20px) scale(1.08); 
+    75% {
+      transform: translate3d(-130px, 80px, 0) scale(1.22) rotate(3deg);
     }
   }
 
   @keyframes float-medium {
-    0%, 100% { 
-      transform: translate(0, 0) scale(1); 
+    0%, 100% {
+      transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
     }
-    33% { 
-      transform: translate(-40px, -50px) scale(1.1); 
+    33% {
+      transform: translate3d(-120px, -140px, 0) scale(1.2) rotate(-8deg);
     }
-    66% { 
-      transform: translate(30px, -20px) scale(0.95); 
+    66% {
+      transform: translate3d(120px, -60px, 0) scale(0.98) rotate(8deg);
     }
   }
 
   @keyframes particle-float {
-    0%, 100% { 
-      transform: translate(0, 0) rotate(0deg);
-      opacity: 0.4;
+    0%, 100% {
+      transform: translate3d(0, 0, 0) rotate(0deg);
+      opacity: 0.35;
     }
-    25% { 
-      transform: translate(20px, -30px) rotate(90deg);
-      opacity: 0.8;
+    25% {
+      transform: translate3d(45px, -70px, 0) rotate(120deg);
+      opacity: 0.85;
     }
-    50% { 
-      transform: translate(-10px, -50px) rotate(180deg);
-      opacity: 0.5;
+    50% {
+      transform: translate3d(-35px, -120px, 0) rotate(240deg);
+      opacity: 0.55;
     }
-    75% { 
-      transform: translate(-30px, -20px) rotate(270deg);
-      opacity: 0.7;
+    75% {
+      transform: translate3d(-85px, -45px, 0) rotate(360deg);
+      opacity: 0.75;
     }
   }
 
   @keyframes wave-move {
-    0% { 
-      background-position: 0% 0%; 
+    0% {
+      background-position: 0% 0%;
     }
-    100% { 
-      background-position: 200% 200%; 
+    100% {
+      background-position: 300% 300%;
     }
   }
 
