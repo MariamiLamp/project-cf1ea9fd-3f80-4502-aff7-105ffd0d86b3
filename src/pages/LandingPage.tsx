@@ -517,10 +517,6 @@ const LandingPage = () => {
 
         {/* CTA Section */}
         <section className="py-32 relative overflow-hidden">
-          <div className="absolute inset-0 bg-background -z-10">
-            {/* <div className="absolute top-0 left-0 w-full h-full bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-multiply"></div> */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-primary/5 blur-3xl"></div>
-          </div>
           <div className="container mx-auto px-6 text-center text-foreground relative z-10">
             <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-secondary/5 border border-secondary/10 mb-8 backdrop-blur-sm">
               <Shield className="w-5 h-5 text-secondary" />
