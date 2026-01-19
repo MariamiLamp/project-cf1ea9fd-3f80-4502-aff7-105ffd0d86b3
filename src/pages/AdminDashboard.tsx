@@ -1,5 +1,5 @@
 import { useState } from "react";
-import useAds from "@/hooks/use-ads";
+import useAds, { AdPlacement, AdItem } from "@/hooks/use-ads";
 
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -392,7 +392,14 @@ const AdminDashboard = () => {
   // Ads state
   // Create Ad state
   const { add: addAd } = useAds();
-  const [adForm, setAdForm] = useState({
+  const [adForm, setAdForm] = useState<{
+    title: string;
+    description: string;
+    imageUrl: string;
+    link: string;
+    placement: AdPlacement;
+    duration: string;
+  }>({
     title: "",
     description: "",
     imageUrl: "",
@@ -566,6 +573,15 @@ const AdminDashboard = () => {
     toast({ title: "تم القبول", description: "تم قبول الإعلان ونشره بنجاح" });
   };
 
+  const handleFileUpload = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64 = e.target?.result as string;
+      setAdForm({ ...adForm, imageUrl: base64 });
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleDeclineAd = (id: number) => {
     updateAd(id, { enabled: false, status: "rejected" });
     toast({ title: "تم الرفض", description: "تم رفض طلب الإعلان" });
@@ -612,7 +628,7 @@ const AdminDashboard = () => {
       description: adForm.description,
       imageUrl: adForm.imageUrl,
       link: adForm.link,
-      placement: adForm.placement as any,
+      placement: adForm.placement,
       enabled: true, // Auto-enable for admins
       status: "active" as const, // Auto-approve for admins
       companyName: "إدارة النظام", // or user?.companyName
@@ -643,7 +659,7 @@ const AdminDashboard = () => {
     setActiveTab("ads");
   };
 
-  const handleEditAdRequest = (ad: any) => {
+  const handleEditAdRequest = (ad: AdItem) => {
     setEditingAdId(ad.id);
     setAdForm({
       title: ad.title || "",
@@ -690,7 +706,7 @@ const AdminDashboard = () => {
 
       updateAd(editingAdId, {
         ...adForm,
-        placement: adForm.placement as any,
+        placement: adForm.placement,
         duration: durationLabel,
         price: price,
       });
@@ -1572,7 +1588,7 @@ const AdminDashboard = () => {
                     <AdPlacementSelector
                       selectedPlacement={adForm.placement}
                       onSelect={(value) =>
-                        setAdForm({ ...adForm, placement: value })
+                        setAdForm({ ...adForm, placement: value as AdPlacement })
                       }
                       adImage={adForm.imageUrl}
                     />
@@ -1600,8 +1616,7 @@ const AdminDashboard = () => {
                         onChange={(e) => {
                           const file = e.target.files?.[0];
                           if (file) {
-                            const url = URL.createObjectURL(file);
-                            setAdForm({ ...adForm, imageUrl: url });
+                            handleFileUpload(file);
                           }
                         }}
                       />
@@ -1984,7 +1999,7 @@ const AdminDashboard = () => {
               <Label>المكان</Label>
               <AdPlacementSelector
                 selectedPlacement={adForm.placement}
-                onSelect={(value) => setAdForm({ ...adForm, placement: value })}
+                onSelect={(value) => setAdForm({ ...adForm, placement: value as AdPlacement })}
                 adImage={adForm.imageUrl}
               />
             </div>
