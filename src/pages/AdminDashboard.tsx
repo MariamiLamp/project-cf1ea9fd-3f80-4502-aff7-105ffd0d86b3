@@ -365,7 +365,7 @@ const AdminDashboard = () => {
   const [plans, setPlans] = useState(mockPlans);
   const [isPlanDialogOpen, setIsPlanDialogOpen] = useState(false);
   const [editingPlan, setEditingPlan] = useState<(typeof mockPlans)[0] | null>(
-    null
+    null,
   );
   const [planForm, setPlanForm] = useState({
     name: "",
@@ -456,8 +456,8 @@ const AdminDashboard = () => {
                 features: planForm.features.split("\n").filter((f) => f.trim()),
                 type: planForm.type,
               }
-            : p
-        )
+            : p,
+        ),
       );
       toast({
         title: "تم التحديث",
@@ -483,7 +483,7 @@ const AdminDashboard = () => {
 
   const handleTogglePlan = (planId: number) => {
     setPlans(
-      plans.map((p) => (p.id === planId ? { ...p, isActive: !p.isActive } : p))
+      plans.map((p) => (p.id === planId ? { ...p, isActive: !p.isActive } : p)),
     );
   };
 
@@ -529,8 +529,8 @@ const AdminDashboard = () => {
                 price: templateForm.price,
                 isPremium: templateForm.isPremium,
               }
-            : t
-        )
+            : t,
+        ),
       );
       toast({ title: "تم التحديث", description: "تم تحديث القالب بنجاح" });
     } else {
@@ -558,8 +558,8 @@ const AdminDashboard = () => {
               ...t,
               status: t.status === "active" ? "inactive" : "active",
             }
-          : t
-      )
+          : t,
+      ),
     );
   };
 
@@ -604,10 +604,10 @@ const AdminDashboard = () => {
       adForm.duration === "1_week"
         ? "أسبوع"
         : adForm.duration === "2_weeks"
-        ? "أسبوعين"
-        : adForm.duration === "1_month"
-        ? "شهر"
-        : "شهر";
+          ? "أسبوعين"
+          : adForm.duration === "1_month"
+            ? "شهر"
+            : "شهر";
 
     switch (adForm.duration) {
       case "1_week":
@@ -671,8 +671,8 @@ const AdminDashboard = () => {
         ad.duration === "أسبوع"
           ? "1_week"
           : ad.duration === "أسبوعين"
-          ? "2_weeks"
-          : "1_month",
+            ? "2_weeks"
+            : "1_month",
     });
     setIsAdDialogOpen(true);
   };
@@ -685,10 +685,10 @@ const AdminDashboard = () => {
         adForm.duration === "1_week"
           ? "أسبوع"
           : adForm.duration === "2_weeks"
-          ? "أسبوعين"
-          : adForm.duration === "1_month"
-          ? "شهر"
-          : "شهر";
+            ? "أسبوعين"
+            : adForm.duration === "1_month"
+              ? "شهر"
+              : "شهر";
 
       switch (adForm.duration) {
         case "1_week":
@@ -749,16 +749,16 @@ const AdminDashboard = () => {
 
   const totalPlanRevenue = plans.reduce(
     (sum, p) => sum + p.price * p.usersCount,
-    0
+    0,
   );
   const totalTemplateDownloads = templates.reduce(
     (sum, t) => sum + t.downloads,
-    0
+    0,
   );
 
   const calculateExpiry = (
     startDate: string | undefined,
-    durationLabel: string | undefined
+    durationLabel: string | undefined,
   ) => {
     if (!startDate) return "-";
     const date = new Date(startDate);
@@ -919,7 +919,7 @@ const AdminDashboard = () => {
                       .filter(
                         (u) =>
                           u.name.includes(searchTerm) ||
-                          u.email.includes(searchTerm)
+                          u.email.includes(searchTerm),
                       )
                       .map((user) => (
                         <TableRow key={user.id}>
@@ -1012,7 +1012,7 @@ const AdminDashboard = () => {
                       .filter(
                         (c) =>
                           c.name.includes(searchTerm) ||
-                          c.email.includes(searchTerm)
+                          c.email.includes(searchTerm),
                       )
                       .map((company) => (
                         <TableRow key={company.id}>
@@ -1096,7 +1096,7 @@ const AdminDashboard = () => {
                       .filter(
                         (h) =>
                           h.name.includes(searchTerm) ||
-                          h.email.includes(searchTerm)
+                          h.email.includes(searchTerm),
                       )
                       .map((hr) => (
                         <TableRow key={hr.id}>
@@ -1544,15 +1544,15 @@ const AdminDashboard = () => {
                               ad.status === "active"
                                 ? "default"
                                 : ad.status === "rejected"
-                                ? "destructive"
-                                : "secondary"
+                                  ? "destructive"
+                                  : "secondary"
                             }
                           >
                             {ad.status === "active"
                               ? "نشط"
                               : ad.status === "rejected"
-                              ? "مرفوض"
-                              : "قيد المراجعة"}
+                                ? "مرفوض"
+                                : "قيد المراجعة"}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-muted-foreground font-mono text-xs">
@@ -1588,7 +1588,10 @@ const AdminDashboard = () => {
                     <AdPlacementSelector
                       selectedPlacement={adForm.placement}
                       onSelect={(value) =>
-                        setAdForm({ ...adForm, placement: value as AdPlacement })
+                        setAdForm({
+                          ...adForm,
+                          placement: value as AdPlacement,
+                        })
                       }
                       adImage={adForm.imageUrl}
                     />
@@ -1999,7 +2002,9 @@ const AdminDashboard = () => {
               <Label>المكان</Label>
               <AdPlacementSelector
                 selectedPlacement={adForm.placement}
-                onSelect={(value) => setAdForm({ ...adForm, placement: value as AdPlacement })}
+                onSelect={(value) =>
+                  setAdForm({ ...adForm, placement: value as AdPlacement })
+                }
                 adImage={adForm.imageUrl}
               />
             </div>
