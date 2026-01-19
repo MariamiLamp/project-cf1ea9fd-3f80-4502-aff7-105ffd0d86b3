@@ -66,27 +66,43 @@ const LandingPage = () => {
           }}
         />
 
-        {/* Floating shapes */}
+        {/* Floating Career-related Shapes */}
         <div
-          className="absolute w-[400px] h-[400px] top-[10%] left-[-5%] bg-primary/10 animate-morph"
+          className="absolute top-[15%] left-[5%] text-primary/10 -z-10 animate-float"
           style={{ animationDuration: "15s" }}
-        />
+        >
+          <Briefcase size={240} strokeWidth={0.5} />
+        </div>
         <div
-          className="absolute w-[300px] h-[300px] top-[40%] right-[-10%] bg-secondary/10 animate-morph"
+          className="absolute top-[45%] right-[-5%] text-secondary/10 -z-10 animate-float"
           style={{ animationDuration: "18s", animationDirection: "reverse" }}
-        />
+        >
+          <FileText size={300} strokeWidth={0.5} />
+        </div>
         <div
-          className="absolute w-[500px] h-[500px] bottom-[10%] left-[20%] bg-accent/5 animate-morph"
+          className="absolute bottom-[10%] left-[15%] text-accent/10 -z-10 animate-float"
           style={{ animationDuration: "25s" }}
-        />
+        >
+          <TrendingUp size={350} strokeWidth={0.5} />
+        </div>
         <div
-          className="absolute w-20 h-20 top-1/4 right-1/4 bg-primary/20 blur-xl animate-drift"
+          className="absolute top-[25%] right-[20%] text-primary/5 -z-10 animate-float"
           style={{ animationDuration: "20s" }}
-        />
+        >
+          <Search size={180} strokeWidth={0.5} />
+        </div>
         <div
-          className="absolute w-32 h-32 bottom-1/4 left-1/3 bg-secondary/15 blur-2xl animate-drift"
-          style={{ animationDuration: "28s", animationDirection: "reverse" }}
-        />
+          className="absolute bottom-[30%] right-[10%] text-secondary/5 -z-10 animate-float"
+          style={{ animationDuration: "22s", animationDirection: "reverse" }}
+        >
+          <Building2 size={220} strokeWidth={0.5} />
+        </div>
+        <div
+          className="absolute top-[60%] left-[30%] text-accent/5 -z-10 animate-float"
+          style={{ animationDuration: "30s" }}
+        >
+          <Target size={260} strokeWidth={0.5} />
+        </div>
       </div>
 
       {/* Header */}
