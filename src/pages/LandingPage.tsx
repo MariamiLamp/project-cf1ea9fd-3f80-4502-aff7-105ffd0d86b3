@@ -28,34 +28,121 @@ const LandingPage = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background flex flex-col" dir="rtl">
+    <div className="min-h-screen bg-background flex flex-col relative isolate" dir="rtl">
+      {/* Animated Background */}
       <div
-        className="fixed inset-0 pointer-events-none -z-50 overflow-hidden"
+        className="fixed inset-0 pointer-events-none -z-10 overflow-hidden"
         aria-hidden="true"
       >
-        {/* Base gradient */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-background to-background" />
+        {/* Base gradient layer (slightly stronger) */}
+        <div className="absolute inset-0 bg-gradient-to-br from-sidebar/10 via-background to-primary/10" />
 
-        {/* Moving gradient orbs (more visible movement) */}
-        <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[900px] h-[700px] mix-blend-screen opacity-70">
-          <div className="w-full h-full bg-primary/12 blur-[140px] rounded-full animate-[orb-drift-1_18s_ease-in-out_infinite]" />
-        </div>
-        <div className="absolute top-1/3 -left-24 w-[520px] h-[520px] mix-blend-screen opacity-60">
-          <div className="w-full h-full bg-secondary/10 blur-[130px] rounded-full animate-[orb-drift-2_16s_ease-in-out_infinite]" />
-        </div>
-        <div className="absolute bottom-0 -right-24 w-[560px] h-[560px] mix-blend-screen opacity-55">
-          <div className="w-full h-full bg-accent/10 blur-[140px] rounded-full animate-[orb-drift-3_17s_ease-in-out_infinite]" />
-        </div>
-
-        {/* Subtle particles */}
-        <div className="absolute top-28 right-24 w-2 h-2 rounded-full bg-primary/30 animate-pulse-soft" />
+        {/* Huge floating orbs (bigger + higher contrast + faster) */}
         <div
-          className="absolute top-52 left-40 w-3 h-3 rounded-full bg-accent/25 animate-pulse-soft"
-          style={{ animationDelay: "1s" }}
+          className="absolute -top-[35%] -left-[25%] w-[1200px] h-[1200px] rounded-full mix-blend-multiply blur-3xl"
+          style={{
+            background:
+              "radial-gradient(circle, hsl(var(--sidebar-background) / 0.24) 0%, transparent 62%)",
+            animation: "float-slow 9s ease-in-out infinite",
+          }}
         />
         <div
-          className="absolute bottom-40 right-1/3 w-2.5 h-2.5 rounded-full bg-secondary/25 animate-pulse-soft"
-          style={{ animationDelay: "0.5s" }}
+          className="absolute top-[5%] -right-[30%] w-[1100px] h-[1100px] rounded-full mix-blend-multiply blur-3xl"
+          style={{
+            background:
+              "radial-gradient(circle, hsl(var(--primary) / 0.20) 0%, transparent 62%)",
+            animation: "float-medium 7s ease-in-out infinite reverse",
+          }}
+        />
+        <div
+          className="absolute -bottom-[45%] left-[10%] w-[1400px] h-[1400px] rounded-full mix-blend-multiply blur-3xl"
+          style={{
+            background:
+              "radial-gradient(circle, hsl(var(--accent) / 0.18) 0%, transparent 62%)",
+            animation: "float-slow 11s ease-in-out infinite",
+          }}
+        />
+
+        {/* Floating particles (faster) */}
+        <div
+          className="absolute w-4 h-4 rounded-full bg-primary/40"
+          style={{
+            top: "18%",
+            left: "12%",
+            animation: "particle-float 4s ease-in-out infinite",
+          }}
+        />
+        <div
+          className="absolute w-3 h-3 rounded-full bg-secondary/50"
+          style={{
+            top: "62%",
+            right: "18%",
+            animation: "particle-float 3.5s ease-in-out infinite 0.6s",
+          }}
+        />
+        <div
+          className="absolute w-5 h-5 rounded-full bg-accent/30"
+          style={{
+            top: "42%",
+            left: "72%",
+            animation: "particle-float 5s ease-in-out infinite 1.2s",
+          }}
+        />
+        <div
+          className="absolute w-2 h-2 rounded-full bg-primary/60"
+          style={{
+            top: "84%",
+            left: "38%",
+            animation: "particle-float 4.5s ease-in-out infinite 0.2s",
+          }}
+        />
+        <div
+          className="absolute w-3 h-3 rounded-full bg-secondary/40"
+          style={{
+            top: "10%",
+            right: "30%",
+            animation: "particle-float 4.2s ease-in-out infinite 0.9s",
+          }}
+        />
+        <div
+          className="absolute w-4 h-4 rounded-full bg-accent/40"
+          style={{
+            bottom: "22%",
+            right: "10%",
+            animation: "particle-float 5.5s ease-in-out infinite 1.8s",
+          }}
+        />
+
+        {/* Moving gradient waves (stronger + faster) */}
+        <div
+          className="absolute inset-0 opacity-40 mix-blend-multiply"
+          style={{
+            background:
+              "linear-gradient(45deg, transparent 35%, hsl(var(--sidebar-background) / 0.12) 50%, transparent 65%)",
+            backgroundSize: "220% 220%",
+            animation: "wave-move 4.5s linear infinite",
+          }}
+        />
+        <div
+          className="absolute inset-0 opacity-30 mix-blend-multiply"
+          style={{
+            background:
+              "linear-gradient(-45deg, transparent 35%, hsl(var(--primary) / 0.10) 50%, transparent 65%)",
+            backgroundSize: "240% 240%",
+            animation: "wave-move 6s linear infinite reverse",
+          }}
+        />
+
+        {/* Subtle grid pattern */}
+        <div
+          className="absolute inset-0 opacity-[0.05]"
+          style={{
+            backgroundImage: `
+              linear-gradient(hsl(var(--sidebar-background) / 0.10) 1px, transparent 1px),
+              linear-gradient(90deg, hsl(var(--sidebar-background) / 0.10) 1px, transparent 1px)
+            `,
+            backgroundSize: "72px 72px",
+          }}
         />
       </div>
 
@@ -430,10 +517,6 @@ const LandingPage = () => {
 
         {/* CTA Section */}
         <section className="py-32 relative overflow-hidden">
-          <div className="absolute inset-0 bg-background -z-10">
-            {/* <div className="absolute top-0 left-0 w-full h-full bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-multiply"></div> */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-primary/5 blur-3xl"></div>
-          </div>
           <div className="container mx-auto px-6 text-center text-foreground relative z-10">
             <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-secondary/5 border border-secondary/10 mb-8 backdrop-blur-sm">
               <Shield className="w-5 h-5 text-secondary" />
