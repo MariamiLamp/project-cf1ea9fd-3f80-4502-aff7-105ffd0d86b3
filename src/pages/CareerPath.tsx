@@ -37,7 +37,7 @@ interface RoadmapItem {
   type: "technology" | "course" | "exercise" | "milestone";
   duration: string;
   completed: boolean;
-  resources?: string[];
+  resources?: { name: string; skills?: string[] }[];
 }
 
 interface RoadmapPhase {
@@ -62,6 +62,19 @@ const CareerPath = () => {
     new Set(["phase-1"]),
   );
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
+  const [acquiredSkills, setAcquiredSkills] = useState<Set<string>>(new Set());
+
+  const toggleSkill = (skill: string) => {
+    setAcquiredSkills((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(skill)) {
+        newSet.delete(skill);
+      } else {
+        newSet.add(skill);
+      }
+      return newSet;
+    });
+  };
 
   const toggleResourceCompletion = (resourceKey: string) => {
     setCompletedResources((prev) => {
@@ -142,7 +155,10 @@ const CareerPath = () => {
               type: "technology",
               duration: "٣ أسابيع",
               completed: false,
-              resources: ["TypeScript Deep Dive", "Effective TypeScript"],
+              resources: [
+                { name: "TypeScript Deep Dive", skills: ["Generics", "Types"] },
+                { name: "Effective TypeScript", skills: ["Best Practices"] },
+              ],
             },
             {
               id: "item-2",
@@ -151,7 +167,10 @@ const CareerPath = () => {
               type: "course",
               duration: "٤ أسابيع",
               completed: false,
-              resources: ["Clean Code", "Design Patterns"],
+              resources: [
+                { name: "Clean Code", skills: ["SOLID", "Refactoring"] },
+                { name: "Design Patterns", skills: ["Singleton", "Observer"] },
+              ],
             },
             {
               id: "item-3",
@@ -177,8 +196,14 @@ const CareerPath = () => {
               duration: "٦ أسابيع",
               completed: false,
               resources: [
-                "System Design Interview",
-                "Designing Data-Intensive Applications",
+                {
+                  name: "System Design Interview",
+                  skills: ["Scalability", "Architecture"],
+                },
+                {
+                  name: "Designing Data-Intensive Applications",
+                  skills: ["Databases", "Distributed Systems"],
+                },
               ],
             },
             {
@@ -188,7 +213,13 @@ const CareerPath = () => {
               type: "course",
               duration: "٤ أسابيع",
               completed: false,
-              resources: ["The Manager's Path", "Staff Engineer"],
+              resources: [
+                {
+                  name: "The Manager's Path",
+                  skills: ["Mentorship", "Leadership"],
+                },
+                { name: "Staff Engineer", skills: ["Strategy", "Impact"] },
+              ],
             },
             {
               id: "item-6",
@@ -238,8 +269,8 @@ const CareerPath = () => {
               duration: "٤ أسابيع",
               completed: false,
               resources: [
-                "AWS Solutions Architect",
-                "Google Cloud Professional",
+                { name: "AWS Solutions Architect", skills: ["Cloud", "AWS"] },
+                { name: "Google Cloud Professional", skills: ["GCP", "Infra"] },
               ],
             },
           ],
@@ -708,57 +739,108 @@ const CareerPath = () => {
                                                   return (
                                                     <div
                                                       key={idx}
-                                                      className={`flex items-center justify-between gap-3 p-2 rounded-lg border transition-all ${
-                                                        isResourceCompleted
-                                                          ? "bg-success/10 border-success/30"
-                                                          : "bg-card border-border hover:border-primary/30"
-                                                      }`}
+                                                      className="space-y-2"
                                                     >
-                                                      <a
-                                                        onClick={(e) => {
-                                                          e.stopPropagation();
-                                                          handleOpenResource(
-                                                            resource,
-                                                          );
-                                                        }}
-                                                        href="#"
-                                                        className={`text-sm text-right flex-1 hover:text-primary transition-colors ${
+                                                      <div
+                                                        className={`flex items-center justify-between gap-3 p-2 rounded-lg border transition-all ${
                                                           isResourceCompleted
-                                                            ? "line-through text-muted-foreground"
-                                                            : "text-foreground"
+                                                            ? "bg-success/10 border-success/30"
+                                                            : "bg-card border-border hover:border-primary/30"
                                                         }`}
                                                       >
-                                                        {resource}
-                                                      </a>
-                                                      <Button
-                                                        size="sm"
-                                                        variant={
-                                                          isResourceCompleted
-                                                            ? "success"
-                                                            : "outline"
-                                                        }
-                                                        className={`h-7 px-3 text-xs gap-1 ${
-                                                          isResourceCompleted
-                                                            ? "bg-success/20 text-success hover:bg-success/30 border-transparent"
-                                                            : ""
-                                                        }`}
-                                                        onClick={(e) => {
-                                                          e.stopPropagation();
-                                                          handleCompleteResource(
-                                                            item.id,
-                                                            idx,
-                                                          );
-                                                        }}
-                                                      >
-                                                        {isResourceCompleted ? (
-                                                          <>
-                                                            <Check className="h-3 w-3" />
-                                                            مكتمل
-                                                          </>
-                                                        ) : (
-                                                          "اكتمل"
+                                                        <a
+                                                          onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleOpenResource(
+                                                              resource.name,
+                                                            );
+                                                          }}
+                                                          href="#"
+                                                          className={`text-sm text-right flex-1 hover:text-primary transition-colors ${
+                                                            isResourceCompleted
+                                                              ? "line-through text-muted-foreground"
+                                                              : "text-foreground"
+                                                          }`}
+                                                        >
+                                                          {resource.name}
+                                                        </a>
+                                                        <Button
+                                                          size="sm"
+                                                          variant={
+                                                            isResourceCompleted
+                                                              ? "success"
+                                                              : "outline"
+                                                          }
+                                                          className={`h-7 px-3 text-xs gap-1 ${
+                                                            isResourceCompleted
+                                                              ? "bg-success/20 text-success hover:bg-success/30 border-transparent"
+                                                              : ""
+                                                          }`}
+                                                          onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleCompleteResource(
+                                                              item.id,
+                                                              idx,
+                                                            );
+                                                          }}
+                                                        >
+                                                          {isResourceCompleted ? (
+                                                            <>
+                                                              <Check className="h-3 w-3" />
+                                                              مكتمل
+                                                            </>
+                                                          ) : (
+                                                            "اكتمل"
+                                                          )}
+                                                        </Button>
+                                                      </div>
+
+                                                      {isResourceCompleted &&
+                                                        resource.skills &&
+                                                        resource.skills.length >
+                                                          0 && (
+                                                          <div className="flex flex-wrap gap-2 mr-2 animate-fade-in">
+                                                            <span className="text-[10px] text-muted-foreground w-full mb-1">
+                                                              المهارات المكتسبة:
+                                                            </span>
+                                                            {resource.skills.map(
+                                                              (skill) => (
+                                                                <Badge
+                                                                  key={skill}
+                                                                  variant={
+                                                                    acquiredSkills.has(
+                                                                      skill,
+                                                                    )
+                                                                      ? "default"
+                                                                      : "outline"
+                                                                  }
+                                                                  className={`cursor-pointer transition-all hover:scale-105 text-[10px] py-0 h-5 ${
+                                                                    acquiredSkills.has(
+                                                                      skill,
+                                                                    )
+                                                                      ? "bg-primary text-primary-foreground shadow-sm"
+                                                                      : "hover:border-primary/50"
+                                                                  }`}
+                                                                  onClick={(
+                                                                    e,
+                                                                  ) => {
+                                                                    e.stopPropagation();
+                                                                    toggleSkill(
+                                                                      skill,
+                                                                    );
+                                                                  }}
+                                                                >
+                                                                  {acquiredSkills.has(
+                                                                    skill,
+                                                                  ) && (
+                                                                    <Check className="w-2 h-2 mr-1" />
+                                                                  )}
+                                                                  {skill}
+                                                                </Badge>
+                                                              ),
+                                                            )}
+                                                          </div>
                                                         )}
-                                                      </Button>
                                                     </div>
                                                   );
                                                 },
