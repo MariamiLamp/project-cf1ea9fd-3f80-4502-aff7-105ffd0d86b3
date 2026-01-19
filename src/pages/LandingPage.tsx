@@ -28,7 +28,10 @@ const LandingPage = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background flex flex-col relative isolate" dir="rtl">
+    <div
+      className="min-h-screen bg-background flex flex-col relative isolate"
+      dir="rtl"
+    >
       {/* Animated Background */}
       <div
         className="fixed inset-0 pointer-events-none -z-10 overflow-hidden"
@@ -37,113 +40,69 @@ const LandingPage = () => {
         {/* Base gradient layer (slightly stronger) */}
         <div className="absolute inset-0 bg-gradient-to-br from-sidebar/10 via-background to-primary/10" />
 
-        {/* Huge floating orbs (bigger + higher contrast + faster) */}
+        {/* Huge floating orbs (bigger + higher contrast + slower) */}
         <div
-          className="absolute -top-[35%] -left-[25%] w-[1200px] h-[1200px] rounded-full mix-blend-multiply blur-3xl"
+          className="absolute -top-[35%] -left-[25%] w-[1200px] h-[1200px] rounded-full mix-blend-multiply blur-3xl opacity-20"
           style={{
             background:
-              "radial-gradient(circle, hsl(var(--sidebar-background) / 0.24) 0%, transparent 62%)",
-            animation: "float-slow 9s ease-in-out infinite",
+              "radial-gradient(circle, hsl(var(--sidebar-background)) 0%, transparent 70%)",
+            animation: "float-slow 20s ease-in-out infinite",
           }}
         />
         <div
-          className="absolute top-[5%] -right-[30%] w-[1100px] h-[1100px] rounded-full mix-blend-multiply blur-3xl"
+          className="absolute top-[5%] -right-[30%] w-[1100px] h-[1100px] rounded-full mix-blend-multiply blur-3xl opacity-15"
           style={{
             background:
-              "radial-gradient(circle, hsl(var(--primary) / 0.20) 0%, transparent 62%)",
-            animation: "float-medium 7s ease-in-out infinite reverse",
+              "radial-gradient(circle, hsl(var(--primary)) 0%, transparent 70%)",
+            animation: "float-medium 25s ease-in-out infinite reverse",
           }}
         />
         <div
-          className="absolute -bottom-[45%] left-[10%] w-[1400px] h-[1400px] rounded-full mix-blend-multiply blur-3xl"
+          className="absolute -bottom-[45%] left-[10%] w-[1400px] h-[1400px] rounded-full mix-blend-multiply blur-3xl opacity-15"
           style={{
             background:
-              "radial-gradient(circle, hsl(var(--accent) / 0.18) 0%, transparent 62%)",
-            animation: "float-slow 11s ease-in-out infinite",
+              "radial-gradient(circle, hsl(var(--accent)) 0%, transparent 70%)",
+            animation: "float-slow 30s ease-in-out infinite",
           }}
         />
 
-        {/* Floating particles (faster) */}
+        {/* Floating Career-related Shapes */}
         <div
-          className="absolute w-4 h-4 rounded-full bg-primary/40"
-          style={{
-            top: "18%",
-            left: "12%",
-            animation: "particle-float 4s ease-in-out infinite",
-          }}
-        />
+          className="absolute top-[15%] left-[5%] text-primary/10 -z-10 animate-float"
+          style={{ animationDuration: "15s" }}
+        >
+          <Briefcase size={240} strokeWidth={0.5} />
+        </div>
         <div
-          className="absolute w-3 h-3 rounded-full bg-secondary/50"
-          style={{
-            top: "62%",
-            right: "18%",
-            animation: "particle-float 3.5s ease-in-out infinite 0.6s",
-          }}
-        />
+          className="absolute top-[45%] right-[-5%] text-secondary/10 -z-10 animate-float"
+          style={{ animationDuration: "18s", animationDirection: "reverse" }}
+        >
+          <FileText size={300} strokeWidth={0.5} />
+        </div>
         <div
-          className="absolute w-5 h-5 rounded-full bg-accent/30"
-          style={{
-            top: "42%",
-            left: "72%",
-            animation: "particle-float 5s ease-in-out infinite 1.2s",
-          }}
-        />
+          className="absolute bottom-[10%] left-[15%] text-accent/10 -z-10 animate-float"
+          style={{ animationDuration: "25s" }}
+        >
+          <TrendingUp size={350} strokeWidth={0.5} />
+        </div>
         <div
-          className="absolute w-2 h-2 rounded-full bg-primary/60"
-          style={{
-            top: "84%",
-            left: "38%",
-            animation: "particle-float 4.5s ease-in-out infinite 0.2s",
-          }}
-        />
+          className="absolute top-[25%] right-[20%] text-primary/5 -z-10 animate-float"
+          style={{ animationDuration: "20s" }}
+        >
+          <Search size={180} strokeWidth={0.5} />
+        </div>
         <div
-          className="absolute w-3 h-3 rounded-full bg-secondary/40"
-          style={{
-            top: "10%",
-            right: "30%",
-            animation: "particle-float 4.2s ease-in-out infinite 0.9s",
-          }}
-        />
+          className="absolute bottom-[30%] right-[10%] text-secondary/5 -z-10 animate-float"
+          style={{ animationDuration: "22s", animationDirection: "reverse" }}
+        >
+          <Building2 size={220} strokeWidth={0.5} />
+        </div>
         <div
-          className="absolute w-4 h-4 rounded-full bg-accent/40"
-          style={{
-            bottom: "22%",
-            right: "10%",
-            animation: "particle-float 5.5s ease-in-out infinite 1.8s",
-          }}
-        />
-
-        {/* Moving gradient waves (stronger + faster) */}
-        <div
-          className="absolute inset-0 opacity-40 mix-blend-multiply"
-          style={{
-            background:
-              "linear-gradient(45deg, transparent 35%, hsl(var(--sidebar-background) / 0.12) 50%, transparent 65%)",
-            backgroundSize: "220% 220%",
-            animation: "wave-move 4.5s linear infinite",
-          }}
-        />
-        <div
-          className="absolute inset-0 opacity-30 mix-blend-multiply"
-          style={{
-            background:
-              "linear-gradient(-45deg, transparent 35%, hsl(var(--primary) / 0.10) 50%, transparent 65%)",
-            backgroundSize: "240% 240%",
-            animation: "wave-move 6s linear infinite reverse",
-          }}
-        />
-
-        {/* Subtle grid pattern */}
-        <div
-          className="absolute inset-0 opacity-[0.05]"
-          style={{
-            backgroundImage: `
-              linear-gradient(hsl(var(--sidebar-background) / 0.10) 1px, transparent 1px),
-              linear-gradient(90deg, hsl(var(--sidebar-background) / 0.10) 1px, transparent 1px)
-            `,
-            backgroundSize: "72px 72px",
-          }}
-        />
+          className="absolute top-[60%] left-[30%] text-accent/5 -z-10 animate-float"
+          style={{ animationDuration: "30s" }}
+        >
+          <Target size={260} strokeWidth={0.5} />
+        </div>
       </div>
 
       {/* Header */}
@@ -210,10 +169,6 @@ const LandingPage = () => {
       <main className="flex-1 pt-24">
         {/* Hero Section */}
         <section className="relative py-24 lg:py-40 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.03] via-primary/5 to-background -z-10">
-            <div className="absolute top-20 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl"></div>
-            <div className="absolute bottom-20 right-1/4 w-96 h-96 bg-secondary/5 rounded-full blur-3xl"></div>
-          </div>
           <div className="container mx-auto px-6 text-center">
             <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-8 animate-fade-down border border-primary/20 backdrop-blur-sm shadow-xl shadow-primary/5">
               <Zap className="w-4 h-4 animate-pulse" />
@@ -227,9 +182,7 @@ const LandingPage = () => {
               اكتشف فرصتك
               <br />
               <span className="relative inline-block">
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
-                  الوظيفية القادمة
-                </span>
+                <span className="text-gradient">الوظيفية القادمة</span>
                 <div className="absolute -bottom-4 left-0 w-full h-1 bg-gradient-to-r from-primary to-secondary rounded-full blur-sm opacity-50"></div>
               </span>
             </h1>
@@ -248,7 +201,7 @@ const LandingPage = () => {
               <Link to="/jobs" className="group">
                 <Button
                   size="lg"
-                  className="h-14 px-10 text-lg shadow-2xl shadow-primary/30 transition-all duration-300 hover:shadow-primary/40 group-hover:scale-105 bg-gradient-to-r from-primary to-primary/90 hover:to-primary"
+                  className="h-14 px-10 text-lg shadow-2xl shadow-primary/30 transition-all duration-300 hover:shadow-primary/40 group-hover:scale-105 bg-gradient-to-r from-primary to-primary/90 hover:to-primary shimmer"
                 >
                   تصفح الوظائف الآن
                   <ArrowLeft className="w-5 h-5 mr-3 group-hover:translate-x-1 transition-transform" />
@@ -307,6 +260,7 @@ const LandingPage = () => {
                 icon={Briefcase}
                 variant="primary"
                 delay={100}
+                className="bg-background/40 backdrop-blur-md border-border/50 shadow-none hover:shadow-xl hover:shadow-primary/5 transition-all duration-300"
               />
               <StatCard
                 title="السير الذاتية"
@@ -314,6 +268,7 @@ const LandingPage = () => {
                 icon={FileText}
                 variant="success"
                 delay={200}
+                className="bg-background/40 backdrop-blur-md border-border/50 shadow-none hover:shadow-xl hover:shadow-success/5 transition-all duration-300"
               />
               <StatCard
                 title="الشركات المسجلة"
@@ -321,6 +276,7 @@ const LandingPage = () => {
                 icon={Building2}
                 variant="info"
                 delay={300}
+                className="bg-background/40 backdrop-blur-md border-border/50 shadow-none hover:shadow-xl hover:shadow-info/5 transition-all duration-300"
               />
               <StatCard
                 title="تم توظيفهم"
@@ -328,6 +284,7 @@ const LandingPage = () => {
                 icon={Users}
                 variant="warning"
                 delay={400}
+                className="bg-background/40 backdrop-blur-md border-border/50 shadow-none hover:shadow-xl hover:shadow-warning/5 transition-all duration-300"
               />
             </div>
           </div>
@@ -373,11 +330,15 @@ const LandingPage = () => {
               ].map((feature, index) => (
                 <div
                   key={index}
-                  className="bg-card/50 backdrop-blur-sm p-8 rounded-2xl border border-border/50 transition-all duration-500 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/10 group hover:scale-[1.02]"
+                  className="bg-card/50 backdrop-blur-sm p-8 rounded-2xl border border-border/50 transition-all duration-500 hover:border-primary/50 group opacity-0 animate-fade-up hover-lift glow-hover"
+                  style={{
+                    animationDelay: `${(index + 1) * 150}ms`,
+                    animationFillMode: "forwards",
+                  }}
                 >
                   <div className="relative">
                     <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-8 text-primary group-hover:scale-110 transition-transform duration-500 shadow-lg shadow-primary/10">
-                      <feature.icon className="w-8 h-8" />
+                      <feature.icon className="w-8 h-8 animate-float" />
                     </div>
                     <div className="absolute top-0 right-0 w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
                       <TrendingUp className="w-4 h-4 text-primary" />
@@ -393,7 +354,7 @@ const LandingPage = () => {
                         key={idx}
                         className="flex items-center gap-3 text-sm"
                       >
-                        <CheckCircle className="w-4 h-4 text-primary" />
+                        <CheckCircle className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
                         <span>{feat}</span>
                       </div>
                     ))}
@@ -462,23 +423,27 @@ const LandingPage = () => {
                     "دعم فني مخصص ٢٤/٧",
                   ],
                 },
-              ].map((plan) => (
+              ].map((plan, index) => (
                 <div
                   key={plan.id}
-                  className={`relative p-8 rounded-3xl border transition-all duration-300 ${
+                  className={`relative p-8 rounded-3xl border transition-all duration-500 opacity-0 animate-fade-up hover-lift ${
                     plan.popular
-                      ? "bg-primary/5 border-primary shadow-2xl shadow-primary/10 scale-105 z-10"
-                      : "bg-card/50 backdrop-blur-sm border-border/50 hover:border-primary/30 hover:shadow-xl"
+                      ? "bg-primary/5 border-primary shadow-2xl shadow-primary/10 scale-105 z-10 glow-hover"
+                      : "bg-card/50 backdrop-blur-sm border-border/50 hover:border-primary/30"
                   }`}
+                  style={{
+                    animationDelay: `${(index + 1) * 200}ms`,
+                    animationFillMode: "forwards",
+                  }}
                 >
                   {plan.popular && (
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-primary to-secondary text-white px-4 py-1 rounded-full text-sm font-medium shadow-lg">
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-primary to-secondary text-white px-4 py-1 rounded-full text-sm font-medium shadow-lg shimmer">
                       الأكثر شيوعاً
                     </div>
                   )}
                   <div className="mb-6">
                     <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                      <plan.icon className="w-6 h-6 text-primary" />
+                      <plan.icon className="w-6 h-6 text-primary animate-pulse" />
                     </div>
                     <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
                     <p className="text-muted-foreground text-sm">
@@ -495,8 +460,11 @@ const LandingPage = () => {
                   </div>
                   <ul className="space-y-4 mb-8">
                     {plan.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-center gap-3 text-sm">
-                        <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
+                      <li
+                        key={idx}
+                        className="flex items-center gap-3 text-sm group/item"
+                      >
+                        <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 group-hover/item:scale-110 transition-transform" />
                         <span className="text-foreground/80">{feature}</span>
                       </li>
                     ))}
@@ -504,7 +472,7 @@ const LandingPage = () => {
                   <Link to="/subscription">
                     <Button
                       variant={plan.popular ? "default" : "outline"}
-                      className="w-full h-12 font-bold"
+                      className={`w-full h-12 font-bold ${plan.popular ? "shimmer" : ""}`}
                     >
                       {plan.price === "مجاناً" ? "ابدأ الآن" : "اشترك الآن"}
                     </Button>
@@ -550,10 +518,10 @@ const LandingPage = () => {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
               <Button
                 size="lg"
-                className="h-16 px-12 text-xl shadow-2xl shadow-primary/20 transition-all duration-300 hover:scale-105 hover:shadow-primary/30 bg-gradient-to-r from-primary to-primary/90"
+                className="h-16 px-12 text-xl shadow-2xl shadow-primary/20 transition-all duration-300 hover:scale-105 hover:shadow-primary/30 bg-gradient-to-r from-primary to-primary/90 shimmer"
                 onClick={() => navigate("/register")}
               >
-                <Target className="w-6 h-6 ml-3" />
+                <Target className="w-6 h-6 ml-3 animate-float" />
                 سجل الآن مجاناً
               </Button>
               <Link to="/jobs">

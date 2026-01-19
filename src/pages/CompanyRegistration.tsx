@@ -29,7 +29,7 @@ import { useNavigate } from "react-router-dom";
 const CompanyRegistration = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 2;
+  const totalSteps = 3;
 
   // Step 1: Basic Info
   const [name, setName] = useState("");
@@ -46,6 +46,11 @@ const CompanyRegistration = () => {
   const [bio, setBio] = useState("");
   const [skills, setSkills] = useState<string[]>([]);
   const [newSkill, setNewSkill] = useState("");
+
+  // Step 3: Legal Info
+  const [taxNumber, setTaxNumber] = useState("");
+  const [legalDocuments, setLegalDocuments] = useState<File[]>([]);
+  const [documentNames, setDocumentNames] = useState<string[]>([]);
 
   // Step 3: Documents (Removed)
   // const [cvFile, setCvFile] = useState<File | null>(null);
@@ -78,6 +83,22 @@ const CompanyRegistration = () => {
     }
   };
 
+  const handleLegalDocumentsChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const files = e.target.files;
+    if (files) {
+      const newFiles = Array.from(files);
+      setLegalDocuments((prev) => [...prev, ...newFiles]);
+      setDocumentNames((prev) => [...prev, ...newFiles.map((f) => f.name)]);
+    }
+  };
+
+  const removeDocument = (index: number) => {
+    setLegalDocuments((prev) => prev.filter((_, i) => i !== index));
+    setDocumentNames((prev) => prev.filter((_, i) => i !== index));
+  };
+
   /* Removed unused handlers for Steps 3 & 4 */
 
   const nextStep = () => {
@@ -93,8 +114,8 @@ const CompanyRegistration = () => {
   };
 
   const handleSubmit = () => {
-    // For now, just navigate to dashboard
-    navigate("/");
+    // Navigate to login page after successful registration
+    navigate("/auth");
   };
 
   const progress = (currentStep / totalSteps) * 100;
@@ -102,6 +123,7 @@ const CompanyRegistration = () => {
   const steps = [
     { number: 1, title: "المعلومات الأساسية", icon: Building2 },
     { number: 2, title: "الملف التعريفي", icon: Camera },
+    { number: 3, title: "المعلومات القانونية", icon: FileText },
   ];
 
   return (
@@ -297,6 +319,80 @@ const CompanyRegistration = () => {
                       placeholder="اكتب نبذة مختصرة عن الشركة ومجال عملها..."
                       className="mt-1 min-h-[100px]"
                     />
+                  </div>
+                </div>
+              </div>
+            )}
+            {/* Step 3: Legal Info */}
+            {currentStep === 3 && (
+              <div className="space-y-6">
+                <h2 className="text-xl font-semibold text-foreground flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-primary" />
+                  المعلومات القانونية
+                </h2>
+
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="taxNumber">الرقم الضريبي</Label>
+                    <div className="relative mt-1">
+                      <FileText className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <Input
+                        id="taxNumber"
+                        value={taxNumber}
+                        onChange={(e) => setTaxNumber(e.target.value)}
+                        placeholder="أدخل الرقم الضريبي للشركة"
+                        className="pr-10"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label>المستندات القانونية (السجل التجاري، إلخ)</Label>
+                    <div className="mt-2">
+                      <div className="border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-primary/50 transition-colors relative">
+                        <input
+                          type="file"
+                          multiple
+                          onChange={handleLegalDocumentsChange}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        />
+                        <div className="space-y-2">
+                          <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+                            <Upload className="w-6 h-6 text-primary" />
+                          </div>
+                          <p className="text-sm font-medium text-foreground">
+                            اسحب وأفلت الملفات هنا أو انقر للاختيار
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            PDF, PNG, JPG (الحد الأقصى 5MB للواحد)
+                          </p>
+                        </div>
+                      </div>
+
+                      {documentNames.length > 0 && (
+                        <div className="mt-4 space-y-2">
+                          {documentNames.map((docName, index) => (
+                            <div
+                              key={index}
+                              className="flex items-center justify-between p-3 bg-muted rounded-lg border border-border"
+                            >
+                              <div className="flex items-center gap-2 overflow-hidden">
+                                <FileText className="w-4 h-4 text-primary shrink-0" />
+                                <span className="text-sm truncate text-foreground">
+                                  {docName}
+                                </span>
+                              </div>
+                              <button
+                                onClick={() => removeDocument(index)}
+                                className="text-muted-foreground hover:text-destructive transition-colors"
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>

@@ -1,12 +1,43 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { ChevronDown, ChevronUp, Sparkles, Search, Loader2, RefreshCw, Copy, Check, Briefcase, HelpCircle } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Sparkles,
+  Search,
+  Loader2,
+  RefreshCw,
+  Copy,
+  Check,
+  Briefcase,
+  HelpCircle,
+  ChevronsUpDown,
+} from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandInput,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 
 interface GeneratedQuestion {
@@ -17,41 +48,45 @@ interface GeneratedQuestion {
   difficulty: "easy" | "medium" | "hard";
 }
 
-
 const questionsByJobTitle: Record<string, GeneratedQuestion[]> = {
   "مطور واجهات أمامية": [
     {
       id: "fe-1",
       question: "ما الفرق بين CSS Grid و Flexbox؟ متى تستخدم كل منهما؟",
-      answer: "Flexbox مصمم للتخطيط في بُعد واحد (صف أو عمود)، بينما Grid مصمم للتخطيط ثنائي الأبعاد (صفوف وأعمدة معاً). استخدم Flexbox للمكونات الصغيرة مثل شريط التنقل، و Grid للتخطيطات الكاملة للصفحة.",
+      answer:
+        "Flexbox مصمم للتخطيط في بُعد واحد (صف أو عمود)، بينما Grid مصمم للتخطيط ثنائي الأبعاد (صفوف وأعمدة معاً). استخدم Flexbox للمكونات الصغيرة مثل شريط التنقل، و Grid للتخطيطات الكاملة للصفحة.",
       category: "تقني",
       difficulty: "medium",
     },
     {
       id: "fe-2",
       question: "اشرح مفهوم Virtual DOM في React وكيف يحسن الأداء؟",
-      answer: "Virtual DOM هو نسخة خفيفة من DOM الحقيقي محفوظة في الذاكرة. عند حدوث تغييرات، يقارن React بين النسخة الجديدة والقديمة (Diffing) ويحدث فقط العناصر المتغيرة في DOM الحقيقي، مما يقلل العمليات المكلفة.",
+      answer:
+        "Virtual DOM هو نسخة خفيفة من DOM الحقيقي محفوظة في الذاكرة. عند حدوث تغييرات، يقارن React بين النسخة الجديدة والقديمة (Diffing) ويحدث فقط العناصر المتغيرة في DOM الحقيقي، مما يقلل العمليات المكلفة.",
       category: "تقني",
       difficulty: "medium",
     },
     {
       id: "fe-3",
       question: "كيف تتعامل مع State Management في تطبيقات React الكبيرة؟",
-      answer: "يعتمد الاختيار على حجم التطبيق: Context API للتطبيقات الصغيرة، Redux أو Zustand للتطبيقات الكبيرة. أفضل فصل الـ state إلى: local state للمكونات، global state للبيانات المشتركة، و server state باستخدام React Query.",
+      answer:
+        "يعتمد الاختيار على حجم التطبيق: Context API للتطبيقات الصغيرة، Redux أو Zustand للتطبيقات الكبيرة. أفضل فصل الـ state إلى: local state للمكونات، global state للبيانات المشتركة، و server state باستخدام React Query.",
       category: "تقني",
       difficulty: "hard",
     },
     {
       id: "fe-4",
       question: "ما هي أفضل الممارسات لتحسين أداء تطبيقات الويب؟",
-      answer: "Code splitting و lazy loading للمكونات، تحسين الصور (WebP, lazy loading)، تقليل bundle size، استخدام CDN، تطبيق caching strategies، تجنب re-renders غير الضرورية باستخدام memo و useMemo و useCallback.",
+      answer:
+        "Code splitting و lazy loading للمكونات، تحسين الصور (WebP, lazy loading)، تقليل bundle size، استخدام CDN، تطبيق caching strategies، تجنب re-renders غير الضرورية باستخدام memo و useMemo و useCallback.",
       category: "تقني",
       difficulty: "hard",
     },
     {
       id: "fe-5",
       question: "اشرح كيف يعمل Event Loop في JavaScript؟",
-      answer: "JavaScript أحادي الخيط، يستخدم Event Loop لإدارة المهام. الكود المتزامن ينفذ أولاً في Call Stack، المهام غير المتزامنة (setTimeout, Promises) تذهب إلى Web APIs ثم إلى Callback Queue أو Microtask Queue، ثم تنفذ عندما يفرغ الـ Stack.",
+      answer:
+        "JavaScript أحادي الخيط، يستخدم Event Loop لإدارة المهام. الكود المتزامن ينفذ أولاً في Call Stack، المهام غير المتزامنة (setTimeout, Promises) تذهب إلى Web APIs ثم إلى Callback Queue أو Microtask Queue، ثم تنفذ عندما يفرغ الـ Stack.",
       category: "تقني",
       difficulty: "hard",
     },
@@ -60,35 +95,41 @@ const questionsByJobTitle: Record<string, GeneratedQuestion[]> = {
     {
       id: "se-1",
       question: "اشرح مبادئ SOLID مع أمثلة عملية",
-      answer: "S: كل class مسؤول عن شيء واحد. O: مفتوح للتوسيع، مغلق للتعديل. L: الـ subclass يحل محل الـ parent بدون مشاكل. I: واجهات صغيرة ومحددة. D: الاعتماد على abstractions لا implementations.",
+      answer:
+        "S: كل class مسؤول عن شيء واحد. O: مفتوح للتوسيع، مغلق للتعديل. L: الـ subclass يحل محل الـ parent بدون مشاكل. I: واجهات صغيرة ومحددة. D: الاعتماد على abstractions لا implementations.",
       category: "تصميم",
       difficulty: "medium",
     },
     {
       id: "se-2",
       question: "كيف تصمم نظام قابل للتوسع (Scalable System)؟",
-      answer: "استخدام microservices، load balancing، horizontal scaling، caching (Redis)، message queues (Kafka/RabbitMQ)، database sharding، CDN للمحتوى الثابت، وتطبيق circuit breaker pattern لمنع cascading failures.",
+      answer:
+        "استخدام microservices، load balancing، horizontal scaling، caching (Redis)، message queues (Kafka/RabbitMQ)، database sharding، CDN للمحتوى الثابت، وتطبيق circuit breaker pattern لمنع cascading failures.",
       category: "تصميم",
       difficulty: "hard",
     },
     {
       id: "se-3",
-      question: "ما هي أنماط التصميم (Design Patterns) التي تستخدمها بشكل متكرر؟",
-      answer: "Singleton للموارد المشتركة، Factory لإنشاء الكائنات، Observer للإشعارات، Strategy للخوارزميات القابلة للتبديل، Decorator لإضافة سلوكيات ديناميكية، و Repository لفصل منطق البيانات.",
+      question:
+        "ما هي أنماط التصميم (Design Patterns) التي تستخدمها بشكل متكرر؟",
+      answer:
+        "Singleton للموارد المشتركة، Factory لإنشاء الكائنات، Observer للإشعارات، Strategy للخوارزميات القابلة للتبديل، Decorator لإضافة سلوكيات ديناميكية، و Repository لفصل منطق البيانات.",
       category: "تصميم",
       difficulty: "medium",
     },
     {
       id: "se-4",
       question: "كيف تضمن جودة الكود في المشاريع؟",
-      answer: "Code reviews إلزامية، unit tests مع coverage > 80%، integration tests، linting و formatting تلقائي، CI/CD pipeline، documentation واضحة، و refactoring دوري للـ technical debt.",
+      answer:
+        "Code reviews إلزامية، unit tests مع coverage > 80%، integration tests، linting و formatting تلقائي، CI/CD pipeline، documentation واضحة، و refactoring دوري للـ technical debt.",
       category: "عملي",
       difficulty: "medium",
     },
     {
       id: "se-5",
       question: "اشرح الفرق بين SQL و NoSQL ومتى تستخدم كل منهما؟",
-      answer: "SQL: بيانات منظمة، علاقات معقدة، ACID compliance (البنوك). NoSQL: بيانات غير منظمة، scalability أفقي، مرونة في الـ schema (social media, IoT). MongoDB للمستندات، Redis للـ caching، Cassandra للـ time-series.",
+      answer:
+        "SQL: بيانات منظمة، علاقات معقدة، ACID compliance (البنوك). NoSQL: بيانات غير منظمة، scalability أفقي، مرونة في الـ schema (social media, IoT). MongoDB للمستندات، Redis للـ caching، Cassandra للـ time-series.",
       category: "تقني",
       difficulty: "medium",
     },
@@ -97,35 +138,40 @@ const questionsByJobTitle: Record<string, GeneratedQuestion[]> = {
     {
       id: "ux-1",
       question: "ما هي عملية التصميم التي تتبعها من البداية للنهاية؟",
-      answer: "Discovery (بحث المستخدمين وتحليل المنافسين)، Define (personas و user journeys)، Ideate (sketches و wireframes)، Prototype (تصميم تفاعلي)، Test (usability testing)، Iterate (تحسين مستمر بناءً على الملاحظات).",
+      answer:
+        "Discovery (بحث المستخدمين وتحليل المنافسين)، Define (personas و user journeys)، Ideate (sketches و wireframes)، Prototype (تصميم تفاعلي)، Test (usability testing)، Iterate (تحسين مستمر بناءً على الملاحظات).",
       category: "عملي",
       difficulty: "medium",
     },
     {
       id: "ux-2",
       question: "كيف تقيس نجاح التصميم؟",
-      answer: "مقاييس كمية: conversion rate, task completion rate, time on task, error rate. مقاييس نوعية: user satisfaction (SUS, NPS), qualitative feedback. A/B testing لمقارنة التصميمات.",
+      answer:
+        "مقاييس كمية: conversion rate, task completion rate, time on task, error rate. مقاييس نوعية: user satisfaction (SUS, NPS), qualitative feedback. A/B testing لمقارنة التصميمات.",
       category: "عملي",
       difficulty: "medium",
     },
     {
       id: "ux-3",
       question: "كيف تتعامل مع متطلبات متناقضة من أصحاب المصلحة؟",
-      answer: "استمع لكل الأطراف وافهم أهدافهم الحقيقية، استخدم بيانات المستخدمين كمرجع محايد، قدم حلول وسط مبنية على الأدلة، وركز على أهداف العمل المشتركة.",
+      answer:
+        "استمع لكل الأطراف وافهم أهدافهم الحقيقية، استخدم بيانات المستخدمين كمرجع محايد، قدم حلول وسط مبنية على الأدلة، وركز على أهداف العمل المشتركة.",
       category: "سلوكي",
       difficulty: "medium",
     },
     {
       id: "ux-4",
       question: "ما هي مبادئ Accessibility التي تطبقها؟",
-      answer: "WCAG guidelines: contrast ratios كافية، نصوص بديلة للصور، keyboard navigation، screen reader support، تجنب الاعتماد على اللون فقط، وتوفير transcripts للمحتوى الصوتي والمرئي.",
+      answer:
+        "WCAG guidelines: contrast ratios كافية، نصوص بديلة للصور، keyboard navigation، screen reader support، تجنب الاعتماد على اللون فقط، وتوفير transcripts للمحتوى الصوتي والمرئي.",
       category: "تقني",
       difficulty: "medium",
     },
     {
       id: "ux-5",
       question: "كيف تجري بحث المستخدمين بميزانية محدودة؟",
-      answer: "مقابلات عن بعد (Zoom)، استطلاعات مجانية (Google Forms)، guerrilla testing في الأماكن العامة، تحليل بيانات analytics الموجودة، و competitive analysis للمنافسين.",
+      answer:
+        "مقابلات عن بعد (Zoom)، استطلاعات مجانية (Google Forms)، guerrilla testing في الأماكن العامة، تحليل بيانات analytics الموجودة، و competitive analysis للمنافسين.",
       category: "عملي",
       difficulty: "easy",
     },
@@ -134,35 +180,40 @@ const questionsByJobTitle: Record<string, GeneratedQuestion[]> = {
     {
       id: "da-1",
       question: "ما هي خطوات تحليل البيانات من البداية للنهاية؟",
-      answer: "تحديد المشكلة والأسئلة، جمع البيانات، تنظيف البيانات (handling missing values, outliers)، استكشاف البيانات (EDA)، التحليل الإحصائي أو النمذجة، التصور والعرض، وتقديم التوصيات.",
+      answer:
+        "تحديد المشكلة والأسئلة، جمع البيانات، تنظيف البيانات (handling missing values, outliers)، استكشاف البيانات (EDA)، التحليل الإحصائي أو النمذجة، التصور والعرض، وتقديم التوصيات.",
       category: "عملي",
       difficulty: "medium",
     },
     {
       id: "da-2",
       question: "كيف تتعامل مع البيانات المفقودة أو غير المكتملة؟",
-      answer: "أولاً: فهم سبب الفقدان (random, systematic). الخيارات: حذف الصفوف/الأعمدة إذا كانت قليلة، imputation بالمتوسط/الوسيط/المنوال، استخدام algorithms متقدمة مثل KNN imputation، أو إنشاء feature flag للقيم المفقودة.",
+      answer:
+        "أولاً: فهم سبب الفقدان (random, systematic). الخيارات: حذف الصفوف/الأعمدة إذا كانت قليلة، imputation بالمتوسط/الوسيط/المنوال، استخدام algorithms متقدمة مثل KNN imputation، أو إنشاء feature flag للقيم المفقودة.",
       category: "تقني",
       difficulty: "medium",
     },
     {
       id: "da-3",
       question: "اشرح الفرق بين Correlation و Causation مع مثال",
-      answer: "Correlation: علاقة إحصائية بين متغيرين. Causation: أحدهما يسبب الآخر. مثال: مبيعات الآيس كريم وحوادث الغرق مرتبطة (correlation) لكن لا يسبب أحدهما الآخر - الطقس الحار هو السبب الحقيقي (confounding variable).",
+      answer:
+        "Correlation: علاقة إحصائية بين متغيرين. Causation: أحدهما يسبب الآخر. مثال: مبيعات الآيس كريم وحوادث الغرق مرتبطة (correlation) لكن لا يسبب أحدهما الآخر - الطقس الحار هو السبب الحقيقي (confounding variable).",
       category: "تقني",
       difficulty: "medium",
     },
     {
       id: "da-4",
       question: "ما هي أدوات تحليل البيانات التي تتقنها؟",
-      answer: "Python (Pandas, NumPy, Matplotlib, Seaborn, Scikit-learn)، SQL للاستعلامات، Excel للتحليل السريع، Tableau/Power BI للتصور، و Jupyter Notebooks للتوثيق والعرض التفاعلي.",
+      answer:
+        "Python (Pandas, NumPy, Matplotlib, Seaborn, Scikit-learn)، SQL للاستعلامات، Excel للتحليل السريع، Tableau/Power BI للتصور، و Jupyter Notebooks للتوثيق والعرض التفاعلي.",
       category: "تقني",
       difficulty: "easy",
     },
     {
       id: "da-5",
       question: "كيف تقدم نتائج تحليل معقدة لجمهور غير تقني؟",
-      answer: "ابدأ بالنتيجة الرئيسية (headline)، استخدم visualizations بسيطة وواضحة، تجنب المصطلحات التقنية، اربط النتائج بأهداف العمل، وقدم توصيات عملية قابلة للتنفيذ.",
+      answer:
+        "ابدأ بالنتيجة الرئيسية (headline)، استخدم visualizations بسيطة وواضحة، تجنب المصطلحات التقنية، اربط النتائج بأهداف العمل، وقدم توصيات عملية قابلة للتنفيذ.",
       category: "سلوكي",
       difficulty: "medium",
     },
@@ -171,35 +222,40 @@ const questionsByJobTitle: Record<string, GeneratedQuestion[]> = {
     {
       id: "pm-1",
       question: "كيف تتعامل مع scope creep في المشاريع؟",
-      answer: "وثيقة نطاق واضحة من البداية، change request process رسمي، تقييم أثر كل تغيير على الوقت والميزانية، التواصل الواضح مع stakeholders، والحفاظ على MoSCoW prioritization.",
+      answer:
+        "وثيقة نطاق واضحة من البداية، change request process رسمي، تقييم أثر كل تغيير على الوقت والميزانية، التواصل الواضح مع stakeholders، والحفاظ على MoSCoW prioritization.",
       category: "عملي",
       difficulty: "medium",
     },
     {
       id: "pm-2",
       question: "ما الفرق بين Agile و Waterfall ومتى تستخدم كل منهما؟",
-      answer: "Waterfall: متطلبات ثابتة، مشاريع قصيرة، قطاعات منظمة (حكومة، بنوك). Agile: متطلبات متغيرة، حاجة لـ feedback سريع، فرق صغيرة. Hybrid approach ممكن حسب المشروع.",
+      answer:
+        "Waterfall: متطلبات ثابتة، مشاريع قصيرة، قطاعات منظمة (حكومة، بنوك). Agile: متطلبات متغيرة، حاجة لـ feedback سريع، فرق صغيرة. Hybrid approach ممكن حسب المشروع.",
       category: "تقني",
       difficulty: "medium",
     },
     {
       id: "pm-3",
       question: "كيف تحفز فريقك وتحافظ على إنتاجيتهم؟",
-      answer: "أهداف واضحة ومشتركة، recognition للإنجازات، إزالة العوائق، توفير فرص النمو، one-on-ones منتظمة، بيئة آمنة للتعبير عن المشاكل، و work-life balance محترم.",
+      answer:
+        "أهداف واضحة ومشتركة، recognition للإنجازات، إزالة العوائق، توفير فرص النمو، one-on-ones منتظمة، بيئة آمنة للتعبير عن المشاكل، و work-life balance محترم.",
       category: "قيادي",
       difficulty: "medium",
     },
     {
       id: "pm-4",
       question: "صف موقفاً أنقذت فيه مشروعاً متعثراً",
-      answer: "استخدم STAR: اشرح الوضع المتأزم، المهمة المطلوبة، الإجراءات التي اتخذتها (تحليل المشكلة، إعادة التخطيط، التواصل مع الأطراف)، والنتيجة الإيجابية مع الدروس المستفادة.",
+      answer:
+        "استخدم STAR: اشرح الوضع المتأزم، المهمة المطلوبة، الإجراءات التي اتخذتها (تحليل المشكلة، إعادة التخطيط، التواصل مع الأطراف)، والنتيجة الإيجابية مع الدروس المستفادة.",
       category: "سلوكي",
       difficulty: "hard",
     },
     {
       id: "pm-5",
       question: "ما هي مؤشرات الأداء (KPIs) التي تتابعها في المشاريع؟",
-      answer: "Velocity و burn-down charts، on-time delivery rate، budget variance، defect density، customer satisfaction، team happiness، و cycle time. الأهم هو اختيار KPIs تتوافق مع أهداف المشروع.",
+      answer:
+        "Velocity و burn-down charts، on-time delivery rate، budget variance، defect density، customer satisfaction، team happiness، و cycle time. الأهم هو اختيار KPIs تتوافق مع أهداف المشروع.",
       category: "عملي",
       difficulty: "medium",
     },
@@ -208,107 +264,139 @@ const questionsByJobTitle: Record<string, GeneratedQuestion[]> = {
     {
       id: "mob-1",
       question: "ما الفرق بين Native و Cross-platform development؟",
-      answer: "Native (Swift/Kotlin): أداء أفضل، وصول كامل للـ APIs، تجربة مستخدم أصلية، لكن تكلفة أعلى. Cross-platform (React Native/Flutter): كود واحد للمنصتين، تطوير أسرع، لكن قد تحتاج bridges للميزات المتقدمة.",
+      answer:
+        "Native (Swift/Kotlin): أداء أفضل، وصول كامل للـ APIs، تجربة مستخدم أصلية، لكن تكلفة أعلى. Cross-platform (React Native/Flutter): كود واحد للمنصتين، تطوير أسرع، لكن قد تحتاج bridges للميزات المتقدمة.",
       category: "تقني",
       difficulty: "medium",
     },
     {
       id: "mob-2",
       question: "كيف تتعامل مع إدارة الذاكرة في تطبيقات الموبايل؟",
-      answer: "تجنب memory leaks بإلغاء subscriptions، استخدام weak references حيث مناسب، تحسين الصور (caching, resizing)، lazy loading للمحتوى، و profiling منتظم باستخدام أدوات المنصة.",
+      answer:
+        "تجنب memory leaks بإلغاء subscriptions، استخدام weak references حيث مناسب، تحسين الصور (caching, resizing)، lazy loading للمحتوى، و profiling منتظم باستخدام أدوات المنصة.",
       category: "تقني",
       difficulty: "hard",
     },
     {
       id: "mob-3",
       question: "اشرح كيفية عمل offline-first في التطبيقات",
-      answer: "تخزين البيانات محلياً (SQLite/Realm)، sync queue للعمليات المعلقة، conflict resolution عند الاتصال، optimistic UI updates، و clear feedback للمستخدم عن حالة الاتصال.",
+      answer:
+        "تخزين البيانات محلياً (SQLite/Realm)، sync queue للعمليات المعلقة، conflict resolution عند الاتصال، optimistic UI updates، و clear feedback للمستخدم عن حالة الاتصال.",
       category: "تقني",
       difficulty: "hard",
     },
     {
       id: "mob-4",
       question: "كيف تضمن أمان البيانات في تطبيقات الموبايل؟",
-      answer: "تشفير البيانات المخزنة (Keychain/Keystore)، HTTPS لكل الاتصالات، certificate pinning، عدم تخزين sensitive data في logs، obfuscation للكود، و secure authentication (OAuth, biometrics).",
+      answer:
+        "تشفير البيانات المخزنة (Keychain/Keystore)، HTTPS لكل الاتصالات، certificate pinning، عدم تخزين sensitive data في logs، obfuscation للكود، و secure authentication (OAuth, biometrics).",
       category: "تقني",
       difficulty: "hard",
     },
     {
       id: "mob-5",
       question: "ما هي خطوات نشر التطبيق على App Store/Play Store؟",
-      answer: "إعداد developer account، تحضير screenshots و app description، إعداد signing certificates، اختبار على أجهزة حقيقية، التأكد من guidelines compliance، رفع التطبيق، والاستجابة لملاحظات المراجعة.",
+      answer:
+        "إعداد developer account، تحضير screenshots و app description، إعداد signing certificates، اختبار على أجهزة حقيقية، التأكد من guidelines compliance، رفع التطبيق، والاستجابة لملاحظات المراجعة.",
       category: "عملي",
       difficulty: "easy",
     },
   ],
 };
 
+const jobTitles = [
+  { value: "frontend-developer", label: "مطور واجهات أمامية" },
+  { value: "backend-developer", label: "مطور واجهات خلفية" },
+  { value: "fullstack-developer", label: "مطور برمجيات كامل" },
+  { value: "ui-ux-designer", label: "مصمم تجربة مستخدم" },
+  { value: "project-manager", label: "مدير مشاريع" },
+  { value: "data-analyst", label: "محلل بيانات" },
+  { value: "software-engineer", label: "مهندس برمجيات" },
+  { value: "hr-specialist", label: "أخصائي موارد بشرية" },
+  { value: "marketing-manager", label: "مدير تسويق" },
+  { value: "sales-representative", label: "مندوب مبيعات" },
+  { value: "customer-service", label: "خدمة عملاء" },
+  { value: "digital-marketing", label: "تسويق رقمي" },
+  { value: "content-writer", label: "كاتب محتوى" },
+  { value: "quality-assurance", label: "مهندس جودة برمجيات" },
+  { value: "mobile-developer", label: "مطور تطبيقات جوال" },
+];
+
 const topicQuestions: Record<string, GeneratedQuestion[]> = {
-  "react": [
+  react: [
     {
       id: "react-1",
       question: "ما الفرق بين useState و useReducer؟",
-      answer: "useState للحالات البسيطة (قيمة واحدة أو بسيطة). useReducer للحالات المعقدة (multiple sub-values، logic معقد، الحالة التالية تعتمد على السابقة). useReducer يفصل الـ logic عن المكون ويسهل الاختبار.",
+      answer:
+        "useState للحالات البسيطة (قيمة واحدة أو بسيطة). useReducer للحالات المعقدة (multiple sub-values، logic معقد، الحالة التالية تعتمد على السابقة). useReducer يفصل الـ logic عن المكون ويسهل الاختبار.",
       category: "React Hooks",
       difficulty: "medium",
     },
     {
       id: "react-2",
       question: "اشرح useEffect و cleanup function",
-      answer: "useEffect ينفذ side effects بعد render. Cleanup function تنظف الـ subscriptions قبل إعادة تنفيذ الـ effect أو unmount المكون. مهم لتجنب memory leaks مع event listeners و timers و subscriptions.",
+      answer:
+        "useEffect ينفذ side effects بعد render. Cleanup function تنظف الـ subscriptions قبل إعادة تنفيذ الـ effect أو unmount المكون. مهم لتجنب memory leaks مع event listeners و timers و subscriptions.",
       category: "React Hooks",
       difficulty: "medium",
     },
     {
       id: "react-3",
       question: "ما هو React.memo ومتى تستخدمه؟",
-      answer: "React.memo هو HOC يمنع re-render إذا لم تتغير الـ props. استخدمه للمكونات التي تعرض نفس النتيجة مع نفس الـ props وعملية الـ render مكلفة. لا تستخدمه في كل مكان - فقط عند الحاجة الفعلية.",
+      answer:
+        "React.memo هو HOC يمنع re-render إذا لم تتغير الـ props. استخدمه للمكونات التي تعرض نفس النتيجة مع نفس الـ props وعملية الـ render مكلفة. لا تستخدمه في كل مكان - فقط عند الحاجة الفعلية.",
       category: "Performance",
       difficulty: "medium",
     },
   ],
-  "javascript": [
+  javascript: [
     {
       id: "js-1",
       question: "ما الفرق بين var و let و const؟",
-      answer: "var: function-scoped، hoisted، يمكن إعادة التعريف. let: block-scoped، hoisted لكن في TDZ، يمكن إعادة القيمة. const: block-scoped، hoisted في TDZ، لا يمكن إعادة القيمة (لكن objects قابلة للتعديل).",
+      answer:
+        "var: function-scoped، hoisted، يمكن إعادة التعريف. let: block-scoped، hoisted لكن في TDZ، يمكن إعادة القيمة. const: block-scoped، hoisted في TDZ، لا يمكن إعادة القيمة (لكن objects قابلة للتعديل).",
       category: "أساسيات",
       difficulty: "easy",
     },
     {
       id: "js-2",
       question: "اشرح Closures مع مثال عملي",
-      answer: "Closure هي دالة تحتفظ بالوصول لمتغيرات النطاق الخارجي حتى بعد انتهاء تنفيذ الدالة الخارجية. مثال: counter function تحتفظ بقيمة count. مفيدة لـ data privacy و factory functions.",
+      answer:
+        "Closure هي دالة تحتفظ بالوصول لمتغيرات النطاق الخارجي حتى بعد انتهاء تنفيذ الدالة الخارجية. مثال: counter function تحتفظ بقيمة count. مفيدة لـ data privacy و factory functions.",
       category: "متقدم",
       difficulty: "medium",
     },
     {
       id: "js-3",
       question: "ما الفرق بين Promise و async/await؟",
-      answer: "Promise: طريقة للتعامل مع العمليات غير المتزامنة باستخدام .then() و .catch(). async/await: syntax sugar فوق Promises تجعل الكود يبدو متزامناً. async/await أسهل للقراءة لكن كلاهما يستخدم Promises داخلياً.",
+      answer:
+        "Promise: طريقة للتعامل مع العمليات غير المتزامنة باستخدام .then() و .catch(). async/await: syntax sugar فوق Promises تجعل الكود يبدو متزامناً. async/await أسهل للقراءة لكن كلاهما يستخدم Promises داخلياً.",
       category: "غير متزامن",
       difficulty: "medium",
     },
   ],
-  "sql": [
+  sql: [
     {
       id: "sql-1",
       question: "ما الفرق بين INNER JOIN و LEFT JOIN؟",
-      answer: "INNER JOIN: يرجع فقط الصفوف المتطابقة في كلا الجدولين. LEFT JOIN: يرجع كل صفوف الجدول الأيسر مع البيانات المتطابقة من الأيمن (NULL إذا لم يوجد تطابق).",
+      answer:
+        "INNER JOIN: يرجع فقط الصفوف المتطابقة في كلا الجدولين. LEFT JOIN: يرجع كل صفوف الجدول الأيسر مع البيانات المتطابقة من الأيمن (NULL إذا لم يوجد تطابق).",
       category: "Joins",
       difficulty: "easy",
     },
     {
       id: "sql-2",
       question: "اشرح الفرق بين WHERE و HAVING",
-      answer: "WHERE: تفلتر الصفوف قبل الـ grouping. HAVING: تفلتر المجموعات بعد GROUP BY. استخدم WHERE للشروط على الصفوف الفردية، و HAVING للشروط على aggregate functions.",
+      answer:
+        "WHERE: تفلتر الصفوف قبل الـ grouping. HAVING: تفلتر المجموعات بعد GROUP BY. استخدم WHERE للشروط على الصفوف الفردية، و HAVING للشروط على aggregate functions.",
       category: "Filtering",
       difficulty: "medium",
     },
     {
       id: "sql-3",
       question: "كيف تحسن أداء الاستعلامات البطيئة؟",
-      answer: "إضافة indexes على الأعمدة المستخدمة في WHERE و JOIN، تجنب SELECT *، استخدام EXPLAIN لتحليل الاستعلام، تجنب functions في WHERE على indexed columns، و denormalization عند الحاجة.",
+      answer:
+        "إضافة indexes على الأعمدة المستخدمة في WHERE و JOIN، تجنب SELECT *، استخدام EXPLAIN لتحليل الاستعلام، تجنب functions في WHERE على indexed columns، و denormalization عند الحاجة.",
       category: "Performance",
       difficulty: "hard",
     },
@@ -317,15 +405,31 @@ const topicQuestions: Record<string, GeneratedQuestion[]> = {
 
 const InterviewPage = () => {
   const { toast } = useToast();
-  
+
   // Generator state
   const [searchQuery, setSearchQuery] = useState("");
   const [searchType, setSearchType] = useState<"job" | "topic">("job");
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedQuestions, setGeneratedQuestions] = useState<GeneratedQuestion[]>([]);
+  const [generatedQuestions, setGeneratedQuestions] = useState<
+    GeneratedQuestion[]
+  >([]);
   const [expandedGenIndex, setExpandedGenIndex] = useState<number | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [questionCount, setQuestionCount] = useState("5");
+  const [openType, setOpenType] = useState(false);
+  const [openCount, setOpenCount] = useState(false);
+  const [openJobSearch, setOpenJobSearch] = useState(false);
+
+  const searchTypeOptions = [
+    { value: "job", label: "مسمى وظيفي", icon: Briefcase },
+    { value: "topic", label: "موضوع تقني", icon: HelpCircle },
+  ];
+
+  const questionCountOptions = [
+    { value: "3", label: "3 أسئلة" },
+    { value: "5", label: "5 أسئلة" },
+    { value: "10", label: "10 أسئلة" },
+  ];
 
   const handleGenerate = async () => {
     if (!searchQuery.trim()) {
@@ -341,7 +445,7 @@ const InterviewPage = () => {
     setGeneratedQuestions([]);
 
     // Simulate AI generation
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
     let questions: GeneratedQuestion[] = [];
     const count = parseInt(questionCount);
@@ -349,7 +453,7 @@ const InterviewPage = () => {
     if (searchType === "job") {
       // Check if we have predefined questions for this job
       const matchedJob = Object.keys(questionsByJobTitle).find(
-        job => job.includes(searchQuery) || searchQuery.includes(job)
+        (job) => job.includes(searchQuery) || searchQuery.includes(job),
       );
 
       if (matchedJob) {
@@ -397,8 +501,9 @@ const InterviewPage = () => {
     } else {
       // Topic-based questions
       const matchedTopic = Object.keys(topicQuestions).find(
-        topic => topic.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                 searchQuery.toLowerCase().includes(topic.toLowerCase())
+        (topic) =>
+          topic.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          searchQuery.toLowerCase().includes(topic.toLowerCase()),
       );
 
       if (matchedTopic) {
@@ -469,11 +574,23 @@ const InterviewPage = () => {
   const getDifficultyBadge = (difficulty: string) => {
     switch (difficulty) {
       case "easy":
-        return <Badge className="bg-success/10 text-success border-success/20">سهل</Badge>;
+        return (
+          <Badge className="bg-success/10 text-success border-success/20">
+            سهل
+          </Badge>
+        );
       case "medium":
-        return <Badge className="bg-warning/10 text-warning border-warning/20">متوسط</Badge>;
+        return (
+          <Badge className="bg-warning/10 text-warning border-warning/20">
+            متوسط
+          </Badge>
+        );
       case "hard":
-        return <Badge className="bg-destructive/10 text-destructive border-destructive/20">صعب</Badge>;
+        return (
+          <Badge className="bg-destructive/10 text-destructive border-destructive/20">
+            صعب
+          </Badge>
+        );
       default:
         return null;
     }
@@ -482,7 +599,9 @@ const InterviewPage = () => {
   return (
     <DashboardLayout>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-foreground mb-2">أسئلة المقابلات</h1>
+        <h1 className="text-2xl font-bold text-foreground mb-2">
+          أسئلة المقابلات
+        </h1>
         <p className="text-muted-foreground">
           استعد لمقابلتك القادمة مع الأسئلة الأكثر شيوعاً والإجابات المثالية
         </p>
@@ -503,52 +622,193 @@ const InterviewPage = () => {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label>نوع البحث</Label>
-              <Select value={searchType} onValueChange={(v: "job" | "topic") => setSearchType(v)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="job">
+              <Popover open={openType} onOpenChange={setOpenType}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={openType}
+                    className="w-full justify-between"
+                  >
                     <div className="flex items-center gap-2">
-                      <Briefcase className="w-4 h-4" />
-                      مسمى وظيفي
+                      {searchType === "job" ? (
+                        <Briefcase className="w-4 h-4 text-muted-foreground" />
+                      ) : (
+                        <HelpCircle className="w-4 h-4 text-muted-foreground" />
+                      )}
+                      {
+                        searchTypeOptions.find((o) => o.value === searchType)
+                          ?.label
+                      }
                     </div>
-                  </SelectItem>
-                  <SelectItem value="topic">
-                    <div className="flex items-center gap-2">
-                      <HelpCircle className="w-4 h-4" />
-                      موضوع تقني
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+                    <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="p-0 w-[var(--radix-popover-trigger-width)]"
+                  align="start"
+                >
+                  <Command>
+                    <CommandList>
+                      <CommandGroup>
+                        {searchTypeOptions.map((option) => (
+                          <CommandItem
+                            key={option.value}
+                            value={option.value}
+                            onSelect={(currentValue) => {
+                              setSearchType(currentValue as "job" | "topic");
+                              setOpenType(false);
+                            }}
+                            className="flex items-center justify-between cursor-pointer"
+                          >
+                            <div className="flex items-center gap-2">
+                              <option.icon className="w-4 h-4" />
+                              {option.label}
+                            </div>
+                            <Check
+                              className={cn(
+                                "h-4 w-4",
+                                searchType === option.value
+                                  ? "opacity-100"
+                                  : "opacity-0",
+                              )}
+                            />
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
 
             <div className="space-y-2">
-              <Label>{searchType === "job" ? "المسمى الوظيفي" : "الموضوع"}</Label>
-              <div className="relative">
-                <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  placeholder={searchType === "job" ? "مثال: مطور واجهات أمامية" : "مثال: React, JavaScript, SQL"}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pr-10"
-                />
-              </div>
+              <Label>
+                {searchType === "job" ? "المسمى الوظيفي" : "الموضوع"}
+              </Label>
+              {searchType === "job" ? (
+                <Popover open={openJobSearch} onOpenChange={setOpenJobSearch}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={openJobSearch}
+                      className="w-full h-11 justify-between bg-muted/50 border-transparent hover:bg-muted/70 px-4 font-normal"
+                    >
+                      {searchQuery
+                        ? jobTitles.find((job) => job.label === searchQuery)
+                            ?.label || searchQuery
+                        : "ابحث عن مسمى وظيفي..."}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    className="w-[var(--radix-popover-trigger-width)] p-0"
+                    align="start"
+                  >
+                    <Command>
+                      <CommandInput
+                        placeholder="ابحث عن مسمى وظيفي..."
+                        className="h-9"
+                      />
+                      <CommandList>
+                        <CommandEmpty>
+                          لم يتم العثور على مسمى وظيفي.
+                        </CommandEmpty>
+                        <CommandGroup>
+                          {jobTitles.map((job) => (
+                            <CommandItem
+                              key={job.value}
+                              value={job.label}
+                              onSelect={(currentValue) => {
+                                setSearchQuery(
+                                  currentValue === searchQuery
+                                    ? ""
+                                    : currentValue,
+                                );
+                                setOpenJobSearch(false);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  searchQuery === job.label
+                                    ? "opacity-100"
+                                    : "opacity-0",
+                                )}
+                              />
+                              {job.label}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              ) : (
+                <div className="relative">
+                  <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    placeholder="مثال: React, JavaScript, SQL"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pr-10"
+                  />
+                </div>
+              )}
             </div>
 
             <div className="space-y-2">
               <Label>عدد الأسئلة</Label>
-              <Select value={questionCount} onValueChange={setQuestionCount}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="3">3 أسئلة</SelectItem>
-                  <SelectItem value="5">5 أسئلة</SelectItem>
-                  <SelectItem value="10">10 أسئلة</SelectItem>
-                </SelectContent>
-              </Select>
+              <Popover open={openCount} onOpenChange={setOpenCount}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={openCount}
+                    className="w-full justify-between"
+                  >
+                    {
+                      questionCountOptions.find(
+                        (o) => o.value === questionCount,
+                      )?.label
+                    }
+                    <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="p-0 w-[var(--radix-popover-trigger-width)]"
+                  align="start"
+                >
+                  <Command>
+                    <CommandList>
+                      <CommandGroup>
+                        {questionCountOptions.map((option) => (
+                          <CommandItem
+                            key={option.value}
+                            value={option.value}
+                            onSelect={(currentValue) => {
+                              setQuestionCount(currentValue);
+                              setOpenCount(false);
+                            }}
+                            className="flex items-center justify-between cursor-pointer"
+                          >
+                            {option.label}
+                            <Check
+                              className={cn(
+                                "h-4 w-4",
+                                questionCount === option.value
+                                  ? "opacity-100"
+                                  : "opacity-0",
+                              )}
+                            />
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
 
             <Button
@@ -591,7 +851,9 @@ const InterviewPage = () => {
                 <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto mb-4" />
                 <p className="text-muted-foreground">جاري توليد الأسئلة...</p>
                 <p className="text-sm text-muted-foreground mt-2">
-                  يتم تحليل {searchType === "job" ? "المسمى الوظيفي" : "الموضوع"} وإنشاء أسئلة مخصصة
+                  يتم تحليل{" "}
+                  {searchType === "job" ? "المسمى الوظيفي" : "الموضوع"} وإنشاء
+                  أسئلة مخصصة
                 </p>
               </CardContent>
             </Card>
@@ -608,12 +870,13 @@ const InterviewPage = () => {
               </div>
 
               {generatedQuestions.map((q, index) => (
-                <div
-                  key={q.id}
-                  className="card-elevated overflow-hidden"
-                >
+                <div key={q.id} className="card-elevated overflow-hidden">
                   <button
-                    onClick={() => setExpandedGenIndex(expandedGenIndex === index ? null : index)}
+                    onClick={() =>
+                      setExpandedGenIndex(
+                        expandedGenIndex === index ? null : index,
+                      )
+                    }
                     className="w-full p-5 flex items-start justify-between gap-4 text-right"
                   >
                     <div className="flex items-start gap-3">
@@ -627,7 +890,9 @@ const InterviewPage = () => {
                           </span>
                           {getDifficultyBadge(q.difficulty)}
                         </div>
-                        <h3 className="font-semibold text-foreground">{q.question}</h3>
+                        <h3 className="font-semibold text-foreground">
+                          {q.question}
+                        </h3>
                       </div>
                     </div>
                     {expandedGenIndex === index ? (
@@ -641,7 +906,9 @@ const InterviewPage = () => {
                     <div className="px-5 pb-5 animate-fade-in">
                       <div className="bg-success/5 border border-success/20 rounded-xl p-4 mr-11">
                         <div className="flex items-center justify-between mb-2">
-                          <h4 className="text-sm font-medium text-success">الإجابة المثالية:</h4>
+                          <h4 className="text-sm font-medium text-success">
+                            الإجابة المثالية:
+                          </h4>
                           <Button
                             variant="ghost"
                             size="sm"
@@ -661,7 +928,9 @@ const InterviewPage = () => {
                             )}
                           </Button>
                         </div>
-                        <p className="text-foreground leading-relaxed">{q.answer}</p>
+                        <p className="text-foreground leading-relaxed">
+                          {q.answer}
+                        </p>
                       </div>
                     </div>
                   )}
@@ -672,7 +941,9 @@ const InterviewPage = () => {
             <Card className="card-elevated">
               <CardContent className="py-12 text-center">
                 <HelpCircle className="w-12 h-12 text-muted-foreground/50 mx-auto mb-4" />
-                <p className="text-muted-foreground">أدخل المسمى الوظيفي أو الموضوع وابدأ التوليد</p>
+                <p className="text-muted-foreground">
+                  أدخل المسمى الوظيفي أو الموضوع وابدأ التوليد
+                </p>
                 <p className="text-sm text-muted-foreground mt-2">
                   سيتم إنشاء أسئلة مخصصة مع إجابات مثالية
                 </p>

@@ -8,6 +8,7 @@ interface StatCardProps {
   icon: LucideIcon;
   variant?: "default" | "primary" | "success" | "warning" | "info";
   delay?: number;
+  className?: string;
 }
 
 const iconStyles = {
@@ -25,10 +26,14 @@ export const StatCard = ({
   icon: Icon,
   variant = "default",
   delay = 0,
+  className,
 }: StatCardProps) => {
   return (
     <div
-      className="p-6 rounded-xl border border-border/50 bg-card opacity-0 animate-fade-up cursor-default"
+      className={cn(
+        "p-6 rounded-xl border border-border/50 bg-card opacity-0 animate-fade-up cursor-default",
+        className,
+      )}
       style={{ animationDelay: `${delay}ms`, animationFillMode: "forwards" }}
     >
       <div className="flex items-center justify-between gap-4">
@@ -44,7 +49,7 @@ export const StatCard = ({
         <div
           className={cn(
             "w-12 h-12 rounded-xl flex items-center justify-center shrink-0",
-            iconStyles[variant]
+            iconStyles[variant],
           )}
         >
           <Icon className="w-6 h-6" />

@@ -21,11 +21,14 @@ import {
   Key,
   Mail,
   Smartphone,
+  Pencil,
+  X,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const Settings = () => {
   const { toast } = useToast();
+  const [isEditing, setIsEditing] = useState(false);
 
   const [notifications, setNotifications] = useState({
     newJobs: true,
@@ -37,6 +40,7 @@ const Settings = () => {
   const [twoFactor, setTwoFactor] = useState(false);
 
   const handleSaveProfile = () => {
+    setIsEditing(false);
     toast({
       title: "تم الحفظ",
       description: "تم حفظ التغييرات بنجاح",
@@ -71,8 +75,14 @@ const Settings = () => {
                 <Input
                   id="name"
                   placeholder="أحمد محمد"
-                  className="text-right"
+                  className="text-right disabled:opacity-70"
+                  disabled={!isEditing}
                 />
+                {isEditing && (
+                  <p className="text-[11px] text-amber-600/90 dark:text-amber-500/90 font-medium">
+                    * يمكنك تغيير اسمك مرة واحدة فقط كل شهر
+                  </p>
+                )}
               </div>
               <div className="space-y-2 text-right">
                 <Label htmlFor="email">البريد الإلكتروني</Label>
@@ -80,8 +90,9 @@ const Settings = () => {
                   id="email"
                   type="email"
                   placeholder="ahmed@example.com"
-                  className="text-left"
+                  className="text-left bg-muted text-muted-foreground cursor-not-allowed"
                   dir="ltr"
+                  readOnly
                 />
               </div>
             </div>
@@ -92,8 +103,9 @@ const Settings = () => {
                   id="phone"
                   type="tel"
                   placeholder="+966 5XX XXX XXXX"
-                  className="text-left"
+                  className="text-left disabled:opacity-70"
                   dir="ltr"
+                  disabled={!isEditing}
                 />
               </div>
               <div className="space-y-2 text-right">
@@ -101,18 +113,40 @@ const Settings = () => {
                 <Input
                   id="job-title"
                   placeholder="مطور برمجيات"
-                  className="text-right"
+                  className="text-right disabled:opacity-70"
+                  disabled={!isEditing}
                 />
               </div>
             </div>
-            <div className="flex justify-start pt-2">
-              <Button
-                onClick={handleSaveProfile}
-                className="gap-2 flex-row-reverse"
-              >
-                <Save className="w-4 h-4" />
-                حفظ التغييرات
-              </Button>
+            <div className="flex justify-start pt-2 gap-3">
+              {isEditing ? (
+                <>
+                  <Button
+                    onClick={handleSaveProfile}
+                    className="gap-2 flex-row-reverse"
+                  >
+                    <Save className="w-4 h-4" />
+                    حفظ التغييرات
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsEditing(false)}
+                    className="gap-2 flex-row-reverse"
+                  >
+                    <X className="w-4 h-4" />
+                    إلغاء
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  variant="outline"
+                  onClick={() => setIsEditing(true)}
+                  className="gap-2 flex-row-reverse"
+                >
+                  <Pencil className="w-4 h-4" />
+                  تعديل البيانات
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>

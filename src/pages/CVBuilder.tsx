@@ -1484,7 +1484,6 @@ const CVBuilder = () => {
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  className="rotate-180"
                 >
                   <path d="m9 18 6-6-6-6" />
                 </svg>
@@ -1520,6 +1519,7 @@ const CVBuilder = () => {
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
+                    className="rotate-180"
                   >
                     <path d="m9 18 6-6-6-6" />
                   </svg>
