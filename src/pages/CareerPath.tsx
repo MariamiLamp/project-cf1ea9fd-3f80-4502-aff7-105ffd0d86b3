@@ -23,6 +23,7 @@ import {
   Clock,
   CheckCircle2,
   Circle,
+  Check,
   Rocket,
   GraduationCap,
   Briefcase,
@@ -55,10 +56,10 @@ const CareerPath = () => {
   const [roadmap, setRoadmap] = useState<RoadmapPhase[] | null>(null);
   const [completedItems, setCompletedItems] = useState<Set<string>>(new Set());
   const [completedResources, setCompletedResources] = useState<Set<string>>(
-    new Set()
+    new Set(),
   );
   const [openPhases, setOpenPhases] = useState<Set<string>>(
-    new Set(["phase-1"])
+    new Set(["phase-1"]),
   );
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
 
@@ -74,43 +75,49 @@ const CareerPath = () => {
     });
   };
 
-  const handleOpenResource = (
-    itemId: string,
-    idx: number,
-    resource: string,
-    type: string
-  ) => {
+  const handleOpenResource = (resource: string) => {
+    // Open an external search (Google) for the resource in a new tab
+    const url = `https://www.google.com/search?q=${encodeURIComponent(
+      resource,
+    )}`;
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
+  const handleCompleteResource = (itemId: string, idx: number) => {
     const resourceKey = `${itemId}-resource-${idx}`;
 
     setCompletedResources((prev) => {
       const newSet = new Set(prev);
-      newSet.add(resourceKey);
+      if (newSet.has(resourceKey)) {
+        newSet.delete(resourceKey);
+      } else {
+        newSet.add(resourceKey);
+      }
 
-      // If all resources for this item are completed, mark the item completed
+      // Check if all resources for this item are completed
       const item = roadmap
         ?.flatMap((p) => p.items)
         .find((i) => i.id === itemId);
+
       if (item && item.resources) {
-        const allDone = item.resources.every((_, i2) =>
-          newSet.has(`${itemId}-resource-${i2}`)
-        );
-        if (allDone) {
-          setCompletedItems((prevItems) => {
-            const s = new Set(prevItems);
+        const allDone = item.resources.every((_, i2) => {
+          const key = `${itemId}-resource-${i2}`;
+          return key === resourceKey ? !prev.has(resourceKey) : prev.has(key);
+        });
+
+        setCompletedItems((prevItems) => {
+          const s = new Set(prevItems);
+          if (allDone) {
             s.add(itemId);
-            return s;
-          });
-        }
+          } else {
+            s.delete(itemId);
+          }
+          return s;
+        });
       }
 
       return newSet;
     });
-
-    // Open an external search (Google) for the resource in a new tab
-    const url = `https://www.google.com/search?q=${encodeURIComponent(
-      resource
-    )}`;
-    window.open(url, "_blank", "noopener,noreferrer");
   };
 
   const generateRoadmap = () => {
@@ -534,10 +541,10 @@ const CareerPath = () => {
             <div className="space-y-4">
               {roadmap.map((phase, phaseIndex) => {
                 const phaseCompletedCount = phase.items.filter((item) =>
-                  completedItems.has(item.id)
+                  completedItems.has(item.id),
                 ).length;
                 const phaseProgress = Math.round(
-                  (phaseCompletedCount / phase.items.length) * 100
+                  (phaseCompletedCount / phase.items.length) * 100,
                 );
                 const isPhaseOpen = openPhases.has(phase.id);
 
@@ -645,7 +652,7 @@ const CareerPath = () => {
                                               <Badge
                                                 variant="outline"
                                                 className={`text-xs gap-1 ${getItemTypeBadgeClass(
-                                                  item.type
+                                                  item.type,
                                                 )}`}
                                               >
                                                 {getItemIcon(item.type)}
@@ -691,7 +698,7 @@ const CareerPath = () => {
                                                   const resourceKey = `${item.id}-resource-${idx}`;
                                                   const isResourceCompleted =
                                                     completedResources.has(
-                                                      resourceKey
+                                                      resourceKey,
                                                     );
                                                   const basePath =
                                                     item.type === "course"
@@ -701,7 +708,7 @@ const CareerPath = () => {
                                                   return (
                                                     <div
                                                       key={idx}
-                                                      className={`flex items-center gap-3 p-2 rounded-lg border transition-all ${
+                                                      className={`flex items-center justify-between gap-3 p-2 rounded-lg border transition-all ${
                                                         isResourceCompleted
                                                           ? "bg-success/10 border-success/30"
                                                           : "bg-card border-border hover:border-primary/30"
@@ -711,14 +718,11 @@ const CareerPath = () => {
                                                         onClick={(e) => {
                                                           e.stopPropagation();
                                                           handleOpenResource(
-                                                            item.id,
-                                                            idx,
                                                             resource,
-                                                            item.type
                                                           );
                                                         }}
                                                         href="#"
-                                                        className={`text-sm w-full text-right ${
+                                                        className={`text-sm text-right flex-1 hover:text-primary transition-colors ${
                                                           isResourceCompleted
                                                             ? "line-through text-muted-foreground"
                                                             : "text-foreground"
@@ -726,9 +730,38 @@ const CareerPath = () => {
                                                       >
                                                         {resource}
                                                       </a>
+                                                      <Button
+                                                        size="sm"
+                                                        variant={
+                                                          isResourceCompleted
+                                                            ? "success"
+                                                            : "outline"
+                                                        }
+                                                        className={`h-7 px-3 text-xs gap-1 ${
+                                                          isResourceCompleted
+                                                            ? "bg-success/20 text-success hover:bg-success/30 border-transparent"
+                                                            : ""
+                                                        }`}
+                                                        onClick={(e) => {
+                                                          e.stopPropagation();
+                                                          handleCompleteResource(
+                                                            item.id,
+                                                            idx,
+                                                          );
+                                                        }}
+                                                      >
+                                                        {isResourceCompleted ? (
+                                                          <>
+                                                            <Check className="h-3 w-3" />
+                                                            مكتمل
+                                                          </>
+                                                        ) : (
+                                                          "اكتمل"
+                                                        )}
+                                                      </Button>
                                                     </div>
                                                   );
-                                                }
+                                                },
                                               )}
                                             </div>
                                           </div>
