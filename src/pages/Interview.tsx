@@ -408,7 +408,7 @@ const InterviewPage = () => {
 
   // Generator state
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchType, setSearchType] = useState<"job" | "topic">("job");
+  const searchType = "topic"; // Fixed to topic-only mode
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedQuestions, setGeneratedQuestions] = useState<
     GeneratedQuestion[]
@@ -450,104 +450,54 @@ const InterviewPage = () => {
     let questions: GeneratedQuestion[] = [];
     const count = parseInt(questionCount);
 
-    if (searchType === "job") {
-      // Check if we have predefined questions for this job
-      const matchedJob = Object.keys(questionsByJobTitle).find(
-        (job) => job.includes(searchQuery) || searchQuery.includes(job),
-      );
+    // Topic-based questions
+    const matchedTopic = Object.keys(topicQuestions).find(
+      (topic) =>
+        topic.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        searchQuery.toLowerCase().includes(topic.toLowerCase()),
+    );
 
-      if (matchedJob) {
-        questions = questionsByJobTitle[matchedJob].slice(0, count);
-      } else {
-        // Generate generic questions for the job
-        questions = [
-          {
-            id: `gen-1-${Date.now()}`,
-            question: `ما هي أهم المهارات المطلوبة لوظيفة ${searchQuery}؟`,
-            answer: `المهارات الأساسية تشمل: الخبرة التقنية في المجال، مهارات التواصل، القدرة على حل المشكلات، العمل الجماعي، والتعلم المستمر. يُنصح بالتركيز على المهارات المذكورة في وصف الوظيفة.`,
-            category: "عام",
-            difficulty: "easy" as const,
-          },
-          {
-            id: `gen-2-${Date.now()}`,
-            question: `كيف تتعامل مع التحديات اليومية في وظيفة ${searchQuery}؟`,
-            answer: `أحدد أولويات المهام، أتواصل مع الفريق لحل المشكلات، أستخدم أدوات إدارة المشاريع، وأتعلم من التجارب السابقة لتحسين الأداء المستقبلي.`,
-            category: "سلوكي",
-            difficulty: "medium" as const,
-          },
-          {
-            id: `gen-3-${Date.now()}`,
-            question: `ما الذي يميزك عن المرشحين الآخرين لوظيفة ${searchQuery}؟`,
-            answer: `ركز على نقاط قوتك الفريدة، خبراتك العملية ذات الصلة، إنجازاتك القابلة للقياس، ومهاراتك الشخصية التي تضيف قيمة للفريق.`,
-            category: "عام",
-            difficulty: "medium" as const,
-          },
-          {
-            id: `gen-4-${Date.now()}`,
-            question: `كيف تحافظ على تطورك المهني في مجال ${searchQuery}؟`,
-            answer: `متابعة أحدث الاتجاهات في المجال، حضور المؤتمرات والدورات، القراءة المستمرة، بناء شبكة علاقات مهنية، وتطبيق المعرفة الجديدة في العمل.`,
-            category: "تطوير",
-            difficulty: "easy" as const,
-          },
-          {
-            id: `gen-5-${Date.now()}`,
-            question: `صف مشروعاً ناجحاً قمت به متعلق بـ ${searchQuery}`,
-            answer: `استخدم طريقة STAR: اشرح الموقف والتحدي، المهمة المطلوبة، الإجراءات التي اتخذتها، والنتائج الإيجابية مع الأرقام إن أمكن.`,
-            category: "سلوكي",
-            difficulty: "medium" as const,
-          },
-        ].slice(0, count);
-      }
+    if (matchedTopic) {
+      questions = topicQuestions[matchedTopic].slice(0, count);
     } else {
-      // Topic-based questions
-      const matchedTopic = Object.keys(topicQuestions).find(
-        (topic) =>
-          topic.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          searchQuery.toLowerCase().includes(topic.toLowerCase()),
-      );
-
-      if (matchedTopic) {
-        questions = topicQuestions[matchedTopic].slice(0, count);
-      } else {
-        // Generate generic topic questions
-        questions = [
-          {
-            id: `topic-1-${Date.now()}`,
-            question: `ما هي أساسيات ${searchQuery}؟`,
-            answer: `المفاهيم الأساسية تشمل: التعريف والغرض، المكونات الرئيسية، الاستخدامات الشائعة، وأفضل الممارسات في المجال.`,
-            category: "أساسيات",
-            difficulty: "easy" as const,
-          },
-          {
-            id: `topic-2-${Date.now()}`,
-            question: `ما هي التحديات الشائعة في ${searchQuery} وكيف تتعامل معها؟`,
-            answer: `التحديات تختلف حسب السياق، لكن عموماً: فهم المتطلبات جيداً، التخطيط المسبق، التعلم من الأخطاء، والاستفادة من خبرات الآخرين.`,
-            category: "متقدم",
-            difficulty: "medium" as const,
-          },
-          {
-            id: `topic-3-${Date.now()}`,
-            question: `كيف تقارن ${searchQuery} مع البدائل الأخرى؟`,
-            answer: `المقارنة تعتمد على: الأداء، سهولة الاستخدام، التكلفة، الدعم المجتمعي، والملاءمة للمشروع. لكل خيار مميزاته وعيوبه.`,
-            category: "مقارنة",
-            difficulty: "medium" as const,
-          },
-          {
-            id: `topic-4-${Date.now()}`,
-            question: `ما هي أفضل الممارسات في ${searchQuery}؟`,
-            answer: `اتبع المعايير الصناعية، وثق عملك، اختبر باستمرار، تعلم من المجتمع، وابقَ محدثاً مع التطورات الجديدة.`,
-            category: "أفضل الممارسات",
-            difficulty: "medium" as const,
-          },
-          {
-            id: `topic-5-${Date.now()}`,
-            question: `كيف تتعلم ${searchQuery} بشكل فعال؟`,
-            answer: `ابدأ بالأساسيات، طبق ما تعلمته في مشاريع صغيرة، اقرأ التوثيق الرسمي، شارك في المجتمعات، واطلب feedback من الخبراء.`,
-            category: "تعلم",
-            difficulty: "easy" as const,
-          },
-        ].slice(0, count);
-      }
+      // Generate generic topic questions
+      questions = [
+        {
+          id: `topic-1-${Date.now()}`,
+          question: `ما هي أساسيات ${searchQuery}؟`,
+          answer: `المفاهيم الأساسية تشمل: التعريف والغرض، المكونات الرئيسية، الاستخدامات الشائعة، وأفضل الممارسات في المجال.`,
+          category: "أساسيات",
+          difficulty: "easy" as const,
+        },
+        {
+          id: `topic-2-${Date.now()}`,
+          question: `ما هي التحديات الشائعة في ${searchQuery} وكيف تتعامل معها؟`,
+          answer: `التحديات تختلف حسب السياق، لكن عموماً: فهم المتطلبات جيداً، التخطيط المسبق، التعلم من الأخطاء، والاستفادة من خبرات الآخرين.`,
+          category: "متقدم",
+          difficulty: "medium" as const,
+        },
+        {
+          id: `topic-3-${Date.now()}`,
+          question: `كيف تقارن ${searchQuery} مع البدائل الأخرى؟`,
+          answer: `المقارنة تعتمد على: الأداء، سهولة الاستخدام، التكلفة، الدعم المجتمعي، والملاءمة للمشروع. لكل خيار مميزاته وعيوبه.`,
+          category: "مقارنة",
+          difficulty: "medium" as const,
+        },
+        {
+          id: `topic-4-${Date.now()}`,
+          question: `ما هي أفضل الممارسات في ${searchQuery}؟`,
+          answer: `اتبع المعايير الصناعية، وثق عملك، اختبر باستمرار، تعلم من المجتمع، وابقَ محدثاً مع التطورات الجديدة.`,
+          category: "أفضل الممارسات",
+          difficulty: "medium" as const,
+        },
+        {
+          id: `topic-5-${Date.now()}`,
+          question: `كيف تتعلم ${searchQuery} بشكل فعال؟`,
+          answer: `ابدأ بالأساسيات، طبق ما تعلمته في مشاريع صغيرة، اقرأ التوثيق الرسمي، شارك في المجتمعات، واطلب feedback من الخبراء.`,
+          category: "تعلم",
+          difficulty: "easy" as const,
+        },
+      ].slice(0, count);
     }
 
     setGeneratedQuestions(questions);
@@ -621,141 +571,16 @@ const InterviewPage = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label>نوع البحث</Label>
-              <Popover open={openType} onOpenChange={setOpenType}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={openType}
-                    className="w-full justify-between"
-                  >
-                    <div className="flex items-center gap-2">
-                      {searchType === "job" ? (
-                        <Briefcase className="w-4 h-4 text-muted-foreground" />
-                      ) : (
-                        <HelpCircle className="w-4 h-4 text-muted-foreground" />
-                      )}
-                      {
-                        searchTypeOptions.find((o) => o.value === searchType)
-                          ?.label
-                      }
-                    </div>
-                    <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent
-                  className="p-0 w-[var(--radix-popover-trigger-width)]"
-                  align="start"
-                >
-                  <Command>
-                    <CommandList>
-                      <CommandGroup>
-                        {searchTypeOptions.map((option) => (
-                          <CommandItem
-                            key={option.value}
-                            value={option.value}
-                            onSelect={(currentValue) => {
-                              setSearchType(currentValue as "job" | "topic");
-                              setOpenType(false);
-                            }}
-                            className="flex items-center justify-between cursor-pointer"
-                          >
-                            <div className="flex items-center gap-2">
-                              <option.icon className="w-4 h-4" />
-                              {option.label}
-                            </div>
-                            <Check
-                              className={cn(
-                                "h-4 w-4",
-                                searchType === option.value
-                                  ? "opacity-100"
-                                  : "opacity-0",
-                              )}
-                            />
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            <div className="space-y-2">
-              <Label>
-                {searchType === "job" ? "المسمى الوظيفي" : "الموضوع"}
-              </Label>
-              {searchType === "job" ? (
-                <Popover open={openJobSearch} onOpenChange={setOpenJobSearch}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      aria-expanded={openJobSearch}
-                      className="w-full h-11 justify-between bg-muted/50 border-transparent hover:bg-muted/70 px-4 font-normal"
-                    >
-                      {searchQuery
-                        ? jobTitles.find((job) => job.label === searchQuery)
-                            ?.label || searchQuery
-                        : "ابحث عن مسمى وظيفي..."}
-                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent
-                    className="w-[var(--radix-popover-trigger-width)] p-0"
-                    align="start"
-                  >
-                    <Command>
-                      <CommandInput
-                        placeholder="ابحث عن مسمى وظيفي..."
-                        className="h-9"
-                      />
-                      <CommandList>
-                        <CommandEmpty>
-                          لم يتم العثور على مسمى وظيفي.
-                        </CommandEmpty>
-                        <CommandGroup>
-                          {jobTitles.map((job) => (
-                            <CommandItem
-                              key={job.value}
-                              value={job.label}
-                              onSelect={(currentValue) => {
-                                setSearchQuery(
-                                  currentValue === searchQuery
-                                    ? ""
-                                    : currentValue,
-                                );
-                                setOpenJobSearch(false);
-                              }}
-                            >
-                              <Check
-                                className={cn(
-                                  "mr-2 h-4 w-4",
-                                  searchQuery === job.label
-                                    ? "opacity-100"
-                                    : "opacity-0",
-                                )}
-                              />
-                              {job.label}
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-              ) : (
-                <div className="relative">
-                  <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input
-                    placeholder="مثال: React, JavaScript, SQL"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pr-10"
-                  />
-                </div>
-              )}
+              <Label>الموضوع</Label>
+              <div className="relative">
+                <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder="مثال: React, JavaScript, SQL"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pr-10"
+                />
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -851,9 +676,7 @@ const InterviewPage = () => {
                 <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto mb-4" />
                 <p className="text-muted-foreground">جاري توليد الأسئلة...</p>
                 <p className="text-sm text-muted-foreground mt-2">
-                  يتم تحليل{" "}
-                  {searchType === "job" ? "المسمى الوظيفي" : "الموضوع"} وإنشاء
-                  أسئلة مخصصة
+                  يتم تحليل الموضوع وإنشاء أسئلة مخصصة
                 </p>
               </CardContent>
             </Card>
