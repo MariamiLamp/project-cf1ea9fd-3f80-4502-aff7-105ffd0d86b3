@@ -114,7 +114,7 @@ const PostsPlanner = () => {
 
   // Scheduling State
   const [scheduleMode, setScheduleMode] = useState<"single" | "recurring">(
-    "single"
+    "single",
   );
   const [recurringSettings, setRecurringSettings] = useState({
     selectedDays: ["sunday", "tuesday", "thursday"] as string[],
@@ -171,7 +171,7 @@ const PostsPlanner = () => {
     tone: string,
     includeHashtags: boolean,
     includeEmojis: boolean,
-    variation: number
+    variation: number,
   ): string => {
     const variations = {
       professional: {
@@ -441,7 +441,7 @@ const PostsPlanner = () => {
           generatorForm.tone,
           generatorForm.includeHashtags,
           generatorForm.includeEmojis,
-          i
+          i,
         ),
         platform: generatorForm.platform,
         selected: true,
@@ -467,13 +467,13 @@ const PostsPlanner = () => {
 
   const handleTogglePostSelection = (id: string) => {
     setGeneratedPosts((posts) =>
-      posts.map((p) => (p.id === id ? { ...p, selected: !p.selected } : p))
+      posts.map((p) => (p.id === id ? { ...p, selected: !p.selected } : p)),
     );
   };
 
   const handleUpdatePostContent = (id: string, content: string) => {
     setGeneratedPosts((posts) =>
-      posts.map((p) => (p.id === id ? { ...p, content } : p))
+      posts.map((p) => (p.id === id ? { ...p, content } : p)),
     );
   };
 
@@ -540,7 +540,7 @@ const PostsPlanner = () => {
         description: `تم جدولة ${newPosts.length} منشور في ${format(
           selectedDate,
           "dd MMMM yyyy",
-          { locale: ar }
+          { locale: ar },
         )}`,
       });
     } else {
@@ -620,20 +620,8 @@ const PostsPlanner = () => {
     });
   };
 
-  const handleMarkAsPosted = (id: string) => {
-    setScheduledPosts(
-      scheduledPosts.map((p) =>
-        p.id === id ? { ...p, status: "posted" as const } : p
-      )
-    );
-    toast({
-      title: "تم التحديث",
-      description: "تم تحديث حالة المنشور",
-    });
-  };
-
   const postsForSelectedDate = scheduledPosts.filter((p) =>
-    isSameDay(p.date, selectedDate)
+    isSameDay(p.date, selectedDate),
   );
 
   const getDatesWithPosts = () => {
@@ -887,7 +875,7 @@ const PostsPlanner = () => {
                                 onChange={(e) =>
                                   handleUpdatePostContent(
                                     post.id,
-                                    e.target.value
+                                    e.target.value,
                                   )
                                 }
                                 rows={6}
@@ -1230,15 +1218,15 @@ const PostsPlanner = () => {
                                       post.status === "posted"
                                         ? "default"
                                         : post.status === "scheduled"
-                                        ? "secondary"
-                                        : "outline"
+                                          ? "secondary"
+                                          : "outline"
                                     }
                                   >
                                     {post.status === "posted"
                                       ? "تم النشر"
                                       : post.status === "scheduled"
-                                      ? "مجدول"
-                                      : "مسودة"}
+                                        ? "مجدول"
+                                        : "مسودة"}
                                   </Badge>
                                 </div>
                                 <div className="flex items-center gap-3">
@@ -1278,17 +1266,6 @@ const PostsPlanner = () => {
                                   <Trash2 className="w-3 h-3 ml-1" />
                                   حذف
                                 </Button>
-                                {post.status !== "posted" && (
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    className="text-green-500 hover:text-green-600"
-                                    onClick={() => handleMarkAsPosted(post.id)}
-                                  >
-                                    <CheckCircle className="w-3 h-3 ml-1" />
-                                    تم النشر
-                                  </Button>
-                                )}
                                 <Button
                                   size="sm"
                                   variant="outline"
@@ -1454,7 +1431,7 @@ const PostsPlanner = () => {
                     {Math.ceil(
                       (getRecurringDates().length *
                         generatedPosts.filter((p) => p.selected).length) /
-                        generatedPosts.filter((p) => p.selected).length
+                        generatedPosts.filter((p) => p.selected).length,
                     ) || 0}{" "}
                     منشور
                   </p>

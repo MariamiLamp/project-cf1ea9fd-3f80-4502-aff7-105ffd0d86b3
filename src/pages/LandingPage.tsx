@@ -130,6 +130,8 @@ const LandingPage = () => {
             {[
               { label: "الوظائف", icon: Search, path: "/jobs" },
               { label: "تواصل معنا", icon: MessageCircle, path: "/contact" },
+              { label: "مدونة", icon: BookOpen, path: "/contact" },
+              { label: "قوالب", icon: FileText, path: "/templates" },
             ].map((item) => (
               <Link
                 key={item.label}
@@ -150,10 +152,10 @@ const LandingPage = () => {
                 className="font-medium group border border-transparent hover:border-border/50 transition-all duration-300"
               >
                 <User className="w-4 h-4 ml-2 opacity-60 group-hover:opacity-100" />
-                تسجيل الدخول
+                تسجيل الدخول/تسجيل
               </Button>
             </Link>
-            <Link to="/register">
+            {/* <Link to="/register">
               <Button
                 size="sm"
                 className="font-medium shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all duration-300 hover:scale-105"
@@ -161,7 +163,7 @@ const LandingPage = () => {
                 <Target className="w-4 h-4 ml-2" />
                 انضم إلينا
               </Button>
-            </Link>
+            </Link> */}
           </div>
         </div>
       </header>
@@ -366,7 +368,7 @@ const LandingPage = () => {
         </section>
 
         {/* Subscription Plans Section */}
-        <section className="py-24 relative">
+        {/* <section className="py-24 relative">
           <div className="container mx-auto px-6">
             <div className="text-center mb-16">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
@@ -481,7 +483,7 @@ const LandingPage = () => {
               ))}
             </div>
           </div>
-        </section>
+        </section> */}
 
         {/* CTA Section */}
         <section className="py-32 relative overflow-hidden">
