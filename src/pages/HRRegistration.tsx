@@ -25,6 +25,7 @@ import {
   UserCheck,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import ImageCropper from "@/components/ImageCropper";
 
 const HRRegistration = () => {
   const navigate = useNavigate();
@@ -46,6 +47,8 @@ const HRRegistration = () => {
   const [bio, setBio] = useState("");
   const [skills, setSkills] = useState<string[]>([]);
   const [newSkill, setNewSkill] = useState("");
+  const [showCropper, setShowCropper] = useState(false);
+  const [tempImage, setTempImage] = useState<string | null>(null);
 
   // Step 3: Documents
   const [cvFile, setCvFile] = useState<File | null>(null);
@@ -65,17 +68,30 @@ const HRRegistration = () => {
   const [newExpDuration, setNewExpDuration] = useState("");
 
   const handleProfilePictureChange = (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const file = e.target.files?.[0];
     if (file) {
-      setProfilePicture(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setProfilePicturePreview(reader.result as string);
+        setTempImage(reader.result as string);
+        setShowCropper(true);
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const onCropComplete = (croppedImage: string) => {
+    setProfilePicturePreview(croppedImage);
+    setShowCropper(false);
+    fetch(croppedImage)
+      .then((res) => res.blob())
+      .then((blob) => {
+        const file = new File([blob], "hr_profile.jpg", {
+          type: "image/jpeg",
+        });
+        setProfilePicture(file);
+      });
   };
 
   const handleCvChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -200,8 +216,8 @@ const HRRegistration = () => {
                     currentStep > step.number
                       ? "bg-primary text-primary-foreground"
                       : currentStep === step.number
-                      ? "bg-primary/20 border-2 border-primary text-primary"
-                      : "bg-muted text-muted-foreground"
+                        ? "bg-primary/20 border-2 border-primary text-primary"
+                        : "bg-muted text-muted-foreground"
                   }`}
                 >
                   {currentStep > step.number ? (
@@ -657,6 +673,14 @@ const HRRegistration = () => {
             تسجيل الدخول
           </button>
         </p>
+
+        {showCropper && tempImage && (
+          <ImageCropper
+            image={tempImage}
+            onCropComplete={onCropComplete}
+            onCancel={() => setShowCropper(false)}
+          />
+        )}
       </div>
     </div>
   );

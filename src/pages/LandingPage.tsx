@@ -18,15 +18,20 @@ import {
   Award,
   Clock,
   Search,
-  Filter,
-  Bell,
   MessageCircle,
   Crown,
+  ShieldCheck,
+  Store,
+  Mail,
+  Map,
+  MessageSquare,
+  Calendar,
 } from "lucide-react";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { Footer } from "@/components/layout/Footer";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import MobileMenu from "@/components/layout/MobileMenu";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -137,21 +142,22 @@ const LandingPage = () => {
 
           <nav className="hidden md:flex items-center gap-10">
             {[
-              { label: t("nav.jobs"), icon: Search, path: "/jobs" },
               {
                 label: t("nav.contact"),
                 icon: MessageCircle,
                 path: "/contact",
               },
-              {
-                label: t("nav.templates"),
-                icon: FileText,
-                path: "/templates",
-              },
+              { label: t("nav.jobs"), icon: Search, path: "/jobs" },
               {
                 label: t("nav.blog"),
                 icon: Crown,
                 path: "/blog",
+              },
+
+              {
+                label: t("nav.templates"),
+                icon: FileText,
+                path: "/templates",
               },
             ].map((item) => (
               <Link
@@ -168,18 +174,36 @@ const LandingPage = () => {
           <div className="flex items-center gap-2 sm:gap-4">
             <LanguageSwitcher />
             <ThemeToggle />
-            <Link to="/auth">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="font-medium group border border-transparent hover:border-border/50 transition-all duration-300"
-              >
-                <User
-                  className={`w-4 h-4 ${isRTL ? "ml-2" : "mr-2"} opacity-60 group-hover:opacity-100`}
-                />
-                {t("nav.login")}
-              </Button>
-            </Link>
+            <div className="hidden md:block">
+              <Link to="/auth">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="font-medium group border border-transparent hover:border-border/50 transition-all duration-300"
+                >
+                  <User
+                    className={`w-4 h-4 ${isRTL ? "ml-2" : "mr-2"} opacity-60 group-hover:opacity-100`}
+                  />
+                  {t("nav.login")}
+                </Button>
+              </Link>
+            </div>
+            <MobileMenu
+              links={[
+                { label: t("nav.jobs"), href: "/jobs", icon: Search },
+                {
+                  label: t("nav.contact"),
+                  href: "/contact",
+                  icon: MessageCircle,
+                },
+                {
+                  label: t("nav.templates"),
+                  href: "/templates",
+                  icon: FileText,
+                },
+                { label: t("nav.blog"), href: "/blog", icon: Crown },
+              ]}
+            />
           </div>
         </div>
       </header>
@@ -376,6 +400,66 @@ const LandingPage = () => {
                     t("landing.features.directConnect.feature1"),
                     t("landing.features.directConnect.feature2"),
                     t("landing.features.directConnect.feature3"),
+                  ],
+                },
+                {
+                  title: t("landing.features.atsCheck.title"),
+                  description: t("landing.features.atsCheck.description"),
+                  icon: ShieldCheck,
+                  features: [
+                    t("landing.features.atsCheck.feature1"),
+                    t("landing.features.atsCheck.feature2"),
+                    t("landing.features.atsCheck.feature3"),
+                  ],
+                },
+                {
+                  title: t("landing.features.templateMarket.title"),
+                  description: t("landing.features.templateMarket.description"),
+                  icon: Store,
+                  features: [
+                    t("landing.features.templateMarket.feature1"),
+                    t("landing.features.templateMarket.feature2"),
+                    t("landing.features.templateMarket.feature3"),
+                  ],
+                },
+                {
+                  title: t("landing.features.coverLetter.title"),
+                  description: t("landing.features.coverLetter.description"),
+                  icon: Mail,
+                  features: [
+                    t("landing.features.coverLetter.feature1"),
+                    t("landing.features.coverLetter.feature2"),
+                    t("landing.features.coverLetter.feature3"),
+                  ],
+                },
+                {
+                  title: t("landing.features.roadmap.title"),
+                  description: t("landing.features.roadmap.description"),
+                  icon: Map,
+                  features: [
+                    t("landing.features.roadmap.feature1"),
+                    t("landing.features.roadmap.feature2"),
+                    t("landing.features.roadmap.feature3"),
+                  ],
+                },
+                {
+                  title: t("landing.features.interviewGen.title"),
+                  description: t("landing.features.interviewGen.description"),
+                  icon: MessageSquare,
+                  features: [
+                    t("landing.features.interviewGen.feature1"),
+                    t("landing.features.interviewGen.feature2"),
+                    t("landing.features.interviewGen.feature3"),
+                  ],
+                },
+                {
+                  title: t("landing.features.postsCalendar.title"),
+                  description: t("landing.features.postsCalendar.description"),
+                  icon: Calendar,
+                  features: [
+                    t("landing.features.postsCalendar.feature1"),
+                    t("landing.features.postsCalendar.feature2"),
+                    t("landing.features.postsCalendar.feature3"),
                   ],
                 },
               ].map((feature, index) => (
