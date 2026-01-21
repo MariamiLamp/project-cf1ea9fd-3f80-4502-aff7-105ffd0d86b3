@@ -1,0 +1,55 @@
+{
+  "common": {
+    "search": "ابحث عن وظائف، شركات، أو مهارات...",
+    "notifications": "الإشعارات",
+    "jobSeeker": "باحث عن عمل",
+    "language": "اللغة",
+    "arabic": "العربية",
+    "english": "English"
+  },
+  "nav": {
+    "home": "الرئيسية",
+    "dashboard": "لوحة التحكم",
+    "cvCheck": "فحص السيرة الذاتية",
+    "coverLetter": "خطاب التقديم",
+    "jobs": "الوظائف",
+    "interview": "المقابلات",
+    "careerPath": "المسار المهني",
+    "cvBuilder": "بناء السيرة الذاتية",
+    "subscription": "الاشتراك",
+    "templates": "القوالب",
+    "settings": "الإعدادات",
+    "contact": "اتصل بنا"
+  },
+  "landing": {
+    "heroTitle": "ابني مستقبلك المهني",
+    "heroSubtitle": "منصة ذكية تساعدك على بناء سيرة ذاتية احترافية والحصول على وظيفة أحلامك",
+    "getStarted": "ابدأ الآن",
+    "learnMore": "اعرف المزيد",
+    "features": "المميزات",
+    "featuresTitle": "كل ما تحتاجه للنجاح المهني",
+    "featuresSubtitle": "أدوات ذكية مدعومة بالذكاء الاصطناعي لمساعدتك في كل خطوة",
+    "cvAnalysis": "تحليل السيرة الذاتية",
+    "cvAnalysisDesc": "تحليل شامل لسيرتك الذاتية مع توصيات للتحسين",
+    "interviewPrep": "التحضير للمقابلات",
+    "interviewPrepDesc": "أسئلة وإجابات نموذجية للمقابلات الشخصية",
+    "jobMatching": "مطابقة الوظائف",
+    "jobMatchingDesc": "توصيات وظائف تناسب مهاراتك وخبراتك",
+    "careerGuidance": "الإرشاد المهني",
+    "careerGuidanceDesc": "خطط تطوير مهنية مخصصة لأهدافك",
+    "testimonials": "آراء العملاء",
+    "testimonialsTitle": "ماذا يقول عملاؤنا",
+    "ctaTitle": "ابدأ رحلتك المهنية اليوم",
+    "ctaSubtitle": "انضم إلى آلاف المحترفين الذين يستخدمون منصتنا",
+    "ctaButton": "سجل مجاناً"
+  },
+  "auth": {
+    "login": "تسجيل الدخول",
+    "register": "إنشاء حساب",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "noAccount": "ليس لديك حساب؟",
+    "hasAccount": "لديك حساب بالفعل؟"
+  }
+}
