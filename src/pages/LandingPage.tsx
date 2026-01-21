@@ -143,6 +143,16 @@ const LandingPage = () => {
                 icon: MessageCircle,
                 path: "/contact",
               },
+              {
+                label: t("nav.templates"),
+                icon: FileText,
+                path: "/templates",
+              },
+              {
+                label: t("nav.blog"),
+                icon: Crown,
+                path: "/blog",
+              },
             ].map((item) => (
               <Link
                 key={item.path}
