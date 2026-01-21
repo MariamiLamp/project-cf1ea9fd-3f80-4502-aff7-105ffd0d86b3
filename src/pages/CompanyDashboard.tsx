@@ -2052,6 +2052,29 @@ const CompanyDashboard = () => {
                     </div>
                   </div>
 
+                  {/* Skills Section */}
+                  <div className="space-y-2 gap-2 py-2">
+                    <p className="text-sm text-muted-foreground">
+                      المهارات والخبرات
+                    </p>
+                    <div className="flex flex-wrap gap-2 py-2">
+                      {candidates
+                        .find((c) => c.id === selectedApplication.candidateId)
+                        ?.skills.map((skill, i) => (
+                          <Badge
+                            key={i}
+                            variant="secondary"
+                            className="px-3 py-1 bg-primary/10 text-primary border-primary/20"
+                          >
+                            {skill}
+                          </Badge>
+                        ))}
+                      <Badge variant="outline" className="px-3 py-1">
+                        {(selectedApplication as any).experience || "بدون خبرة"}
+                      </Badge>
+                    </div>
+                  </div>
+
                   <div className="grid grid-cols-2 gap-4">
                     <div className="p-3 bg-muted/50 rounded-lg">
                       <p className="text-sm text-muted-foreground">
