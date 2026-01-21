@@ -1,0 +1,55 @@
+{
+  "common": {
+    "search": "Search for jobs, companies, or skills...",
+    "notifications": "Notifications",
+    "jobSeeker": "Job Seeker",
+    "language": "Language",
+    "arabic": "العربية",
+    "english": "English"
+  },
+  "nav": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "cvCheck": "CV Check",
+    "coverLetter": "Cover Letter",
+    "jobs": "Jobs",
+    "interview": "Interview",
+    "careerPath": "Career Path",
+    "cvBuilder": "CV Builder",
+    "subscription": "Subscription",
+    "templates": "Templates",
+    "settings": "Settings",
+    "contact": "Contact Us"
+  },
+  "landing": {
+    "heroTitle": "Build Your Career Future",
+    "heroSubtitle": "Smart platform that helps you build a professional resume and land your dream job",
+    "getStarted": "Get Started",
+    "learnMore": "Learn More",
+    "features": "Features",
+    "featuresTitle": "Everything You Need for Career Success",
+    "featuresSubtitle": "AI-powered tools to help you at every step",
+    "cvAnalysis": "CV Analysis",
+    "cvAnalysisDesc": "Comprehensive CV analysis with improvement recommendations",
+    "interviewPrep": "Interview Preparation",
+    "interviewPrepDesc": "Sample questions and answers for job interviews",
+    "jobMatching": "Job Matching",
+    "jobMatchingDesc": "Job recommendations that match your skills and experience",
+    "careerGuidance": "Career Guidance",
+    "careerGuidanceDesc": "Personalized career development plans for your goals",
+    "testimonials": "Testimonials",
+    "testimonialsTitle": "What Our Clients Say",
+    "ctaTitle": "Start Your Career Journey Today",
+    "ctaSubtitle": "Join thousands of professionals using our platform",
+    "ctaButton": "Register for Free"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Create Account",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot Password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?"
+  }
+}
