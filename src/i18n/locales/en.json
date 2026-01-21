@@ -5,7 +5,11 @@
     "jobSeeker": "Job Seeker",
     "language": "Language",
     "arabic": "العربية",
-    "english": "English"
+    "english": "English",
+    "gender": "Gender",
+    "male": "Male",
+    "female": "Female",
+    "ratherNotToSay": "Rather not to say"
   },
   "nav": {
     "home": "Home",
@@ -17,11 +21,12 @@
     "careerPath": "Career Path",
     "cvBuilder": "CV Builder",
     "subscription": "Subscription",
-    "templates": "Templates",
+    "templates": "Templates Market",
     "settings": "Settings",
     "contact": "Contact Us",
-    "login": "Login",
-    "joinUs": "Join Us"
+    "login": "Login / Sign Up",
+    "joinUs": "Join Us",
+    "blog": "Blog"
   },
   "landing": {
     "tagline": "• Smart Employment Platform •",
@@ -69,6 +74,48 @@
         "feature1": "Instant Messaging",
         "feature2": "Virtual Interviews",
         "feature3": "Automated Follow-up"
+      },
+      "atsCheck": {
+        "title": "ATS System Analysis",
+        "description": "Ensure your CV is optimized for Applicant Tracking Systems with our advanced AI analysis.",
+        "feature1": "Keyword Optimization",
+        "feature2": "Format Validation",
+        "feature3": "Score Analysis"
+      },
+      "templateMarket": {
+        "title": "Premium Templates Market",
+        "description": "Access a curated collection of professional, ATS-friendly templates for any industry.",
+        "feature1": "Modern Designs",
+        "feature2": "Easy Customization",
+        "feature3": "Industry Specific"
+      },
+      "coverLetter": {
+        "title": " Cover Letter ",
+        "description": "Generate compelling, personalized cover letters tailored to specific job descriptions.",
+        "feature1": "AI Writing assistant",
+        "feature2": "Job-Specific Tone",
+        "feature3": "Quick Generation"
+      },
+      "roadmap": {
+        "title": "Career Roadmap ",
+        "description": "Get a personalized step-by-step plan to achieve your professional career goals.",
+        "feature1": "Goal Tracking",
+        "feature2": "Skill Gap Analysis",
+        "feature3": "Timeline Planning"
+      },
+      "interviewGen": {
+        "title": " Interview Prep",
+        "description": "Prepare for interviews with AI-generated questions and personalized feedback.",
+        "feature1": "Realistic Questions",
+        "feature2": "Best Answer Tips",
+        "feature3": "Voice Practice"
+      },
+      "postsCalendar": {
+        "title": "Personal Brand Calendar",
+        "description": "Plan and schedule your professional content to build a strong presence on social media.",
+        "feature1": "Content Scheduling",
+        "feature2": "Engagement Tips",
+        "feature3": "Brand Consistency"
       }
     },
     "plans": {

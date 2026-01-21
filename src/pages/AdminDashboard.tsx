@@ -487,11 +487,6 @@ const AdminDashboard = () => {
     );
   };
 
-  const handleDeletePlan = (planId: number) => {
-    setPlans(plans.filter((p) => p.id !== planId));
-    toast({ title: "تم الحذف", description: "تم حذف خطة الاشتراك" });
-  };
-
   // Template handlers
   const handleAddTemplate = () => {
     setEditingTemplate(null);
@@ -1249,13 +1244,6 @@ const AdminDashboard = () => {
                                 }
                               >
                                 {plan.isActive ? "Stop" : "Active"}
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => handleDeletePlan(plan.id)}
-                              >
-                                <Trash2 className="w-4 h-4 text-destructive" />
                               </Button>
                             </div>
                           </TableCell>

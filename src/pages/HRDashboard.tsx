@@ -146,22 +146,18 @@ const HRDashboard = () => {
     }
 
     // Navigate to CV builder with candidate info
-    navigate(`/cv-builder?mode=hr&name=${encodeURIComponent(newCandidateName)}&title=${encodeURIComponent(newJobTitle)}`);
+    navigate(
+      `/cv-builder?mode=hr&name=${encodeURIComponent(newCandidateName)}&title=${encodeURIComponent(newJobTitle)}`,
+    );
     setShowNewCVDialog(false);
     setNewCandidateName("");
     setNewJobTitle("");
   };
 
   const handleEditCV = (cv: CreatedCV) => {
-    navigate(`/cv-builder?mode=hr&id=${cv.id}&name=${encodeURIComponent(cv.candidateName)}&title=${encodeURIComponent(cv.jobTitle)}`);
-  };
-
-  const handleDeleteCV = (id: string) => {
-    setCreatedCVs(createdCVs.filter(cv => cv.id !== id));
-    toast({
-      title: "تم الحذف",
-      description: "تم حذف السيرة الذاتية بنجاح",
-    });
+    navigate(
+      `/cv-builder?mode=hr&id=${cv.id}&name=${encodeURIComponent(cv.candidateName)}&title=${encodeURIComponent(cv.jobTitle)}`,
+    );
   };
 
   const getStatusBadge = (status: CreatedCV["status"]) => {
@@ -175,9 +171,9 @@ const HRDashboard = () => {
   };
 
   const filteredCVs = createdCVs.filter(
-    cv =>
+    (cv) =>
       cv.candidateName.includes(searchQuery) ||
-      cv.jobTitle.includes(searchQuery)
+      cv.jobTitle.includes(searchQuery),
   );
 
   return (
@@ -195,7 +191,12 @@ const HRDashboard = () => {
       </div>
 
       {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6" dir="rtl">
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="space-y-6"
+        dir="rtl"
+      >
         <TabsList className="grid w-full max-w-md grid-cols-2">
           <TabsTrigger value="overview">نظرة عامة</TabsTrigger>
           <TabsTrigger value="cvs">إدارة السير الذاتية</TabsTrigger>
@@ -232,7 +233,10 @@ const HRDashboard = () => {
                 <FileText className="w-5 h-5 text-primary" />
                 السير الذاتية المنشأة
               </CardTitle>
-              <Button onClick={() => setShowNewCVDialog(true)} className="gap-2">
+              <Button
+                onClick={() => setShowNewCVDialog(true)}
+                className="gap-2"
+              >
                 <Plus className="w-4 h-4" />
                 إنشاء سيرة ذاتية جديدة
               </Button>
@@ -258,7 +262,7 @@ const HRDashboard = () => {
                     <TableHead>تاريخ الإنشاء</TableHead>
                     <TableHead>آخر تعديل</TableHead>
                     <TableHead>الحالة</TableHead>
-                    <TableHead></TableHead>
+                    <TableHead>الإجراءات</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -271,7 +275,9 @@ const HRDashboard = () => {
                               {cv.candidateName.charAt(0)}
                             </AvatarFallback>
                           </Avatar>
-                          <span className="font-medium">{cv.candidateName}</span>
+                          <span className="font-medium">
+                            {cv.candidateName}
+                          </span>
                         </div>
                       </TableCell>
                       <TableCell>{cv.jobTitle}</TableCell>
@@ -294,20 +300,16 @@ const HRDashboard = () => {
                           <Button variant="ghost" size="icon">
                             <Download className="w-4 h-4" />
                           </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleDeleteCV(cv.id)}
-                          >
-                            <Trash2 className="w-4 h-4 text-destructive" />
-                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>
                   ))}
                   {filteredCVs.length === 0 && (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                      <TableCell
+                        colSpan={6}
+                        className="text-center py-8 text-muted-foreground"
+                      >
                         لا توجد سير ذاتية
                       </TableCell>
                     </TableRow>
@@ -353,9 +355,7 @@ const HRDashboard = () => {
             <Button variant="outline" onClick={() => setShowNewCVDialog(false)}>
               إلغاء
             </Button>
-            <Button onClick={handleCreateNewCV}>
-              بدء الإنشاء
-            </Button>
+            <Button onClick={handleCreateNewCV}>بدء الإنشاء</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

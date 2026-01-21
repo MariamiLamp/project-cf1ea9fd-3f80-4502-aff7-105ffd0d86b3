@@ -23,8 +23,18 @@ import {
   ArrowLeft,
   Check,
   UserCheck,
+  UserCircle2,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
+import ImageCropper from "@/components/ImageCropper";
 
 const HRRegistration = () => {
   const navigate = useNavigate();
@@ -37,6 +47,8 @@ const HRRegistration = () => {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [gender, setGender] = useState("rather-not-to-say");
+  const { t } = useTranslation();
 
   // Step 2: Profile
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
@@ -46,6 +58,8 @@ const HRRegistration = () => {
   const [bio, setBio] = useState("");
   const [skills, setSkills] = useState<string[]>([]);
   const [newSkill, setNewSkill] = useState("");
+  const [showCropper, setShowCropper] = useState(false);
+  const [tempImage, setTempImage] = useState<string | null>(null);
 
   // Step 3: Documents
   const [cvFile, setCvFile] = useState<File | null>(null);
@@ -65,17 +79,30 @@ const HRRegistration = () => {
   const [newExpDuration, setNewExpDuration] = useState("");
 
   const handleProfilePictureChange = (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const file = e.target.files?.[0];
     if (file) {
-      setProfilePicture(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setProfilePicturePreview(reader.result as string);
+        setTempImage(reader.result as string);
+        setShowCropper(true);
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const onCropComplete = (croppedImage: string) => {
+    setProfilePicturePreview(croppedImage);
+    setShowCropper(false);
+    fetch(croppedImage)
+      .then((res) => res.blob())
+      .then((blob) => {
+        const file = new File([blob], "hr_profile.jpg", {
+          type: "image/jpeg",
+        });
+        setProfilePicture(file);
+      });
   };
 
   const handleCvChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -200,8 +227,8 @@ const HRRegistration = () => {
                     currentStep > step.number
                       ? "bg-primary text-primary-foreground"
                       : currentStep === step.number
-                      ? "bg-primary/20 border-2 border-primary text-primary"
-                      : "bg-muted text-muted-foreground"
+                        ? "bg-primary/20 border-2 border-primary text-primary"
+                        : "bg-muted text-muted-foreground"
                   }`}
                 >
                   {currentStep > step.number ? (
@@ -304,6 +331,34 @@ const HRRegistration = () => {
                         className="pr-10"
                       />
                     </div>
+                  </div>
+
+                  <div className="space-y-2 pt-2">
+                    <Label className="text-sm font-semibold text-foreground">
+                      {t("common.gender")}
+                    </Label>
+                    <Select value={gender} onValueChange={setGender} dir="rtl">
+                      <SelectTrigger className="w-full bg-muted/30 border-border/50 hover:border-primary/50 transition-colors h-12 rounded-xl">
+                        <SelectValue placeholder={t("common.gender")} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="male">
+                          <div className="flex items-center gap-2">
+                            <UserCircle2 className="w-4 h-4 text-blue-500" />
+                            {t("common.male")}
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="female">
+                          <div className="flex items-center gap-2">
+                            <UserCircle2 className="w-4 h-4 text-pink-500" />
+                            {t("common.female")}
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="rather-not-to-say">
+                          {t("common.ratherNotToSay")}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
               </div>
@@ -657,6 +712,14 @@ const HRRegistration = () => {
             تسجيل الدخول
           </button>
         </p>
+
+        {showCropper && tempImage && (
+          <ImageCropper
+            image={tempImage}
+            onCropComplete={onCropComplete}
+            onCancel={() => setShowCropper(false)}
+          />
+        )}
       </div>
     </div>
   );
