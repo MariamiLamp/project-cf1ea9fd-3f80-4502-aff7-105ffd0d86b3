@@ -74,6 +74,7 @@ import {
 import { AdPlacementSelector } from "@/components/dashboard/AdPlacementSelector";
 import { StatCard } from "@/components/dashboard/StatCard";
 import MobileTabsMenu from "@/components/dashboard/MobileTabsMenu";
+import JobForm, { JobFormData } from "@/components/dashboard/JobForm";
 
 // Mock data
 const initialJobs = [
@@ -334,13 +335,15 @@ const CompanyDashboard = () => {
 
   const liveAds = ads.filter((a) => a.enabled);
 
-  const [editJob, setEditJob] = useState({
+  const [editJob, setEditJob] = useState<JobFormData>({
     id: 0,
     title: "",
     department: "",
     type: "",
     country: "",
     city: "",
+    description: "",
+    requirements: "",
     status: "",
   });
 
@@ -351,13 +354,13 @@ const CompanyDashboard = () => {
     navigate("/auth");
   };
 
-  const handleAddJob = () => {
+  const handleAddJobData = (data: JobFormData) => {
     if (
-      !newJob.title ||
-      !newJob.department ||
-      !newJob.type ||
-      !newJob.country ||
-      !newJob.city
+      !data.title ||
+      !data.department ||
+      !data.type ||
+      !data.country ||
+      !data.city
     ) {
       toast({
         title: "خطأ",
@@ -369,13 +372,16 @@ const CompanyDashboard = () => {
 
     const job = {
       id: jobs.length + 1,
-      title: newJob.title,
-      department: newJob.department,
-      type: newJob.type,
-      location: `${newJob.country} - ${newJob.city}`,
+      title: data.title,
+      department: data.department,
+      type: data.type,
+      location: `${data.country} - ${data.city}`,
       applications: 0,
       status: "active",
       postedDate: new Date().toISOString().split("T")[0],
+      // We'll keep these in the state if we want to support editing them later
+      description: data.description,
+      requirements: data.requirements,
     };
 
     setJobs([...jobs, job]);
@@ -395,7 +401,11 @@ const CompanyDashboard = () => {
     });
   };
 
-  const handleEditJob = (job: (typeof initialJobs)[0]) => {
+  const handleAddJob = () => {
+    handleAddJobData(newJob as any);
+  };
+
+  const handleEditJob = (job: any) => {
     setSelectedJob(job);
     const [country, city] = job.location.includes(" - ")
       ? job.location.split(" - ")
@@ -408,22 +418,26 @@ const CompanyDashboard = () => {
       type: job.type,
       country: country,
       city: city || "",
+      description: job.description || "",
+      requirements: job.requirements || "",
       status: job.status,
     });
     setIsEditJobOpen(true);
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEditData = (data: JobFormData) => {
     setJobs(
       jobs.map((job) =>
-        job.id === editJob.id
+        job.id === data.id
           ? {
               ...job,
-              title: editJob.title,
-              department: editJob.department,
-              type: editJob.type,
-              location: `${editJob.country} - ${editJob.city}`,
-              status: editJob.status,
+              title: data.title,
+              department: data.department,
+              type: data.type,
+              location: `${data.country} - ${data.city}`,
+              status: data.status,
+              description: data.description,
+              requirements: data.requirements,
             }
           : job,
       ),
@@ -852,7 +866,10 @@ const CompanyDashboard = () => {
                     إضافة وظيفة
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-lg" dir="rtl">
+                <DialogContent
+                  className="max-w-lg max-h-[90vh] overflow-y-auto"
+                  dir="rtl"
+                >
                   <DialogHeader className="text-right sm:text-right">
                     <DialogTitle className="text-right">
                       إضافة وظيفة جديدة
@@ -1862,124 +1879,22 @@ const CompanyDashboard = () => {
         </Tabs>
         {/* Edit Job Dialog */}
         <Dialog open={isEditJobOpen} onOpenChange={setIsEditJobOpen}>
-          <DialogContent className="max-w-lg" dir="rtl">
+          <DialogContent
+            className="max-w-lg max-h-[90vh] overflow-y-auto"
+            dir="rtl"
+          >
             <DialogHeader className="text-right sm:text-right">
               <DialogTitle className="text-right">تعديل الوظيفة</DialogTitle>
               <DialogDescription className="text-right">
                 قم بتحديث بيانات الوظيفة
               </DialogDescription>
             </DialogHeader>
-            <div className="space-y-4 mt-4">
-              <div className="space-y-2 text-right">
-                <Label>المسمى الوظيفي</Label>
-                <Input
-                  className="text-right"
-                  value={editJob.title}
-                  onChange={(e) =>
-                    setEditJob({ ...editJob, title: e.target.value })
-                  }
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2 text-right">
-                  <Label>القسم</Label>
-                  <Select
-                    dir="rtl"
-                    value={editJob.department}
-                    onValueChange={(value) =>
-                      setEditJob({ ...editJob, department: value })
-                    }
-                  >
-                    <SelectTrigger className="text-right">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent dir="rtl">
-                      <SelectItem value="التقنية">التقنية</SelectItem>
-                      <SelectItem value="التسويق">التسويق</SelectItem>
-                      <SelectItem value="المالية">المالية</SelectItem>
-                      <SelectItem value="الإدارة">الإدارة</SelectItem>
-                      <SelectItem value="البيانات">البيانات</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2 text-right">
-                  <Label>نوع الدوام</Label>
-                  <Select
-                    dir="rtl"
-                    value={editJob.type}
-                    onValueChange={(value) =>
-                      setEditJob({ ...editJob, type: value })
-                    }
-                  >
-                    <SelectTrigger className="text-right">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent dir="rtl">
-                      <SelectItem value="دوام كامل">دوام كامل</SelectItem>
-                      <SelectItem value="دوام جزئي">دوام جزئي</SelectItem>
-                      <SelectItem value="عن بعد">عن بعد</SelectItem>
-                      <SelectItem value="عقد">عقد</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2 text-right">
-                  <Label>الدولة</Label>
-                  <Select
-                    dir="rtl"
-                    value={editJob.country}
-                    onValueChange={(value) =>
-                      setEditJob({ ...editJob, country: value })
-                    }
-                  >
-                    <SelectTrigger className="text-right">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent dir="rtl">
-                      <SelectItem value="المملكة العربية السعودية">
-                        المملكة العربية السعودية
-                      </SelectItem>
-                      <SelectItem value="الإمارات">الإمارات</SelectItem>
-                      <SelectItem value="قطر">قطر</SelectItem>
-                      <SelectItem value="الكويت">الكويت</SelectItem>
-                      <SelectItem value="مصر">مصر</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2 text-right">
-                  <Label>المدينة</Label>
-                  <Input
-                    className="text-right"
-                    value={editJob.city}
-                    onChange={(e) =>
-                      setEditJob({ ...editJob, city: e.target.value })
-                    }
-                  />
-                </div>
-                <div className="space-y-2 text-right">
-                  <Label>الحالة</Label>
-                  <Select
-                    dir="rtl"
-                    value={editJob.status}
-                    onValueChange={(value) =>
-                      setEditJob({ ...editJob, status: value })
-                    }
-                  >
-                    <SelectTrigger className="text-right">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent dir="rtl">
-                      <SelectItem value="active">نشطة</SelectItem>
-                      <SelectItem value="closed">مغلقة</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <Button onClick={handleSaveEdit} className="w-full">
-                حفظ التغييرات
-              </Button>
-            </div>
+            <JobForm
+              mode="edit"
+              initialData={editJob}
+              onSubmit={handleSaveEditData}
+              submitLabel="حفظ التغييرات"
+            />
           </DialogContent>
         </Dialog>
         {/* View Application Dialog */}
@@ -1987,7 +1902,10 @@ const CompanyDashboard = () => {
           open={isViewApplicationOpen}
           onOpenChange={setIsViewApplicationOpen}
         >
-          <DialogContent className="max-w-3xl" dir="rtl">
+          <DialogContent
+            className="max-w-3xl max-h-[90vh] overflow-y-auto"
+            dir="rtl"
+          >
             <DialogHeader>
               <DialogTitle className="text-right">
                 تفاصيل طلب التوظيف
