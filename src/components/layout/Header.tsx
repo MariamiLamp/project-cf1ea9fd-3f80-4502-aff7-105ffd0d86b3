@@ -9,7 +9,7 @@ export const Header = () => {
   return (
     <header className="h-16 bg-card border-b border-border px-6 flex items-center justify-between sticky top-0 z-40">
       {/* Logo & Brand */}
-      <div className="flex items-center gap-3">
+      {/* <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary via-primary/80 to-secondary flex items-center justify-center shadow-lg shadow-primary/20">
           <BookOpen className="w-5 h-5 text-primary-foreground" />
         </div>
@@ -22,7 +22,7 @@ export const Header = () => {
             كارير بوك
           </p>
         </div>
-      </div>
+      </div> */}
 
       {/* Search */}
       <div className="flex-1 max-w-md mx-4">

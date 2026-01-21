@@ -13,7 +13,6 @@ import {
   Sparkles,
   LogOut,
   Crown,
-  ShoppingBag,
   CalendarDays,
   BookOpen,
 } from "lucide-react";
@@ -23,14 +22,14 @@ import { useSidebarState } from "@/contexts/SidebarContext";
 const navItems = [
   { icon: LayoutDashboard, label: "لوحة التحكم", path: "/dashboard" },
   { icon: User, label: "الملف الشخصي", path: "/candidate/1" },
+  { icon: FileEdit, label: "منشئ السيرة الذاتية", path: "/cv-builder" },
   { icon: FileText, label: "فحص السيرة الذاتية", path: "/cv-check" },
   { icon: Sparkles, label: "خطاب التقديم", path: "/cover-letter" },
   { icon: Briefcase, label: "فرص العمل", path: "/jobs" },
-  { icon: ShoppingBag, label: "سوق القوالب", path: "/templates" },
-  { icon: CalendarDays, label: "مخطط المنشورات", path: "/posts-planner" },
   { icon: TrendingUp, label: "المسار المهني", path: "/career-path" },
   { icon: MessageSquare, label: "أسئلة المقابلات", path: "/interview" },
-  { icon: FileEdit, label: "منشئ السيرة الذاتية", path: "/cv-builder" },
+  { icon: CalendarDays, label: "مخطط المنشورات", path: "/posts-planner" },
+
   { icon: Crown, label: "الاشتراكات", path: "/subscription" },
 ];
 
@@ -46,7 +45,7 @@ export const Sidebar = () => {
     <aside
       className={cn(
         "fixed right-0 top-0 h-screen bg-sidebar text-sidebar-foreground transition-all duration-300 z-50 flex flex-col",
-        collapsed ? "w-20" : "w-64"
+        collapsed ? "w-20" : "w-64",
       )}
     >
       {/* Logo & Brand */}
@@ -78,7 +77,7 @@ export const Sidebar = () => {
               className={cn(
                 "nav-item group",
                 isActive && "active",
-                collapsed && "justify-center px-2"
+                collapsed && "justify-center px-2",
               )}
             >
               <item.icon
@@ -86,7 +85,7 @@ export const Sidebar = () => {
                   "w-5 h-5 transition-colors shrink-0",
                   isActive
                     ? "text-sidebar-primary"
-                    : "text-sidebar-foreground/70 group-hover:text-sidebar-foreground"
+                    : "text-sidebar-foreground/70 group-hover:text-sidebar-foreground",
                 )}
               />
               {!collapsed && (
