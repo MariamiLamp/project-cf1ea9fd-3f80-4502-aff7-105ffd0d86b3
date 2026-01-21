@@ -5,7 +5,11 @@
     "jobSeeker": "Job Seeker",
     "language": "Language",
     "arabic": "العربية",
-    "english": "English"
+    "english": "English",
+    "gender": "Gender",
+    "male": "Male",
+    "female": "Female",
+    "ratherNotToSay": "Rather not to say"
   },
   "nav": {
     "home": "Home",

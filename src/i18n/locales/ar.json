@@ -5,7 +5,11 @@
     "jobSeeker": "باحث عن عمل",
     "language": "اللغة",
     "arabic": "العربية",
-    "english": "English"
+    "english": "English",
+    "gender": "الجنس",
+    "male": "ذكر",
+    "female": "أنثى",
+    "ratherNotToSay": "أفضل عدم البوح"
   },
   "nav": {
     "home": "الرئيسية",

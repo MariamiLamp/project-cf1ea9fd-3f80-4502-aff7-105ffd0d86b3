@@ -22,7 +22,16 @@ import {
   ArrowRight,
   ArrowLeft,
   Check,
+  UserCircle2,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
 import ImageCropper from "@/components/ImageCropper";
 
@@ -37,6 +46,8 @@ const JobSeekerRegistration = () => {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [gender, setGender] = useState("rather-not-to-say");
+  const { t } = useTranslation();
 
   // Step 2: Profile
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
@@ -322,6 +333,34 @@ const JobSeekerRegistration = () => {
                         className="pr-10"
                       />
                     </div>
+                  </div>
+
+                  <div className="space-y-2 pt-2">
+                    <Label className="text-sm font-semibold text-foreground">
+                      {t("common.gender")}
+                    </Label>
+                    <Select value={gender} onValueChange={setGender} dir="rtl">
+                      <SelectTrigger className="w-full bg-muted/30 border-border/50 hover:border-primary/50 transition-colors h-12 rounded-xl">
+                        <SelectValue placeholder={t("common.gender")} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="male">
+                          <div className="flex items-center gap-2">
+                            <UserCircle2 className="w-4 h-4 text-blue-500" />
+                            {t("common.male")}
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="female">
+                          <div className="flex items-center gap-2">
+                            <UserCircle2 className="w-4 h-4 text-pink-500" />
+                            {t("common.female")}
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="rather-not-to-say">
+                          {t("common.ratherNotToSay")}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
               </div>
