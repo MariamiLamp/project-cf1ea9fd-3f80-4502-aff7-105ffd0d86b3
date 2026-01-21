@@ -170,6 +170,7 @@ const initialApplications = [
     status: "shortlisted",
     appliedDate: "2024-01-20",
     matchScore: 95,
+    experience: "5 سنوات",
     rejectionReason: "",
     notes: "مرشح متميز جداً، نحتاج لتحديد موعد مقابلة تقنية ثانية.",
   },
@@ -181,6 +182,7 @@ const initialApplications = [
     status: "viewed",
     appliedDate: "2024-01-19",
     matchScore: 88,
+    experience: "3 سنوات",
     rejectionReason: "",
     notes: "",
   },
@@ -192,6 +194,7 @@ const initialApplications = [
     status: "accepted",
     appliedDate: "2024-01-18",
     matchScore: 82,
+    experience: "4 سنوات",
     rejectionReason: "",
     notes: "",
   },
@@ -203,6 +206,7 @@ const initialApplications = [
     status: "rejected",
     appliedDate: "2024-01-17",
     matchScore: 78,
+    experience: "6 سنوات",
     rejectionReason: "الخبرة في إدارة المشاريع التقنية أقل من المطلوب",
     notes: "",
   },
@@ -214,6 +218,7 @@ const initialApplications = [
     status: "pending",
     appliedDate: "2024-01-21",
     matchScore: 91,
+    experience: "5 سنوات",
     rejectionReason: "",
     notes: "",
   },
@@ -292,6 +297,7 @@ const CompanyDashboard = () => {
   const [filterDate, setFilterDate] = useState<string>("");
   const [filterMatchScore, setFilterMatchScore] = useState<string>("all");
   const [filterJob, setFilterJob] = useState<string>("all");
+  const [filterExperience, setFilterExperience] = useState<string>("all");
 
   // Applied filters state (actual filters used for the list)
   const [appliedFilters, setAppliedFilters] = useState({
@@ -299,6 +305,7 @@ const CompanyDashboard = () => {
     date: "",
     matchScore: "all",
     job: "all",
+    experience: "all",
   });
 
   const handleApplyFilters = () => {
@@ -307,6 +314,7 @@ const CompanyDashboard = () => {
       date: filterDate,
       matchScore: filterMatchScore,
       job: filterJob,
+      experience: filterExperience,
     });
   };
 
@@ -329,6 +337,19 @@ const CompanyDashboard = () => {
       app.matchScore < parseInt(appliedFilters.matchScore)
     )
       return false;
+
+    // Filter by Experience
+    if (appliedFilters.experience !== "all") {
+      const expYears = parseInt((app as any).experience) || 0;
+      const filterExp = appliedFilters.experience;
+
+      if (filterExp === "no-experience" && expYears > 0) return false;
+      if (filterExp === "less-than-1" && expYears >= 1) return false;
+      if (filterExp === "1-3" && (expYears < 1 || expYears > 3)) return false;
+      if (filterExp === "3-5" && (expYears < 3 || expYears > 5)) return false;
+      if (filterExp === "5-10" && (expYears < 5 || expYears > 10)) return false;
+      if (filterExp === "more-than-10" && expYears <= 10) return false;
+    }
 
     return true;
   });
@@ -1324,7 +1345,7 @@ const CompanyDashboard = () => {
                 <div className="flex flex-col md:flex-row items-center justify-between gap-4 w-full">
                   <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
                     {/* Mobile Filter Button */}
-                    <div className="md:hidden">
+                    <div className="lg:hidden">
                       <Popover>
                         <PopoverTrigger asChild>
                           <Button
@@ -1337,7 +1358,8 @@ const CompanyDashboard = () => {
                             {(appliedFilters.status !== "all" ||
                               appliedFilters.job !== "all" ||
                               appliedFilters.date ||
-                              appliedFilters.matchScore !== "all") && (
+                              appliedFilters.matchScore !== "all" ||
+                              appliedFilters.experience !== "all") && (
                               <Badge
                                 variant="secondary"
                                 className="mr-1 h-5 px-1 text-[10px] rounded-sm pointer-events-none"
@@ -1427,6 +1449,44 @@ const CompanyDashboard = () => {
                                 </Select>
                               </div>
                               <div className="space-y-1.5">
+                                <Label htmlFor="experience" className="text-xs">
+                                  الخبرة
+                                </Label>
+                                <Select
+                                  value={filterExperience}
+                                  onValueChange={setFilterExperience}
+                                >
+                                  <SelectTrigger
+                                    id="experience"
+                                    dir="rtl"
+                                    className="h-8"
+                                  >
+                                    <SelectValue placeholder="الخبرة" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="all">الخبرات</SelectItem>
+                                    <SelectItem value="no-experience">
+                                      بدون خبرة
+                                    </SelectItem>
+                                    <SelectItem value="less-than-1">
+                                      أقل من سنة
+                                    </SelectItem>
+                                    <SelectItem value="1-3">
+                                      1-3 سنوات
+                                    </SelectItem>
+                                    <SelectItem value="3-5">
+                                      3-5 سنوات
+                                    </SelectItem>
+                                    <SelectItem value="5-10">
+                                      5-10 سنوات
+                                    </SelectItem>
+                                    <SelectItem value="more-than-10">
+                                      أكثر من 10 سنوات
+                                    </SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div className="space-y-1.5">
                                 <Label htmlFor="date" className="text-xs">
                                   التاريخ
                                 </Label>
@@ -1481,7 +1541,8 @@ const CompanyDashboard = () => {
                               {(appliedFilters.status !== "all" ||
                                 appliedFilters.job !== "all" ||
                                 appliedFilters.date ||
-                                appliedFilters.matchScore !== "all") && (
+                                appliedFilters.matchScore !== "all" ||
+                                appliedFilters.experience !== "all") && (
                                 <Button
                                   variant="secondary"
                                   size="sm"
@@ -1491,11 +1552,13 @@ const CompanyDashboard = () => {
                                     setFilterJob("all");
                                     setFilterDate("");
                                     setFilterMatchScore("all");
+                                    setFilterExperience("all");
                                     setAppliedFilters({
                                       status: "all",
                                       job: "all",
                                       date: "",
                                       matchScore: "all",
+                                      experience: "all",
                                     });
                                   }}
                                 >
@@ -1510,13 +1573,14 @@ const CompanyDashboard = () => {
                     </div>
 
                     {/* Desktop Filters */}
-                    <div className="hidden md:flex flex-wrap items-center justify-start gap-3 w-full">
+                    <div className="hidden lg:flex flex-wrap items-center justify-start gap-3 w-full">
                       <div className="flex flex-wrap items-center gap-2">
                         <div className="flex items-center gap-2 border-r pr-2 mr-2">
                           {(appliedFilters.status !== "all" ||
                             appliedFilters.job !== "all" ||
                             appliedFilters.date ||
-                            appliedFilters.matchScore !== "all") && (
+                            appliedFilters.matchScore !== "all" ||
+                            appliedFilters.experience !== "all") && (
                             <Button
                               variant="outline"
                               size="sm"
@@ -1525,11 +1589,13 @@ const CompanyDashboard = () => {
                                 setFilterJob("all");
                                 setFilterDate("");
                                 setFilterMatchScore("all");
+                                setFilterExperience("all");
                                 setAppliedFilters({
                                   status: "all",
                                   job: "all",
                                   date: "",
                                   matchScore: "all",
+                                  experience: "all",
                                 });
                               }}
                               className="h-8 w-[130px] min-w-fit gap-2"
@@ -1591,6 +1657,33 @@ const CompanyDashboard = () => {
                           </SelectContent>
                         </Select>
 
+                        <Select
+                          value={filterExperience}
+                          onValueChange={setFilterExperience}
+                        >
+                          <SelectTrigger
+                            dir="rtl"
+                            className="w-[140px] h-8 text-xs"
+                          >
+                            <SelectValue placeholder="الخبرة" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">كل الخبرات</SelectItem>
+                            <SelectItem value="no-experience">
+                              بدون خبرة
+                            </SelectItem>
+                            <SelectItem value="less-than-1">
+                              أقل من سنة
+                            </SelectItem>
+                            <SelectItem value="1-3">1-3 سنوات</SelectItem>
+                            <SelectItem value="3-5">3-5 سنوات</SelectItem>
+                            <SelectItem value="5-10">5-10 سنوات</SelectItem>
+                            <SelectItem value="more-than-10">
+                              أكثر من 10 سنوات
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+
                         <Input
                           type="date"
                           value={filterDate}
@@ -1638,6 +1731,7 @@ const CompanyDashboard = () => {
                       <TableHead>الإجراءات</TableHead>
                       <TableHead>الحالة</TableHead>
                       <TableHead>تاريخ التقديم</TableHead>
+                      <TableHead>الخبرة</TableHead>
                       <TableHead>نسبة التوافق</TableHead>
                       <TableHead>الوظيفة</TableHead>
                       <TableHead>اسم المتقدم</TableHead>
@@ -1664,6 +1758,9 @@ const CompanyDashboard = () => {
                           <TableCell className="text-muted-foreground">
                             {app.appliedDate}
                           </TableCell>
+                          <TableCell className="text-muted-foreground whitespace-nowrap">
+                            {(app as any).experience || "بدون خبرة"}
+                          </TableCell>
                           <TableCell>
                             <Badge
                               variant={
@@ -1688,7 +1785,7 @@ const CompanyDashboard = () => {
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={6} className="text-center py-8">
+                        <TableCell colSpan={7} className="text-center py-8">
                           <div className="flex flex-col items-center gap-3 text-muted-foreground">
                             <Search className="w-8 h-8 opacity-20" />
                             <p>لا توجد طلبات تطابق معايير البحث</p>
