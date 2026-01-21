@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   Briefcase,
   FileText,
@@ -7,6 +8,7 @@ import {
   Building2,
   CheckCircle,
   ArrowLeft,
+  ArrowRight,
   BookOpen,
   Sparkles,
   Target,
@@ -23,14 +25,19 @@ import {
 } from "lucide-react";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { Footer } from "@/components/layout/Footer";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const LandingPage = () => {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === "ar";
+  const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
 
   return (
     <div
       className="min-h-screen bg-background flex flex-col relative isolate"
-      dir="rtl"
+      dir={isRTL ? "rtl" : "ltr"}
     >
       {/* Animated Background */}
       <div
@@ -111,7 +118,9 @@ const LandingPage = () => {
           <div className="flex items-center gap-4">
             <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-primary via-primary/80 to-secondary flex items-center justify-center shadow-lg shadow-primary/20 group hover:shadow-primary/30 transition-all duration-300">
               <BookOpen className="w-6 h-6 text-primary-foreground" />
-              <div className="absolute -top-1 -right-1 w-5 h-5 bg-primary rounded-full flex items-center justify-center">
+              <div
+                className={`absolute -top-1 ${isRTL ? "-right-1" : "-left-1"} w-5 h-5 bg-primary rounded-full flex items-center justify-center`}
+              >
                 <Sparkles className="w-3 h-3 text-white" />
               </div>
             </div>
@@ -121,20 +130,22 @@ const LandingPage = () => {
                 <span className="text-foreground font-black">Book</span>
               </h1>
               <p className="text-xs text-muted-foreground tracking-widest uppercase mt-1">
-                • منصة التوظيف الذكية •
+                {t("landing.tagline")}
               </p>
             </div>
           </div>
 
           <nav className="hidden md:flex items-center gap-10">
             {[
-              { label: "الوظائف", icon: Search, path: "/jobs" },
-              { label: "تواصل معنا", icon: MessageCircle, path: "/contact" },
-              { label: "مدونة", icon: BookOpen, path: "/contact" },
-              { label: "قوالب", icon: FileText, path: "/templates" },
+              { label: t("nav.jobs"), icon: Search, path: "/jobs" },
+              {
+                label: t("nav.contact"),
+                icon: MessageCircle,
+                path: "/contact",
+              },
             ].map((item) => (
               <Link
-                key={item.label}
+                key={item.path}
                 to={item.path}
                 className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-all duration-300 group"
               >
@@ -144,26 +155,21 @@ const LandingPage = () => {
             ))}
           </nav>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
+            <LanguageSwitcher />
+            <ThemeToggle />
             <Link to="/auth">
               <Button
                 variant="ghost"
                 size="sm"
                 className="font-medium group border border-transparent hover:border-border/50 transition-all duration-300"
               >
-                <User className="w-4 h-4 ml-2 opacity-60 group-hover:opacity-100" />
-                تسجيل الدخول/تسجيل
+                <User
+                  className={`w-4 h-4 ${isRTL ? "ml-2" : "mr-2"} opacity-60 group-hover:opacity-100`}
+                />
+                {t("nav.login")}
               </Button>
             </Link>
-            {/* <Link to="/register">
-              <Button
-                size="sm"
-                className="font-medium shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all duration-300 hover:scale-105"
-              >
-                <Target className="w-4 h-4 ml-2" />
-                انضم إلينا
-              </Button>
-            </Link> */}
           </div>
         </div>
       </header>
@@ -174,27 +180,29 @@ const LandingPage = () => {
           <div className="container mx-auto px-6 text-center">
             <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-8 animate-fade-down border border-primary/20 backdrop-blur-sm shadow-xl shadow-primary/5">
               <Zap className="w-4 h-4 animate-pulse" />
-              <span>منصة التوظيف الأولى في المنطقة</span>
+              <span>{t("landing.badge")}</span>
               <div className="w-2 h-2 bg-primary rounded-full animate-ping"></div>
             </div>
             <h1
               className="text-5xl md:text-7xl lg:text-8xl font-black text-foreground mb-8 tracking-tight leading-tight max-w-6xl mx-auto animate-fade-up opacity-0"
               style={{ animationDelay: "100ms", animationFillMode: "forwards" }}
             >
-              اكتشف فرصتك
+              {t("landing.heroTitle")}
               <br />
               <span className="relative inline-block">
-                <span className="text-gradient">الوظيفية القادمة</span>
-                <div className="absolute -bottom-4 left-0 w-full h-1 bg-gradient-to-r from-primary to-secondary rounded-full blur-sm opacity-50"></div>
+                <span className="text-gradient">
+                  {t("landing.heroTitleHighlight")}
+                </span>
+                <div
+                  className={`absolute -bottom-4 ${isRTL ? "right-0" : "left-0"} w-full h-1 bg-gradient-to-r from-primary to-secondary rounded-full blur-sm opacity-50`}
+                ></div>
               </span>
             </h1>
             <p
               className="text-xl text-muted-foreground max-w-3xl mx-auto mb-12 leading-relaxed animate-fade-up opacity-0 font-medium"
               style={{ animationDelay: "200ms", animationFillMode: "forwards" }}
             >
-              نوصلك بأفضل الشركات في المنطقة باستخدام الذكاء الاصطناعي المتقدم.
-              سواء كنت تبحث عن وظيفة أحلامك أو ترغب في توظيف أفضل المواهب، نحن
-              هنا للمساعدة.
+              {t("landing.heroSubtitle")}
             </p>
             <div
               className="flex flex-col sm:flex-row items-center justify-center gap-6 animate-fade-up opacity-0"
@@ -205,8 +213,10 @@ const LandingPage = () => {
                   size="lg"
                   className="h-14 px-10 text-lg shadow-2xl shadow-primary/30 transition-all duration-300 hover:shadow-primary/40 group-hover:scale-105 bg-gradient-to-r from-primary to-primary/90 hover:to-primary shimmer"
                 >
-                  تصفح الوظائف الآن
-                  <ArrowLeft className="w-5 h-5 mr-3 group-hover:translate-x-1 transition-transform" />
+                  {t("landing.browseJobs")}
+                  <ArrowIcon
+                    className={`w-5 h-5 ${isRTL ? "mr-3 group-hover:-translate-x-1" : "ml-3 group-hover:translate-x-1"} transition-transform`}
+                  />
                 </Button>
               </Link>
               <Link to="/register/company" className="group">
@@ -215,8 +225,8 @@ const LandingPage = () => {
                   variant="outline"
                   className="h-14 px-10 text-lg bg-background/50 backdrop-blur-md border-2 transition-all duration-300 hover:scale-105 hover:border-primary/50 hover:bg-background/80"
                 >
-                  <Building2 className="w-5 h-5 ml-3" />
-                  وظف المواهب
+                  <Building2 className={`w-5 h-5 ${isRTL ? "ml-3" : "mr-3"}`} />
+                  {t("landing.hireTalent")}
                 </Button>
               </Link>
             </div>
@@ -224,10 +234,26 @@ const LandingPage = () => {
             {/* Floating Stats */}
             <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
               {[
-                { label: "سرعة التوظيف", value: "2.5x", icon: Zap },
-                { label: "دقة المطابقة", value: "98%", icon: Target },
-                { label: "رضا العملاء", value: "4.9/5", icon: Award },
-                { label: "وقت الاستجابة", value: "24h", icon: Clock },
+                {
+                  label: t("landing.stats.hiringSpeed"),
+                  value: "2.5x",
+                  icon: Zap,
+                },
+                {
+                  label: t("landing.stats.matchAccuracy"),
+                  value: "98%",
+                  icon: Target,
+                },
+                {
+                  label: t("landing.stats.customerSatisfaction"),
+                  value: "4.9/5",
+                  icon: Award,
+                },
+                {
+                  label: t("landing.stats.responseTime"),
+                  value: "24h",
+                  icon: Clock,
+                },
               ].map((stat, idx) => (
                 <div
                   key={idx}
@@ -250,14 +276,16 @@ const LandingPage = () => {
         <section className="py-20 relative">
           <div className="container mx-auto px-6">
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold mb-4">أرقام تتحدث عن نفسها</h2>
+              <h2 className="text-4xl font-bold mb-4">
+                {t("landing.statsSection.title")}
+              </h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                انضم إلى مجتمع يضم آلاف المحترفين والشركات الرائدة
+                {t("landing.statsSection.subtitle")}
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               <StatCard
-                title="الوظائف النشطة"
+                title={t("landing.statsSection.activeJobs")}
                 value="+2,500"
                 icon={Briefcase}
                 variant="primary"
@@ -265,7 +293,7 @@ const LandingPage = () => {
                 className="bg-background/40 backdrop-blur-md border-border/50 shadow-none hover:shadow-xl hover:shadow-primary/5 transition-all duration-300"
               />
               <StatCard
-                title="السير الذاتية"
+                title={t("landing.statsSection.cvs")}
                 value="+15,000"
                 icon={FileText}
                 variant="success"
@@ -273,7 +301,7 @@ const LandingPage = () => {
                 className="bg-background/40 backdrop-blur-md border-border/50 shadow-none hover:shadow-xl hover:shadow-success/5 transition-all duration-300"
               />
               <StatCard
-                title="الشركات المسجلة"
+                title={t("landing.statsSection.companies")}
                 value="+500"
                 icon={Building2}
                 variant="info"
@@ -281,7 +309,7 @@ const LandingPage = () => {
                 className="bg-background/40 backdrop-blur-md border-border/50 shadow-none hover:shadow-xl hover:shadow-info/5 transition-all duration-300"
               />
               <StatCard
-                title="تم توظيفهم"
+                title={t("landing.statsSection.hired")}
                 value="+1,200"
                 icon={Users}
                 variant="warning"
@@ -298,36 +326,47 @@ const LandingPage = () => {
             <div className="text-center mb-20">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
                 <Sparkles className="w-4 h-4" />
-                مميزاتنا الفريدة
+                {t("landing.features.badge")}
               </div>
-              <h2 className="text-4xl font-bold mb-6">لماذا تختار منصتنا؟</h2>
+              <h2 className="text-4xl font-bold mb-6">
+                {t("landing.features.title")}
+              </h2>
               <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-                نقدم لك مجموعة من الأدوات والمميزات التي تساعدك في رحلتك المهنية
+                {t("landing.features.subtitle")}
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[
                 {
-                  title: "بناء سيرة ذاتية ذكية",
-                  description:
-                    "أنشئ سيرة ذاتية متميزة باستخدام قوالبنا الاحترافية وأدوات الذكاء الاصطناعي المتقدمة.",
+                  title: t("landing.features.smartCV.title"),
+                  description: t("landing.features.smartCV.description"),
                   icon: FileText,
-                  features: ["تحليل ذكي", "تصميم احترافي", "تحديث آلي"],
+                  features: [
+                    t("landing.features.smartCV.feature1"),
+                    t("landing.features.smartCV.feature2"),
+                    t("landing.features.smartCV.feature3"),
+                  ],
                 },
                 {
-                  title: "توصيات ذكية دقيقة",
-                  description:
-                    "خوارزميات متطورة لمطابقة مهاراتك مع الوظائف الأنسب لك بدقة تصل إلى 98%.",
+                  title: t("landing.features.smartMatch.title"),
+                  description: t("landing.features.smartMatch.description"),
                   icon: Target,
-                  features: ["مطابقة دقيقة", "تحديث لحظي", "توصيات مخصصة"],
+                  features: [
+                    t("landing.features.smartMatch.feature1"),
+                    t("landing.features.smartMatch.feature2"),
+                    t("landing.features.smartMatch.feature3"),
+                  ],
                 },
                 {
-                  title: "تواصل مباشر وسريع",
-                  description:
-                    "تواصل مباشرة مع مسؤولي التوظيف في كبرى الشركات بدون وسطاء.",
+                  title: t("landing.features.directConnect.title"),
+                  description: t("landing.features.directConnect.description"),
                   icon: Users,
-                  features: ["مراسلة فورية", "مقابلات افتراضية", "متابعة آلية"],
+                  features: [
+                    t("landing.features.directConnect.feature1"),
+                    t("landing.features.directConnect.feature2"),
+                    t("landing.features.directConnect.feature3"),
+                  ],
                 },
               ].map((feature, index) => (
                 <div
@@ -342,7 +381,9 @@ const LandingPage = () => {
                     <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-8 text-primary group-hover:scale-110 transition-transform duration-500 shadow-lg shadow-primary/10">
                       <feature.icon className="w-8 h-8 animate-float" />
                     </div>
-                    <div className="absolute top-0 right-0 w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                    <div
+                      className={`absolute top-0 ${isRTL ? "right-0" : "left-0"} w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center`}
+                    >
                       <TrendingUp className="w-4 h-4 text-primary" />
                     </div>
                   </div>
@@ -367,139 +408,21 @@ const LandingPage = () => {
           </div>
         </section>
 
-        {/* Subscription Plans Section */}
-        {/* <section className="py-24 relative">
-          <div className="container mx-auto px-6">
-            <div className="text-center mb-16">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
-                <Crown className="w-4 h-4" />
-                خطط الاشتراك
-              </div>
-              <h2 className="text-4xl font-bold mb-6">استثمر في مستقبلك</h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-                اختر الباقة المناسبة لاحتياجاتك وابدأ رحلتك المهنية اليوم
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-              {[
-                {
-                  id: "basic",
-                  name: "الأساسية",
-                  description: "للباحثين عن عمل المبتدئين",
-                  price: "مجاناً",
-                  period: "مدى الحياة",
-                  icon: Zap,
-                  features: [
-                    "فحص السيرة الذاتية شهرياً",
-                    "تصفح الوظائف المتاحة",
-                    "٣ طلبات توظيف شهرياً",
-                  ],
-                },
-                {
-                  id: "pro",
-                  name: "الاحترافية",
-                  description: "للباحثين الجادين",
-                  price: "49 ر.س",
-                  period: "شهرياً",
-                  icon: Crown,
-                  popular: true,
-                  features: [
-                    "فحص سيرة ذاتية غير محدود",
-                    "مولد خطابات التقديم AI",
-                    "طلبات توظيف غير محدودة",
-                    "دعم فني أولوي",
-                  ],
-                },
-                {
-                  id: "enterprise",
-                  name: "الشركات",
-                  description: "لفـرق الموارد البشرية",
-                  price: "199 ر.س",
-                  period: "شهرياً",
-                  icon: Building2,
-                  features: [
-                    "لوحة تحكم كاملة",
-                    "إدارة المرشحين المتقدمة",
-                    "تحليلات وتقارير مفصلة",
-                    "دعم فني مخصص ٢٤/٧",
-                  ],
-                },
-              ].map((plan, index) => (
-                <div
-                  key={plan.id}
-                  className={`relative p-8 rounded-3xl border transition-all duration-500 opacity-0 animate-fade-up hover-lift ${
-                    plan.popular
-                      ? "bg-primary/5 border-primary shadow-2xl shadow-primary/10 scale-105 z-10 glow-hover"
-                      : "bg-card/50 backdrop-blur-sm border-border/50 hover:border-primary/30"
-                  }`}
-                  style={{
-                    animationDelay: `${(index + 1) * 200}ms`,
-                    animationFillMode: "forwards",
-                  }}
-                >
-                  {plan.popular && (
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-primary to-secondary text-white px-4 py-1 rounded-full text-sm font-medium shadow-lg shimmer">
-                      الأكثر شيوعاً
-                    </div>
-                  )}
-                  <div className="mb-6">
-                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                      <plan.icon className="w-6 h-6 text-primary animate-pulse" />
-                    </div>
-                    <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
-                    <p className="text-muted-foreground text-sm">
-                      {plan.description}
-                    </p>
-                  </div>
-                  <div className="mb-8">
-                    <span className="text-4xl font-black text-foreground">
-                      {plan.price}
-                    </span>
-                    <span className="text-muted-foreground text-sm mr-2">
-                      /{plan.period}
-                    </span>
-                  </div>
-                  <ul className="space-y-4 mb-8">
-                    {plan.features.map((feature, idx) => (
-                      <li
-                        key={idx}
-                        className="flex items-center gap-3 text-sm group/item"
-                      >
-                        <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 group-hover/item:scale-110 transition-transform" />
-                        <span className="text-foreground/80">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <Link to="/subscription">
-                    <Button
-                      variant={plan.popular ? "default" : "outline"}
-                      className={`w-full h-12 font-bold ${plan.popular ? "shimmer" : ""}`}
-                    >
-                      {plan.price === "مجاناً" ? "ابدأ الآن" : "اشترك الآن"}
-                    </Button>
-                  </Link>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section> */}
-
         {/* CTA Section */}
         <section className="py-32 relative overflow-hidden">
           <div className="container mx-auto px-6 text-center text-foreground relative z-10">
             <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-secondary/5 border border-secondary/10 mb-8 backdrop-blur-sm">
               <Shield className="w-5 h-5 text-secondary" />
               <span className="font-medium text-secondary">
-                منصة آمنة وموثوقة
+                {t("landing.cta.badge")}
               </span>
             </div>
             <h2 className="text-4xl md:text-6xl font-black mb-10 tracking-tight text-foreground">
-              جاهز لبدء{" "}
+              {t("landing.cta.title")}{" "}
               <span className="text-primary relative inline-block">
-                رحلتك المهنية
+                {t("landing.cta.titleHighlight")}
                 <svg
-                  className="absolute w-full h-3 -bottom-1 left-0 text-primary/20"
+                  className={`absolute w-full h-3 -bottom-1 ${isRTL ? "right-0" : "left-0"} text-primary/20`}
                   viewBox="0 0 100 10"
                   preserveAspectRatio="none"
                 >
@@ -511,11 +434,10 @@ const LandingPage = () => {
                   />
                 </svg>
               </span>
-              ؟
+              {isRTL ? "؟" : "?"}
             </h2>
             <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto font-medium">
-              انضم إلى آلاف الباحثين عن عمل والشركات التي تثق بمنصتنا. ابدأ
-              رحلتك نحو النجاح المهني اليوم.
+              {t("landing.cta.subtitle")}
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
               <Button
@@ -523,8 +445,10 @@ const LandingPage = () => {
                 className="h-16 px-12 text-xl shadow-2xl shadow-primary/20 transition-all duration-300 hover:scale-105 hover:shadow-primary/30 bg-gradient-to-r from-primary to-primary/90 shimmer"
                 onClick={() => navigate("/register")}
               >
-                <Target className="w-6 h-6 ml-3 animate-float" />
-                سجل الآن مجاناً
+                <Target
+                  className={`w-6 h-6 ${isRTL ? "ml-3" : "mr-3"} animate-float`}
+                />
+                {t("landing.cta.registerFree")}
               </Button>
               <Link to="/jobs">
                 <Button
@@ -532,13 +456,13 @@ const LandingPage = () => {
                   variant="outline"
                   className="h-16 px-10 text-xl border-2 border-input bg-background/50 backdrop-blur-sm hover:bg-accent hover:text-accent-foreground text-foreground"
                 >
-                  <Search className="w-6 h-6 ml-3" />
-                  استكشف الوظائف
+                  <Search className={`w-6 h-6 ${isRTL ? "ml-3" : "mr-3"}`} />
+                  {t("landing.cta.exploreJobs")}
                 </Button>
               </Link>
             </div>
             <p className="text-muted-foreground/80 mt-8 text-sm">
-              بدون رسوم • بدون التزام • تجربة مجانية كاملة
+              {t("landing.cta.noFees")}
             </p>
           </div>
         </section>

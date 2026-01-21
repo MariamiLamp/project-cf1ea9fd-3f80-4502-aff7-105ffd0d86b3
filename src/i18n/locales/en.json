@@ -1,0 +1,129 @@
+{
+  "common": {
+    "search": "Search for jobs, companies, or skills...",
+    "notifications": "Notifications",
+    "jobSeeker": "Job Seeker",
+    "language": "Language",
+    "arabic": "العربية",
+    "english": "English"
+  },
+  "nav": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "cvCheck": "CV Check",
+    "coverLetter": "Cover Letter",
+    "jobs": "Jobs",
+    "interview": "Interview",
+    "careerPath": "Career Path",
+    "cvBuilder": "CV Builder",
+    "subscription": "Subscription",
+    "templates": "Templates",
+    "settings": "Settings",
+    "contact": "Contact Us",
+    "login": "Login",
+    "joinUs": "Join Us"
+  },
+  "landing": {
+    "tagline": "• Smart Employment Platform •",
+    "badge": "The First Employment Platform in the Region",
+    "heroTitle": "Discover Your",
+    "heroTitleHighlight": "Next Career Opportunity",
+    "heroSubtitle": "We connect you with the best companies in the region using advanced AI. Whether you're looking for your dream job or want to hire top talent, we're here to help.",
+    "browseJobs": "Browse Jobs Now",
+    "hireTalent": "Hire Talent",
+    "stats": {
+      "hiringSpeed": "Hiring Speed",
+      "matchAccuracy": "Match Accuracy",
+      "customerSatisfaction": "Customer Satisfaction",
+      "responseTime": "Response Time"
+    },
+    "statsSection": {
+      "title": "Numbers That Speak for Themselves",
+      "subtitle": "Join a community of thousands of professionals and leading companies",
+      "activeJobs": "Active Jobs",
+      "cvs": "Resumes",
+      "companies": "Registered Companies",
+      "hired": "Successfully Hired"
+    },
+    "features": {
+      "badge": "Our Unique Features",
+      "title": "Why Choose Our Platform?",
+      "subtitle": "We offer you a set of tools and features to help you in your career journey",
+      "smartCV": {
+        "title": "Smart CV Builder",
+        "description": "Create an outstanding resume using our professional templates and advanced AI tools.",
+        "feature1": "Smart Analysis",
+        "feature2": "Professional Design",
+        "feature3": "Auto Update"
+      },
+      "smartMatch": {
+        "title": "Accurate Smart Recommendations",
+        "description": "Advanced algorithms to match your skills with the most suitable jobs with up to 98% accuracy.",
+        "feature1": "Precise Matching",
+        "feature2": "Real-time Updates",
+        "feature3": "Personalized Recommendations"
+      },
+      "directConnect": {
+        "title": "Direct & Fast Communication",
+        "description": "Connect directly with recruiters at top companies without intermediaries.",
+        "feature1": "Instant Messaging",
+        "feature2": "Virtual Interviews",
+        "feature3": "Automated Follow-up"
+      }
+    },
+    "plans": {
+      "badge": "Subscription Plans",
+      "title": "Invest in Your Future",
+      "subtitle": "Choose the plan that suits your needs and start your career journey today",
+      "mostPopular": "Most Popular",
+      "startNow": "Start Now",
+      "subscribeNow": "Subscribe Now",
+      "free": "Free",
+      "lifetime": "Lifetime",
+      "monthly": "Monthly",
+      "basic": {
+        "name": "Basic",
+        "description": "For beginner job seekers",
+        "feature1": "Monthly CV Check",
+        "feature2": "Browse Available Jobs",
+        "feature3": "3 Job Applications/Month"
+      },
+      "pro": {
+        "name": "Professional",
+        "description": "For serious job seekers",
+        "price": "49 SAR",
+        "feature1": "Unlimited CV Checks",
+        "feature2": "AI Cover Letter Generator",
+        "feature3": "Unlimited Job Applications",
+        "feature4": "Priority Support"
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "For HR Teams",
+        "price": "199 SAR",
+        "feature1": "Full Dashboard",
+        "feature2": "Advanced Candidate Management",
+        "feature3": "Detailed Analytics & Reports",
+        "feature4": "24/7 Dedicated Support"
+      }
+    },
+    "cta": {
+      "badge": "Safe & Trusted Platform",
+      "title": "Ready to Start",
+      "titleHighlight": "Your Career Journey",
+      "subtitle": "Join thousands of job seekers and companies who trust our platform. Start your journey to career success today.",
+      "registerFree": "Register for Free",
+      "exploreJobs": "Explore Jobs",
+      "noFees": "No Fees • No Commitment • Full Free Trial"
+    }
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Create Account",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot Password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?"
+  }
+}
