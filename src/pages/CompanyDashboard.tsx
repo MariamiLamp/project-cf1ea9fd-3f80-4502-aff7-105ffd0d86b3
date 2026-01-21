@@ -1366,7 +1366,11 @@ const CompanyDashboard = () => {
                                   value={filterStatus}
                                   onValueChange={setFilterStatus}
                                 >
-                                  <SelectTrigger id="status" className="h-8">
+                                  <SelectTrigger
+                                    id="status"
+                                    dir="rtl"
+                                    className="h-8"
+                                  >
                                     <SelectValue placeholder="الحالة" />
                                   </SelectTrigger>
                                   <SelectContent>
@@ -1400,7 +1404,11 @@ const CompanyDashboard = () => {
                                   value={filterJob}
                                   onValueChange={setFilterJob}
                                 >
-                                  <SelectTrigger id="job" className="h-8">
+                                  <SelectTrigger
+                                    id="job"
+                                    dir="rtl"
+                                    className="h-8"
+                                  >
                                     <SelectValue placeholder="الوظيفة" />
                                   </SelectTrigger>
                                   <SelectContent>
@@ -1432,31 +1440,34 @@ const CompanyDashboard = () => {
                                   className="h-8"
                                 />
                               </div>
-                              <div className="space-y-1.5">
-                                <Label htmlFor="match" className="text-xs">
-                                  نسبة التوافق
-                                </Label>
-                                <Select
-                                  value={filterMatchScore}
-                                  onValueChange={setFilterMatchScore}
+                              <Select
+                                value={filterMatchScore}
+                                onValueChange={setFilterMatchScore}
+                              >
+                                <SelectTrigger
+                                  id="match"
+                                  dir="rtl"
+                                  className="h-9 flex items-center gap-2 px-3"
                                 >
-                                  <SelectTrigger id="match" className="h-8">
-                                    <SelectValue placeholder="نسبة التوافق" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="all">الكل</SelectItem>
-                                    <SelectItem value="90">
-                                      90% فما فوق
-                                    </SelectItem>
-                                    <SelectItem value="80">
-                                      80% فما فوق
-                                    </SelectItem>
-                                    <SelectItem value="70">
-                                      70% فما فوق
-                                    </SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              </div>
+                                  <span className="text-xs font-medium text-foreground/70 whitespace-nowrap">
+                                    نسبة التوافق:
+                                  </span>
+                                  <SelectValue placeholder="الكل" />
+                                </SelectTrigger>
+
+                                <SelectContent>
+                                  <SelectItem value="all">الكل</SelectItem>
+                                  <SelectItem value="90">
+                                    90% فما فوق
+                                  </SelectItem>
+                                  <SelectItem value="80">
+                                    80% فما فوق
+                                  </SelectItem>
+                                  <SelectItem value="70">
+                                    70% فما فوق
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
                             </div>
                             <div className="flex gap-2">
                               <Button
@@ -1542,7 +1553,10 @@ const CompanyDashboard = () => {
                           value={filterStatus}
                           onValueChange={setFilterStatus}
                         >
-                          <SelectTrigger className="w-[130px] h-8 text-xs">
+                          <SelectTrigger
+                            dir="rtl"
+                            className="w-[130px] h-8 text-xs"
+                          >
                             <SelectValue placeholder="الحالة" />
                           </SelectTrigger>
                           <SelectContent>
@@ -1561,7 +1575,10 @@ const CompanyDashboard = () => {
                         </Select>
 
                         <Select value={filterJob} onValueChange={setFilterJob}>
-                          <SelectTrigger className="w-[150px] h-8 text-xs">
+                          <SelectTrigger
+                            dir="rtl"
+                            className="w-[150px] h-8 text-xs"
+                          >
                             <SelectValue placeholder="الوظيفة" />
                           </SelectTrigger>
                           <SelectContent>
@@ -1585,8 +1602,14 @@ const CompanyDashboard = () => {
                           value={filterMatchScore}
                           onValueChange={setFilterMatchScore}
                         >
-                          <SelectTrigger className="w-[130px] h-8 text-xs">
-                            <SelectValue placeholder="نسبة التوافق" />
+                          <SelectTrigger
+                            dir="rtl"
+                            className="w-fit min-w-[160px] h-8 text-xs flex items-center gap-2 px-3 shadow-none bg-background"
+                          >
+                            <span className="text-[11px] font-semibold text-foreground/70 whitespace-nowrap">
+                              نسبة التوافق:
+                            </span>
+                            <SelectValue placeholder="الكل" />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="all">الكل</SelectItem>
