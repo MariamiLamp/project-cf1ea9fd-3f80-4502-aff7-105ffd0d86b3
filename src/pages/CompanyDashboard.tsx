@@ -73,6 +73,7 @@ import {
 
 import { AdPlacementSelector } from "@/components/dashboard/AdPlacementSelector";
 import { StatCard } from "@/components/dashboard/StatCard";
+import MobileTabsMenu from "@/components/dashboard/MobileTabsMenu";
 
 // Mock data
 const initialJobs = [
@@ -81,7 +82,7 @@ const initialJobs = [
     title: "مطور واجهات أمامية",
     department: "التقنية",
     type: "دوام كامل",
-    location: "مصر",
+    location: "مصر - القاهرة",
     applications: 24,
     status: "active",
     postedDate: "2024-01-10",
@@ -91,7 +92,7 @@ const initialJobs = [
     title: "محلل بيانات",
     department: "البيانات",
     type: "دوام كامل",
-    location: "الإمارات",
+    location: "الإمارات - دبي",
     applications: 18,
     status: "active",
     postedDate: "2024-01-15",
@@ -101,7 +102,7 @@ const initialJobs = [
     title: "مدير مشاريع",
     department: "الإدارة",
     type: "دوام كامل",
-    location: "المملكة العربية السعودية",
+    location: "المملكة العربية السعودية - الرياض",
     applications: 12,
     status: "closed",
     postedDate: "2024-01-05",
@@ -244,7 +245,8 @@ const CompanyDashboard = () => {
     title: "",
     department: "",
     type: "",
-    location: "",
+    country: "",
+    city: "",
     description: "",
     requirements: "",
   });
@@ -337,9 +339,12 @@ const CompanyDashboard = () => {
     title: "",
     department: "",
     type: "",
-    location: "",
+    country: "",
+    city: "",
     status: "",
   });
+
+  const [activeTab, setActiveTab] = useState("jobs");
 
   const handleLogout = () => {
     logout();
@@ -351,7 +356,8 @@ const CompanyDashboard = () => {
       !newJob.title ||
       !newJob.department ||
       !newJob.type ||
-      !newJob.location
+      !newJob.country ||
+      !newJob.city
     ) {
       toast({
         title: "خطأ",
@@ -366,7 +372,7 @@ const CompanyDashboard = () => {
       title: newJob.title,
       department: newJob.department,
       type: newJob.type,
-      location: newJob.location,
+      location: `${newJob.country} - ${newJob.city}`,
       applications: 0,
       status: "active",
       postedDate: new Date().toISOString().split("T")[0],
@@ -382,7 +388,8 @@ const CompanyDashboard = () => {
       title: "",
       department: "",
       type: "",
-      location: "",
+      country: "",
+      city: "",
       description: "",
       requirements: "",
     });
@@ -390,12 +397,17 @@ const CompanyDashboard = () => {
 
   const handleEditJob = (job: (typeof initialJobs)[0]) => {
     setSelectedJob(job);
+    const [country, city] = job.location.includes(" - ")
+      ? job.location.split(" - ")
+      : [job.location, ""];
+
     setEditJob({
       id: job.id,
       title: job.title,
       department: job.department,
       type: job.type,
-      location: job.location,
+      country: country,
+      city: city || "",
       status: job.status,
     });
     setIsEditJobOpen(true);
@@ -410,7 +422,7 @@ const CompanyDashboard = () => {
               title: editJob.title,
               department: editJob.department,
               type: editJob.type,
-              location: editJob.location,
+              location: `${editJob.country} - ${editJob.city}`,
               status: editJob.status,
             }
           : job,
@@ -421,14 +433,6 @@ const CompanyDashboard = () => {
       description: "تم تحديث بيانات الوظيفة بنجاح",
     });
     setIsEditJobOpen(false);
-  };
-
-  const handleDeleteJob = (jobId: number) => {
-    setJobs(jobs.filter((job) => job.id !== jobId));
-    toast({
-      title: "تم الحذف",
-      description: "تم حذف الوظيفة بنجاح",
-    });
   };
 
   const handleToggleJobStatus = (jobId: number) => {
@@ -778,7 +782,7 @@ const CompanyDashboard = () => {
         </div>
       </header>
 
-      <main className="p-6 space-y-6">
+      <main className="p-6 pb-24 md:pb-6 space-y-6">
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard
@@ -811,10 +815,14 @@ const CompanyDashboard = () => {
           />
         </div>
         {/* Tabs */}
-        <Tabs defaultValue="jobs" className="space-y-4">
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="space-y-4"
+        >
           <div className="flex flex-col items-end gap-4">
             <div className="flex items-center justify-between w-full flex-row-reverse">
-              <TabsList className="bg-muted/50 flex-wrap h-auto gap-1">
+              <TabsList className="hidden md:flex bg-muted/50 flex-wrap h-auto gap-1">
                 <TabsTrigger value="ads" className="gap-2">
                   <Megaphone className="w-4 h-4" />
                   الإعلانات
@@ -827,16 +835,16 @@ const CompanyDashboard = () => {
                   <FileText className="w-4 h-4" />
                   الطلبات
                 </TabsTrigger>
-                <TabsTrigger value="candidates" className="gap-2">
+                {/* <TabsTrigger value="candidates" className="gap-2">
                   <Users className="w-4 h-4" />
                   المرشحون
-                </TabsTrigger>
+                </TabsTrigger> */}
                 <TabsTrigger value="jobs" className="gap-2">
                   <Briefcase className="w-4 h-4" />
                   الوظائف
                 </TabsTrigger>
               </TabsList>
-
+              {/* add new job */}
               <Dialog open={isAddJobOpen} onOpenChange={setIsAddJobOpen}>
                 <DialogTrigger asChild>
                   <Button className="gap-2">
@@ -845,16 +853,19 @@ const CompanyDashboard = () => {
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-lg" dir="rtl">
-                  <DialogHeader>
-                    <DialogTitle>إضافة وظيفة جديدة</DialogTitle>
-                    <DialogDescription>
+                  <DialogHeader className="text-right sm:text-right">
+                    <DialogTitle className="text-right">
+                      إضافة وظيفة جديدة
+                    </DialogTitle>
+                    <DialogDescription className="text-right">
                       أدخل تفاصيل الوظيفة المطلوبة
                     </DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4 mt-4">
-                    <div className="space-y-2">
+                    <div className="space-y-2 text-right">
                       <Label>المسمى الوظيفي *</Label>
                       <Input
+                        className="text-right"
                         placeholder="مثال: مطور واجهات أمامية"
                         value={newJob.title}
                         onChange={(e) =>
@@ -863,17 +874,18 @@ const CompanyDashboard = () => {
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
+                      <div className="space-y-2 text-right">
                         <Label>القسم *</Label>
                         <Select
+                          dir="rtl"
                           onValueChange={(value) =>
                             setNewJob({ ...newJob, department: value })
                           }
                         >
-                          <SelectTrigger>
+                          <SelectTrigger className="text-right">
                             <SelectValue placeholder="اختر القسم" />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent dir="rtl">
                             <SelectItem value="التقنية">التقنية</SelectItem>
                             <SelectItem value="التسويق">التسويق</SelectItem>
                             <SelectItem value="المالية">المالية</SelectItem>
@@ -884,17 +896,18 @@ const CompanyDashboard = () => {
                           </SelectContent>
                         </Select>
                       </div>
-                      <div className="space-y-2">
+                      <div className="space-y-2 text-right">
                         <Label>نوع الدوام *</Label>
                         <Select
+                          dir="rtl"
                           onValueChange={(value) =>
                             setNewJob({ ...newJob, type: value })
                           }
                         >
-                          <SelectTrigger>
+                          <SelectTrigger className="text-right">
                             <SelectValue placeholder="اختر النوع" />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent dir="rtl">
                             <SelectItem value="دوام كامل">دوام كامل</SelectItem>
                             <SelectItem value="دوام جزئي">دوام جزئي</SelectItem>
                             <SelectItem value="عن بعد">عن بعد</SelectItem>
@@ -903,28 +916,42 @@ const CompanyDashboard = () => {
                         </Select>
                       </div>
                     </div>
-                    <div className="space-y-2">
-                      <Label>الموقع *</Label>
-                      <Select
-                        onValueChange={(value) =>
-                          setNewJob({ ...newJob, location: value })
-                        }
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="اختر المدينة" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="المملكة العربية السعودية">
-                            المملكة العربية السعودية
-                          </SelectItem>
-                          <SelectItem value="الإمارات">الإمارات</SelectItem>
-                          <SelectItem value="قطر">قطر</SelectItem>
-                          <SelectItem value="الكويت">الكويت</SelectItem>
-                          <SelectItem value="مصر">مصر</SelectItem>
-                        </SelectContent>
-                      </Select>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2 text-right">
+                        <Label>الدولة *</Label>
+                        <Select
+                          dir="rtl"
+                          onValueChange={(value) =>
+                            setNewJob({ ...newJob, country: value })
+                          }
+                        >
+                          <SelectTrigger className="text-right">
+                            <SelectValue placeholder="اختر الدولة" />
+                          </SelectTrigger>
+                          <SelectContent dir="rtl">
+                            <SelectItem value="المملكة العربية السعودية">
+                              المملكة العربية السعودية
+                            </SelectItem>
+                            <SelectItem value="الإمارات">الإمارات</SelectItem>
+                            <SelectItem value="قطر">قطر</SelectItem>
+                            <SelectItem value="الكويت">الكويت</SelectItem>
+                            <SelectItem value="مصر">مصر</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2 text-right">
+                        <Label>المدينة *</Label>
+                        <Input
+                          className="text-right"
+                          placeholder="مثال: الرياض، دبي..."
+                          value={newJob.city}
+                          onChange={(e) =>
+                            setNewJob({ ...newJob, city: e.target.value })
+                          }
+                        />
+                      </div>
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-2 text-right">
                       <div className="flex items-center justify-between">
                         <Label>وصف الوظيفة</Label>
                         <Button
@@ -997,10 +1024,11 @@ const CompanyDashboard = () => {
                         onChange={(e) =>
                           setNewJob({ ...newJob, description: e.target.value })
                         }
+                        className="text-right"
                         rows={6}
                       />
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-2 text-right">
                       <Label>المتطلبات</Label>
                       <Textarea
                         placeholder="اكتب متطلبات الوظيفة..."
@@ -1008,6 +1036,7 @@ const CompanyDashboard = () => {
                         onChange={(e) =>
                           setNewJob({ ...newJob, requirements: e.target.value })
                         }
+                        className="text-right"
                         rows={3}
                       />
                     </div>
@@ -1040,7 +1069,8 @@ const CompanyDashboard = () => {
                       <TableHead>تاريخ النشر</TableHead>
                       <TableHead>الحالة</TableHead>
                       <TableHead>عدد الطلبات</TableHead>
-                      <TableHead>الموقع</TableHead>
+                      <TableHead>المدينة</TableHead>
+                      <TableHead>الدولة</TableHead>
                       <TableHead>نوع الدوام</TableHead>
                       <TableHead>القسم</TableHead>
                       <TableHead>المسمى الوظيفي</TableHead>
@@ -1069,13 +1099,6 @@ const CompanyDashboard = () => {
                               onClick={() => handleEditJob(job)}
                             >
                               <Edit className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleDeleteJob(job.id)}
-                            >
-                              <Trash2 className="w-4 h-4 text-destructive" />
                             </Button>
                           </div>
                         </TableCell>
@@ -1112,11 +1135,9 @@ const CompanyDashboard = () => {
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-1 justify-end">
-                            <MapPin className="w-3 h-3" />
-                            {job.location}
-                          </div>
+                          {job.location.split(" - ")[1] || job.location}
                         </TableCell>
+                        <TableCell>{job.location.split(" - ")[0]}</TableCell>
                         <TableCell>{job.type}</TableCell>
                         <TableCell>{job.department}</TableCell>
                         <TableCell className="font-medium">
@@ -1192,7 +1213,7 @@ const CompanyDashboard = () => {
           </TabsContent>
 
           {/* Candidates Tab */}
-          <TabsContent value="candidates">
+          {/* <TabsContent value="candidates">
             <Card>
               <CardHeader className="text-right">
                 <CardTitle className="flex items-center justify-end gap-2">
@@ -1277,7 +1298,7 @@ const CompanyDashboard = () => {
                 </Table>
               </CardContent>
             </Card>
-          </TabsContent>
+          </TabsContent> */}
 
           {/* Applications Tab */}
           <TabsContent value="applications">
@@ -1842,14 +1863,17 @@ const CompanyDashboard = () => {
         {/* Edit Job Dialog */}
         <Dialog open={isEditJobOpen} onOpenChange={setIsEditJobOpen}>
           <DialogContent className="max-w-lg" dir="rtl">
-            <DialogHeader>
-              <DialogTitle>تعديل الوظيفة</DialogTitle>
-              <DialogDescription>قم بتحديث بيانات الوظيفة</DialogDescription>
+            <DialogHeader className="text-right sm:text-right">
+              <DialogTitle className="text-right">تعديل الوظيفة</DialogTitle>
+              <DialogDescription className="text-right">
+                قم بتحديث بيانات الوظيفة
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 mt-4">
-              <div className="space-y-2">
+              <div className="space-y-2 text-right">
                 <Label>المسمى الوظيفي</Label>
                 <Input
+                  className="text-right"
                   value={editJob.title}
                   onChange={(e) =>
                     setEditJob({ ...editJob, title: e.target.value })
@@ -1857,18 +1881,19 @@ const CompanyDashboard = () => {
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
+                <div className="space-y-2 text-right">
                   <Label>القسم</Label>
                   <Select
+                    dir="rtl"
                     value={editJob.department}
                     onValueChange={(value) =>
                       setEditJob({ ...editJob, department: value })
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="text-right">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent dir="rtl">
                       <SelectItem value="التقنية">التقنية</SelectItem>
                       <SelectItem value="التسويق">التسويق</SelectItem>
                       <SelectItem value="المالية">المالية</SelectItem>
@@ -1877,18 +1902,19 @@ const CompanyDashboard = () => {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-2 text-right">
                   <Label>نوع الدوام</Label>
                   <Select
+                    dir="rtl"
                     value={editJob.type}
                     onValueChange={(value) =>
                       setEditJob({ ...editJob, type: value })
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="text-right">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent dir="rtl">
                       <SelectItem value="دوام كامل">دوام كامل</SelectItem>
                       <SelectItem value="دوام جزئي">دوام جزئي</SelectItem>
                       <SelectItem value="عن بعد">عن بعد</SelectItem>
@@ -1898,38 +1924,52 @@ const CompanyDashboard = () => {
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>الموقع</Label>
+                <div className="space-y-2 text-right">
+                  <Label>الدولة</Label>
                   <Select
-                    value={editJob.location}
+                    dir="rtl"
+                    value={editJob.country}
                     onValueChange={(value) =>
-                      setEditJob({ ...editJob, location: value })
+                      setEditJob({ ...editJob, country: value })
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="text-right">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="الرياض">الرياض</SelectItem>
-                      <SelectItem value="جدة">جدة</SelectItem>
-                      <SelectItem value="الدمام">الدمام</SelectItem>
-                      <SelectItem value="مكة">مكة</SelectItem>
-                      <SelectItem value="المدينة">المدينة</SelectItem>
+                    <SelectContent dir="rtl">
+                      <SelectItem value="المملكة العربية السعودية">
+                        المملكة العربية السعودية
+                      </SelectItem>
+                      <SelectItem value="الإمارات">الإمارات</SelectItem>
+                      <SelectItem value="قطر">قطر</SelectItem>
+                      <SelectItem value="الكويت">الكويت</SelectItem>
+                      <SelectItem value="مصر">مصر</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-2 text-right">
+                  <Label>المدينة</Label>
+                  <Input
+                    className="text-right"
+                    value={editJob.city}
+                    onChange={(e) =>
+                      setEditJob({ ...editJob, city: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="space-y-2 text-right">
                   <Label>الحالة</Label>
                   <Select
+                    dir="rtl"
                     value={editJob.status}
                     onValueChange={(value) =>
                       setEditJob({ ...editJob, status: value })
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="text-right">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent dir="rtl">
                       <SelectItem value="active">نشطة</SelectItem>
                       <SelectItem value="closed">مغلقة</SelectItem>
                     </SelectContent>
@@ -2247,6 +2287,9 @@ const CompanyDashboard = () => {
           </DialogContent>
         </Dialog>
       </main>
+
+      {/* Mobile Navigation */}
+      <MobileTabsMenu activeTab={activeTab} onTabChange={setActiveTab} />
     </div>
   );
 };
