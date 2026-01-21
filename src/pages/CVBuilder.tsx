@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { cn } from "@/lib/utils";
 import { useSearchParams } from "react-router-dom";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,12 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   User,
   Briefcase,
@@ -95,6 +102,129 @@ interface Certificate {
   date: string;
   credentialId: string;
 }
+
+const months = [
+  { value: "01", label: "يناير" },
+  { value: "02", label: "فبراير" },
+  { value: "03", label: "مارس" },
+  { value: "04", label: "أبريل" },
+  { value: "05", label: "مايو" },
+  { value: "06", label: "يونيو" },
+  { value: "07", label: "يوليو" },
+  { value: "08", label: "أغسطس" },
+  { value: "09", label: "سبتمبر" },
+  { value: "10", label: "أكتوبر" },
+  { value: "11", label: "نوفمبر" },
+  { value: "12", label: "ديسمبر" },
+];
+
+const years = Array.from({ length: 2026 - 1960 + 1 }, (_, i) =>
+  (2026 - i).toString(),
+);
+
+const MonthPicker = ({
+  value,
+  onChange,
+  disabled,
+}: {
+  value: string;
+  onChange: (val: string) => void;
+  disabled?: boolean;
+}) => {
+  const currentMonth = months.find((m) => m.value === value);
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild disabled={disabled}>
+        <Button
+          variant="outline"
+          className={cn(
+            "w-full justify-start text-right font-normal h-10 px-3 border-input bg-background hover:bg-accent hover:text-accent-foreground transition-all rounded-md",
+            !value && "text-muted-foreground",
+          )}
+        >
+          <Calendar className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          <span className="truncate">
+            {value ? currentMonth?.label : "الشهر"}
+          </span>
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[180px] p-0" align="start">
+        <ScrollArea className="h-72">
+          <div className="p-2 space-y-1">
+            <div className="text-[10px] font-bold uppercase tracking-wider px-2 py-1.5 text-muted-foreground/70">
+              الشهر
+            </div>
+            {months.map((m) => (
+              <button
+                key={m.value}
+                className={cn(
+                  "w-full text-right px-2 py-1.5 text-sm rounded-md transition-colors",
+                  m.value === value
+                    ? "bg-primary text-primary-foreground font-medium"
+                    : "hover:bg-accent text-foreground",
+                )}
+                onClick={() => onChange(m.value)}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
+        </ScrollArea>
+      </PopoverContent>
+    </Popover>
+  );
+};
+
+const YearPicker = ({
+  value,
+  onChange,
+  disabled,
+}: {
+  value: string;
+  onChange: (val: string) => void;
+  disabled?: boolean;
+}) => {
+  return (
+    <Popover>
+      <PopoverTrigger asChild disabled={disabled}>
+        <Button
+          variant="outline"
+          className={cn(
+            "w-full justify-start text-right font-normal h-10 px-3 border-input bg-background hover:bg-accent hover:text-accent-foreground transition-all rounded-md",
+            !value && "text-muted-foreground",
+          )}
+        >
+          <Calendar className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          <span className="truncate">{value || "السنة"}</span>
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[180px] p-0" align="start">
+        <ScrollArea className="h-72">
+          <div className="p-2 space-y-1">
+            <div className="text-[10px] font-bold uppercase tracking-wider px-2 py-1.5 text-muted-foreground/70">
+              السنة
+            </div>
+            {years.map((y) => (
+              <button
+                key={y}
+                className={cn(
+                  "w-full text-right px-2 py-1.5 text-sm rounded-md transition-colors",
+                  y === value
+                    ? "bg-primary text-primary-foreground font-medium"
+                    : "hover:bg-accent text-foreground",
+                )}
+                onClick={() => onChange(y)}
+              >
+                {y}
+              </button>
+            ))}
+          </div>
+        </ScrollArea>
+      </PopoverContent>
+    </Popover>
+  );
+};
 
 const CVBuilder = () => {
   const { user } = useAuth();
@@ -196,7 +326,7 @@ const CVBuilder = () => {
 
   // Handle CV file upload
   const handleFileUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -377,12 +507,12 @@ const CVBuilder = () => {
   const updateExperience = (
     id: string,
     field: keyof Experience,
-    value: string | boolean
+    value: string | boolean,
   ) => {
     setExperiences(
       experiences.map((exp) =>
-        exp.id === id ? { ...exp, [field]: value } : exp
-      )
+        exp.id === id ? { ...exp, [field]: value } : exp,
+      ),
     );
   };
 
@@ -408,10 +538,12 @@ const CVBuilder = () => {
   const updateEducation = (
     id: string,
     field: keyof Education,
-    value: string
+    value: string,
   ) => {
     setEducation(
-      education.map((edu) => (edu.id === id ? { ...edu, [field]: value } : edu))
+      education.map((edu) =>
+        edu.id === id ? { ...edu, [field]: value } : edu,
+      ),
     );
   };
 
@@ -433,8 +565,8 @@ const CVBuilder = () => {
   const updateSkill = (id: string, field: keyof Skill, value: string) => {
     setSkills(
       skills.map((skill) =>
-        skill.id === id ? { ...skill, [field]: value } : skill
-      )
+        skill.id === id ? { ...skill, [field]: value } : skill,
+      ),
     );
   };
 
@@ -458,12 +590,12 @@ const CVBuilder = () => {
   const updateCertificate = (
     id: string,
     field: keyof Certificate,
-    value: string
+    value: string,
   ) => {
     setCertificates(
       certificates.map((cert) =>
-        cert.id === id ? { ...cert, [field]: value } : cert
-      )
+        cert.id === id ? { ...cert, [field]: value } : cert,
+      ),
     );
   };
 
@@ -502,10 +634,10 @@ const CVBuilder = () => {
         {/* Upload Dialog */}
         <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
           <DialogContent className="max-w-md" dir="rtl">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
+            <DialogHeader className="flex flex-col items-center text-center">
+              <DialogTitle className="flex items-center gap-2 justify-center">
                 <Upload className="w-5 h-5 text-primary" />
-                رفع سيرة ذاتية موجودة
+                <span>رفع سيرة ذاتية موجودة</span>
               </DialogTitle>
               <DialogDescription>
                 قم برفع سيرتك الذاتية وسنقوم بتحليلها واستخراج البيانات تلقائياً
@@ -541,7 +673,7 @@ const CVBuilder = () => {
                 />
               </div>
             </div>
-            <DialogFooter>
+            <DialogFooter className="flex justify-center gap-2">
               <Button
                 variant="outline"
                 onClick={() => setShowUploadDialog(false)}
@@ -555,10 +687,10 @@ const CVBuilder = () => {
         {/* Template Selection Dialog */}
         <Dialog open={showTemplateDialog} onOpenChange={setShowTemplateDialog}>
           <DialogContent className="max-w-3xl" dir="rtl">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
+            <DialogHeader className="flex flex-col items-center text-center">
+              <DialogTitle className="flex items-center gap-2 justify-center">
                 <Layout className="w-5 h-5 text-primary" />
-                اختر قالب السيرة الذاتية
+                <span>اختر قالب السيرة الذاتية</span>
               </DialogTitle>
               <DialogDescription>
                 اختر القالب المناسب لمجال عملك وأسلوبك
@@ -621,7 +753,7 @@ const CVBuilder = () => {
                 ))}
               </div>
             </div>
-            <DialogFooter>
+            <DialogFooter className="flex justify-center gap-2">
               <Button
                 variant="outline"
                 onClick={() => setShowTemplateDialog(false)}
@@ -726,53 +858,64 @@ const CVBuilder = () => {
             <Card className="card-elevated">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-sm font-medium text-muted-foreground">
-                    الخطوة {currentStep + 1} من {sections.length}
-                  </span>
                   <span className="text-sm font-medium text-primary">
                     {sections[currentStep]?.label}
                   </span>
+                  <span className="text-sm font-medium text-muted-foreground">
+                    الخطوة {currentStep + 1} من {sections.length}
+                  </span>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-start justify-between">
                   {sections.map((section, index) => (
-                    <div key={section.id} className="flex-1 flex items-center">
-                      <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all ${
-                          index < currentStep
-                            ? "bg-success text-success-foreground"
-                            : index === currentStep
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-muted text-muted-foreground"
-                        }`}
-                      >
-                        {index < currentStep ? (
-                          <Check className="w-4 h-4" />
-                        ) : (
-                          index + 1
-                        )}
-                      </div>
-                      {index < sections.length - 1 && (
-                        <div
-                          className={`flex-1 h-1 mx-2 rounded-full transition-all ${
-                            index < currentStep ? "bg-success" : "bg-muted"
-                          }`}
-                        />
-                      )}
-                    </div>
-                  ))}
-                </div>
-                <div className="flex justify-between mt-2">
-                  {sections.map((section, index) => (
-                    <span
+                    <div
                       key={section.id}
-                      className={`text-xs text-center flex-1 ${
-                        index === currentStep
-                          ? "text-primary font-medium"
-                          : "text-muted-foreground"
-                      }`}
+                      className="flex-1 flex flex-col items-center"
                     >
-                      {section.label}
-                    </span>
+                      <div className="flex items-center w-full mb-2">
+                        <div
+                          className={cn(
+                            "flex-1 h-1",
+                            index === 0 ? "invisible" : "",
+                            index <= currentStep ? "bg-success" : "bg-muted",
+                          )}
+                        />
+                        <div
+                          className={cn(
+                            "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all shrink-0",
+                            index < currentStep
+                              ? "bg-success text-success-foreground shadow-sm shadow-success/20"
+                              : index === currentStep
+                                ? "bg-primary text-primary-foreground ring-4 ring-primary/20 shadow-lg shadow-primary/10"
+                                : "bg-muted text-muted-foreground",
+                          )}
+                        >
+                          {index < currentStep ? (
+                            <Check className="w-4 h-4" />
+                          ) : (
+                            index + 1
+                          )}
+                        </div>
+                        <div
+                          className={cn(
+                            "flex-1 h-1",
+                            index === sections.length - 1 ? "invisible" : "",
+                            index < currentStep ? "bg-success" : "bg-muted",
+                          )}
+                        />
+                      </div>
+                      <span
+                        className={cn(
+                          "text-[10px] sm:text-xs text-center font-medium transition-colors whitespace-nowrap px-1",
+                          index === currentStep
+                            ? "text-primary font-bold"
+                            : index < currentStep
+                              ? "text-success/90 font-semibold"
+                              : "text-muted-foreground",
+                        )}
+                      >
+                        {section.label}
+                      </span>
+                    </div>
                   ))}
                 </div>
               </CardContent>
@@ -993,7 +1136,7 @@ const CVBuilder = () => {
                                 updateExperience(
                                   exp.id,
                                   "company",
-                                  e.target.value
+                                  e.target.value,
                                 )
                               }
                               placeholder="اسم الشركة"
@@ -1009,7 +1152,7 @@ const CVBuilder = () => {
                                 updateExperience(
                                   exp.id,
                                   "position",
-                                  e.target.value
+                                  e.target.value,
                                 )
                               }
                               placeholder="المسمى الوظيفي"
@@ -1021,34 +1164,65 @@ const CVBuilder = () => {
                             <label className="text-sm font-medium">
                               تاريخ البدء
                             </label>
-                            <Input
-                              type="month"
-                              value={exp.startDate}
-                              onChange={(e) =>
-                                updateExperience(
-                                  exp.id,
-                                  "startDate",
-                                  e.target.value
-                                )
-                              }
-                            />
+                            <div className="grid grid-cols-2 gap-2 mt-1">
+                              <MonthPicker
+                                value={exp.startDate.split("-")[1] || ""}
+                                onChange={(val) => {
+                                  const year =
+                                    exp.startDate.split("-")[0] || "2024";
+                                  updateExperience(
+                                    exp.id,
+                                    "startDate",
+                                    `${year}-${val}`,
+                                  );
+                                }}
+                              />
+                              <YearPicker
+                                value={exp.startDate.split("-")[0] || ""}
+                                onChange={(val) => {
+                                  const month =
+                                    exp.startDate.split("-")[1] || "01";
+                                  updateExperience(
+                                    exp.id,
+                                    "startDate",
+                                    `${val}-${month}`,
+                                  );
+                                }}
+                              />
+                            </div>
                           </div>
                           <div className="space-y-2">
                             <label className="text-sm font-medium">
                               تاريخ الانتهاء
                             </label>
-                            <Input
-                              type="month"
-                              value={exp.endDate}
-                              onChange={(e) =>
-                                updateExperience(
-                                  exp.id,
-                                  "endDate",
-                                  e.target.value
-                                )
-                              }
-                              disabled={exp.current}
-                            />
+                            <div className="grid grid-cols-2 gap-2 mt-1">
+                              <MonthPicker
+                                value={exp.endDate.split("-")[1] || ""}
+                                onChange={(val) => {
+                                  const year =
+                                    exp.endDate.split("-")[0] || "2024";
+                                  updateExperience(
+                                    exp.id,
+                                    "endDate",
+                                    `${year}-${val}`,
+                                  );
+                                }}
+                                disabled={exp.current}
+                              />
+                              <YearPicker
+                                value={exp.endDate.split("-")[0] || ""}
+                                onChange={(val) => {
+                                  const month =
+                                    exp.endDate.split("-")[1] || "01";
+                                  updateExperience(
+                                    exp.id,
+                                    "endDate",
+                                    `${val}-${month}`,
+                                  );
+                                }}
+                                disabled={exp.current}
+                              />
+                            </div>
                             <label className="flex items-center gap-2 text-sm">
                               <input
                                 type="checkbox"
@@ -1057,7 +1231,7 @@ const CVBuilder = () => {
                                   updateExperience(
                                     exp.id,
                                     "current",
-                                    e.target.checked
+                                    e.target.checked,
                                   )
                                 }
                                 className="rounded"
@@ -1094,7 +1268,7 @@ const CVBuilder = () => {
                               updateExperience(
                                 exp.id,
                                 "description",
-                                e.target.value
+                                e.target.value,
                               )
                             }
                             placeholder="اكتب وصفاً لمهامك وإنجازاتك في هذا المنصب..."
@@ -1171,7 +1345,7 @@ const CVBuilder = () => {
                                 updateEducation(
                                   edu.id,
                                   "institution",
-                                  e.target.value
+                                  e.target.value,
                                 )
                               }
                               placeholder="اسم الجامعة أو المعهد"
@@ -1187,7 +1361,7 @@ const CVBuilder = () => {
                                 updateEducation(
                                   edu.id,
                                   "degree",
-                                  e.target.value
+                                  e.target.value,
                                 )
                               }
                               placeholder="بكالوريوس، ماجستير، دكتوراه..."
@@ -1225,33 +1399,63 @@ const CVBuilder = () => {
                             <label className="text-sm font-medium">
                               تاريخ البدء
                             </label>
-                            <Input
-                              type="month"
-                              value={edu.startDate}
-                              onChange={(e) =>
-                                updateEducation(
-                                  edu.id,
-                                  "startDate",
-                                  e.target.value
-                                )
-                              }
-                            />
+                            <div className="grid grid-cols-2 gap-2 mt-1">
+                              <MonthPicker
+                                value={edu.startDate.split("-")[1] || ""}
+                                onChange={(val) => {
+                                  const year =
+                                    edu.startDate.split("-")[0] || "2024";
+                                  updateEducation(
+                                    edu.id,
+                                    "startDate",
+                                    `${year}-${val}`,
+                                  );
+                                }}
+                              />
+                              <YearPicker
+                                value={edu.startDate.split("-")[0] || ""}
+                                onChange={(val) => {
+                                  const month =
+                                    edu.startDate.split("-")[1] || "01";
+                                  updateEducation(
+                                    edu.id,
+                                    "startDate",
+                                    `${val}-${month}`,
+                                  );
+                                }}
+                              />
+                            </div>
                           </div>
                           <div className="space-y-2">
                             <label className="text-sm font-medium">
                               تاريخ التخرج
                             </label>
-                            <Input
-                              type="month"
-                              value={edu.endDate}
-                              onChange={(e) =>
-                                updateEducation(
-                                  edu.id,
-                                  "endDate",
-                                  e.target.value
-                                )
-                              }
-                            />
+                            <div className="grid grid-cols-2 gap-2 mt-1">
+                              <MonthPicker
+                                value={edu.endDate.split("-")[1] || ""}
+                                onChange={(val) => {
+                                  const year =
+                                    edu.endDate.split("-")[0] || "2024";
+                                  updateEducation(
+                                    edu.id,
+                                    "endDate",
+                                    `${year}-${val}`,
+                                  );
+                                }}
+                              />
+                              <YearPicker
+                                value={edu.endDate.split("-")[0] || ""}
+                                onChange={(val) => {
+                                  const month =
+                                    edu.endDate.split("-")[1] || "01";
+                                  updateEducation(
+                                    edu.id,
+                                    "endDate",
+                                    `${val}-${month}`,
+                                  );
+                                }}
+                              />
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -1402,7 +1606,7 @@ const CVBuilder = () => {
                                 updateCertificate(
                                   cert.id,
                                   "name",
-                                  e.target.value
+                                  e.target.value,
                                 )
                               }
                               placeholder="AWS Solutions Architect"
@@ -1418,7 +1622,7 @@ const CVBuilder = () => {
                                 updateCertificate(
                                   cert.id,
                                   "issuer",
-                                  e.target.value
+                                  e.target.value,
                                 )
                               }
                               placeholder="Amazon Web Services"
@@ -1430,17 +1634,31 @@ const CVBuilder = () => {
                             <label className="text-sm font-medium">
                               تاريخ الحصول
                             </label>
-                            <Input
-                              type="month"
-                              value={cert.date}
-                              onChange={(e) =>
-                                updateCertificate(
-                                  cert.id,
-                                  "date",
-                                  e.target.value
-                                )
-                              }
-                            />
+                            <div className="grid grid-cols-2 gap-2 mt-1">
+                              <MonthPicker
+                                value={cert.date.split("-")[1] || ""}
+                                onChange={(val) => {
+                                  const year =
+                                    cert.date.split("-")[0] || "2024";
+                                  updateCertificate(
+                                    cert.id,
+                                    "date",
+                                    `${year}-${val}`,
+                                  );
+                                }}
+                              />
+                              <YearPicker
+                                value={cert.date.split("-")[0] || ""}
+                                onChange={(val) => {
+                                  const month = cert.date.split("-")[1] || "01";
+                                  updateCertificate(
+                                    cert.id,
+                                    "date",
+                                    `${val}-${month}`,
+                                  );
+                                }}
+                              />
+                            </div>
                           </div>
                           <div className="space-y-2">
                             <label className="text-sm font-medium">
@@ -1452,7 +1670,7 @@ const CVBuilder = () => {
                                 updateCertificate(
                                   cert.id,
                                   "credentialId",
-                                  e.target.value
+                                  e.target.value,
                                 )
                               }
                               placeholder="ABC123XYZ"
