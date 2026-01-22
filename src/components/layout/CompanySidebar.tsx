@@ -1,0 +1,131 @@
+import { Link, useLocation } from "react-router-dom";
+import {
+  LayoutDashboard,
+  Briefcase,
+  FileText,
+  Megaphone,
+  Settings,
+  ChevronLeft,
+  ChevronRight,
+  LogOut,
+  Building2,
+  Sparkles,
+  Image,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useSidebarState } from "@/contexts/SidebarContext";
+
+interface CompanySidebarProps {
+  activeTab: string;
+  onTabChange: (tab: string) => void;
+}
+
+const navItems = [
+  { icon: LayoutDashboard, label: "لوحة التحكم", value: "overview" },
+  { icon: Briefcase, label: "الوظائف", value: "jobs" },
+  { icon: FileText, label: "الطلبات", value: "applications" },
+  { icon: Megaphone, label: "الترويج", value: "promotion" },
+  { icon: Image, label: "الإعلانات", value: "ads" },
+  { icon: Sparkles, label: "مولد الوصف", value: "generator" },
+];
+
+const bottomNavItems = [
+  { icon: Settings, label: "الإعدادات", path: "/settings" },
+];
+
+export const CompanySidebar = ({ activeTab, onTabChange }: CompanySidebarProps) => {
+  const { collapsed, toggle } = useSidebarState();
+  const location = useLocation();
+
+  return (
+    <aside
+      className={cn(
+        "fixed right-0 top-0 h-screen bg-sidebar text-sidebar-foreground transition-all duration-300 z-50 flex flex-col",
+        collapsed ? "w-20" : "w-64"
+      )}
+    >
+      {/* Logo & Brand */}
+      <div className="p-6 border-b border-sidebar-border flex items-center gap-3 overflow-hidden">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center shadow-lg shadow-emerald-500/20 shrink-0">
+          <Building2 className="w-5 h-5 text-white" />
+        </div>
+        {!collapsed && (
+          <div className="animate-fade-in">
+            <h1 className="text-lg font-bold text-white leading-none">
+              لوحة الشركة
+            </h1>
+            <p className="text-[10px] text-sidebar-foreground/80 tracking-widest uppercase mt-0.5 font-medium">
+              Company Dashboard
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+        {navItems.map((item) => {
+          const isActive = activeTab === item.value;
+          return (
+            <button
+              key={item.value}
+              onClick={() => onTabChange(item.value)}
+              className={cn(
+                "nav-item group w-full",
+                isActive && "active",
+                collapsed && "justify-center px-2"
+              )}
+            >
+              <item.icon
+                className={cn(
+                  "w-5 h-5 transition-colors shrink-0",
+                  isActive
+                    ? "text-sidebar-primary"
+                    : "text-sidebar-foreground/70 group-hover:text-sidebar-foreground"
+                )}
+              />
+              {!collapsed && (
+                <span className="animate-fade-in">{item.label}</span>
+              )}
+              {isActive && !collapsed && (
+                <div className="mr-auto w-1.5 h-1.5 rounded-full bg-sidebar-primary" />
+              )}
+            </button>
+          );
+        })}
+      </nav>
+
+      {/* Bottom Navigation */}
+      <div className="p-4 border-t border-sidebar-border space-y-2">
+        {bottomNavItems.map((item) => (
+          <Link
+            key={item.path}
+            to={item.path}
+            className={cn("nav-item", collapsed && "justify-center px-2")}
+          >
+            <item.icon className="w-5 h-5 text-sidebar-foreground/70 shrink-0" />
+            {!collapsed && <span>{item.label}</span>}
+          </Link>
+        ))}
+        <Link
+          to="/auth"
+          className={cn("nav-item w-full", collapsed && "justify-center px-2")}
+        >
+          <LogOut className="w-5 h-5 text-sidebar-foreground/70 shrink-0" />
+          {!collapsed && <span>تسجيل الخروج</span>}
+        </Link>
+      </div>
+
+      {/* Collapse Button */}
+      <button
+        onClick={toggle}
+        className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-sidebar-accent border border-sidebar-border flex items-center justify-center text-sidebar-foreground hover:bg-sidebar-primary hover:text-white transition-colors"
+      >
+        {collapsed ? (
+          <ChevronLeft className="w-4 h-4" />
+        ) : (
+          <ChevronRight className="w-4 h-4" />
+        )}
+      </button>
+    </aside>
+  );
+};
