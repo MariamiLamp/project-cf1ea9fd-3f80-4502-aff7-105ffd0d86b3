@@ -32,6 +32,7 @@ import NotFound from "./pages/NotFound";
 import Notifications from "./pages/Notifications";
 import ContactUs from "./pages/ContactUs";
 import ProfileViews from "./pages/ProfileViews";
+import Blog from "./pages/Blog";
 
 const queryClient = new QueryClient();
 
@@ -76,6 +77,7 @@ const App = () => (
               <Route path="/settings" element={<Settings />} />
               <Route path="/notifications" element={<Notifications />} />
               <Route path="/contact" element={<ContactUs />} />
+              <Route path="/blog" element={<Blog />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
