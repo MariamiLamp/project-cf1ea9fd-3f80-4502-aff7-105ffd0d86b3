@@ -12,7 +12,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
   TableBody,
@@ -41,6 +40,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import useAds, { AdPlacement } from "@/hooks/use-ads";
@@ -49,21 +49,16 @@ import {
   Plus,
   Users,
   FileText,
-  LogOut,
   Eye,
   CheckCircle,
   XCircle,
   Clock,
-  MapPin,
-  Building2,
   TrendingUp,
   Edit,
-  Trash2,
   Sparkles,
   Image,
   Star,
   Megaphone,
-  BookOpen,
   Loader2,
   X,
   Search,
@@ -71,9 +66,9 @@ import {
   Download,
 } from "lucide-react";
 
+import { CompanyDashboardLayout } from "@/components/layout/CompanyDashboardLayout";
 import { AdPlacementSelector } from "@/components/dashboard/AdPlacementSelector";
 import { StatCard } from "@/components/dashboard/StatCard";
-import MobileTabsMenu from "@/components/dashboard/MobileTabsMenu";
 import JobForm, { JobFormData } from "@/components/dashboard/JobForm";
 
 // Mock data
@@ -779,114 +774,305 @@ const CompanyDashboard = () => {
     },
   ];
 
+  // Overview content renderer
+  const renderOverview = () => (
+    <div className="space-y-6">
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          title="الوظائف النشطة"
+          value="12"
+          icon={Briefcase}
+          variant="primary"
+          delay={100}
+        />
+        <StatCard
+          title="إجمالي الطلبات"
+          value="156"
+          icon={FileText}
+          variant="success"
+          delay={200}
+        />
+        <StatCard
+          title="المرشحون المتوافقون"
+          value="48"
+          icon={Users}
+          variant="info"
+          delay={300}
+        />
+        <StatCard
+          title="معدل القبول"
+          value="32%"
+          icon={TrendingUp}
+          variant="warning"
+          delay={400}
+        />
+      </div>
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => setActiveTab("jobs")}>
+          <CardContent className="pt-6 text-center">
+            <Briefcase className="w-8 h-8 mx-auto mb-2 text-primary" />
+            <h3 className="font-semibold">إدارة الوظائف</h3>
+            <p className="text-sm text-muted-foreground">عرض وتعديل الوظائف المنشورة</p>
+          </CardContent>
+        </Card>
+        <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => setActiveTab("applications")}>
+          <CardContent className="pt-6 text-center">
+            <FileText className="w-8 h-8 mx-auto mb-2 text-primary" />
+            <h3 className="font-semibold">طلبات التوظيف</h3>
+            <p className="text-sm text-muted-foreground">مراجعة طلبات المتقدمين</p>
+          </CardContent>
+        </Card>
+        <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => setIsAddJobOpen(true)}>
+          <CardContent className="pt-6 text-center">
+            <Plus className="w-8 h-8 mx-auto mb-2 text-primary" />
+            <h3 className="font-semibold">إضافة وظيفة</h3>
+            <p className="text-sm text-muted-foreground">نشر وظيفة جديدة</p>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+
+  // Jobs content renderer
+  const renderJobs = () => (
+    <Card>
+      <CardHeader className="text-right">
+        <div className="flex items-center justify-between">
+          <Dialog open={isAddJobOpen} onOpenChange={setIsAddJobOpen}>
+            <DialogTrigger asChild>
+              <Button className="gap-2">
+                <Plus className="w-4 h-4" />
+                إضافة وظيفة
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto" dir="rtl">
+              <DialogHeader className="text-right sm:text-right">
+                <DialogTitle className="text-right">إضافة وظيفة جديدة</DialogTitle>
+                <DialogDescription className="text-right">أدخل تفاصيل الوظيفة المطلوبة</DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 mt-4">
+                <div className="space-y-2 text-right">
+                  <Label>المسمى الوظيفي *</Label>
+                  <Input
+                    className="text-right"
+                    placeholder="مثال: مطور واجهات أمامية"
+                    value={newJob.title}
+                    onChange={(e) => setNewJob({ ...newJob, title: e.target.value })}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2 text-right">
+                    <Label>القسم *</Label>
+                    <Select dir="rtl" onValueChange={(value) => setNewJob({ ...newJob, department: value })}>
+                      <SelectTrigger className="text-right">
+                        <SelectValue placeholder="اختر القسم" />
+                      </SelectTrigger>
+                      <SelectContent dir="rtl">
+                        <SelectItem value="التقنية">التقنية</SelectItem>
+                        <SelectItem value="التسويق">التسويق</SelectItem>
+                        <SelectItem value="المالية">المالية</SelectItem>
+                        <SelectItem value="الإدارة">الإدارة</SelectItem>
+                        <SelectItem value="الموارد البشرية">الموارد البشرية</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2 text-right">
+                    <Label>نوع الدوام *</Label>
+                    <Select dir="rtl" onValueChange={(value) => setNewJob({ ...newJob, type: value })}>
+                      <SelectTrigger className="text-right">
+                        <SelectValue placeholder="اختر النوع" />
+                      </SelectTrigger>
+                      <SelectContent dir="rtl">
+                        <SelectItem value="دوام كامل">دوام كامل</SelectItem>
+                        <SelectItem value="دوام جزئي">دوام جزئي</SelectItem>
+                        <SelectItem value="عن بعد">عن بعد</SelectItem>
+                        <SelectItem value="عقد">عقد</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2 text-right">
+                    <Label>الدولة *</Label>
+                    <Select dir="rtl" onValueChange={(value) => setNewJob({ ...newJob, country: value })}>
+                      <SelectTrigger className="text-right">
+                        <SelectValue placeholder="اختر الدولة" />
+                      </SelectTrigger>
+                      <SelectContent dir="rtl">
+                        <SelectItem value="المملكة العربية السعودية">المملكة العربية السعودية</SelectItem>
+                        <SelectItem value="الإمارات">الإمارات</SelectItem>
+                        <SelectItem value="قطر">قطر</SelectItem>
+                        <SelectItem value="الكويت">الكويت</SelectItem>
+                        <SelectItem value="مصر">مصر</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2 text-right">
+                    <Label>المدينة *</Label>
+                    <Input
+                      className="text-right"
+                      placeholder="مثال: الرياض، دبي..."
+                      value={newJob.city}
+                      onChange={(e) => setNewJob({ ...newJob, city: e.target.value })}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2 text-right">
+                  <div className="flex items-center justify-between">
+                    <Label>وصف الوظيفة</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        if (!newJob.title) {
+                          toast({
+                            title: "خطأ",
+                            description: "يرجى إدخال المسمى الوظيفي أولاً",
+                            variant: "destructive",
+                          });
+                          return;
+                        }
+                        setIsGenerating(true);
+                        setTimeout(() => {
+                          const mockDescription = `نبحث عن ${newJob.title} متميز للانضمام إلى فريقنا${newJob.department ? ` في قسم ${newJob.department}` : ""}.
+
+المسؤوليات الرئيسية:
+• تطوير وصيانة التطبيقات والأنظمة
+• التعاون مع الفريق لتحقيق أهداف المشروع
+• المشاركة في مراجعة الكود وتحسين الأداء
+
+المتطلبات:
+• خبرة لا تقل عن 3 سنوات في المجال
+• مهارات تواصل ممتازة
+• القدرة على العمل ضمن فريق
+
+المزايا:
+• راتب تنافسي
+• تأمين صحي شامل
+• بيئة عمل محفزة`;
+                          setNewJob({ ...newJob, description: mockDescription });
+                          setIsGenerating(false);
+                          toast({
+                            title: "تم التوليد",
+                            description: "تم إنشاء وصف الوظيفة بنجاح",
+                          });
+                        }, 1500);
+                      }}
+                      disabled={isGenerating}
+                      className="gap-1 h-7 text-xs"
+                    >
+                      {isGenerating ? (
+                        <>
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                          جاري التوليد...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="w-3 h-3" />
+                          توليد بالذكاء الاصطناعي
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  <Textarea
+                    placeholder="اكتب وصفاً تفصيلياً للوظيفة أو استخدم الذكاء الاصطناعي..."
+                    value={newJob.description}
+                    onChange={(e) => setNewJob({ ...newJob, description: e.target.value })}
+                    className="text-right"
+                    rows={6}
+                  />
+                </div>
+                <div className="space-y-2 text-right">
+                  <Label>المتطلبات</Label>
+                  <Textarea
+                    placeholder="اكتب متطلبات الوظيفة..."
+                    value={newJob.requirements}
+                    onChange={(e) => setNewJob({ ...newJob, requirements: e.target.value })}
+                    className="text-right"
+                    rows={3}
+                  />
+                </div>
+                <Button onClick={handleAddJob} className="w-full">نشر الوظيفة</Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+          <CardTitle className="flex items-center gap-2">
+            <span>الوظائف المنشورة</span>
+            <Briefcase className="w-5 h-5" />
+          </CardTitle>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <Table dir="ltr" className="text-right [&_th]:text-right [&_td]:text-right">
+          <TableHeader>
+            <TableRow>
+              <TableHead>الإجراءات</TableHead>
+              <TableHead>تاريخ النشر</TableHead>
+              <TableHead>الحالة</TableHead>
+              <TableHead>عدد الطلبات</TableHead>
+              <TableHead>المدينة</TableHead>
+              <TableHead>الدولة</TableHead>
+              <TableHead>نوع الدوام</TableHead>
+              <TableHead>القسم</TableHead>
+              <TableHead>المسمى الوظيفي</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {jobs.map((job) => (
+              <TableRow key={job.id}>
+                <TableCell>
+                  <div className="flex gap-1 justify-end">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleToggleJobStatus(job.id)}
+                      className={
+                        job.status === "active"
+                          ? "text-destructive border-destructive/20 hover:bg-destructive/5 h-8 px-3 text-xs"
+                          : "text-success border-success/20 hover:bg-success/5 h-8 px-3 text-xs"
+                      }
+                    >
+                      {job.status === "active" ? "إيقاف" : "تنشيط"}
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => handleEditJob(job)}>
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </TableCell>
+                <TableCell className="text-muted-foreground">{job.postedDate}</TableCell>
+                <TableCell>
+                  <Badge
+                    variant={job.status === "active" ? "default" : job.status === "paused" ? "secondary" : "outline"}
+                    className={job.status === "active" ? "bg-success hover:bg-success/90" : job.status === "paused" ? "bg-warning hover:bg-warning/90 text-warning-foreground" : ""}
+                  >
+                    {job.status === "active" ? "نشطة" : job.status === "paused" ? "متوقفة" : "مغلقة"}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <Badge variant="secondary">{job.applications} طلب</Badge>
+                </TableCell>
+                <TableCell>{job.location.split(" - ")[1] || job.location}</TableCell>
+                <TableCell>{job.location.split(" - ")[0]}</TableCell>
+                <TableCell>{job.type}</TableCell>
+                <TableCell>{job.department}</TableCell>
+                <TableCell className="font-medium">{job.title}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
+  );
+
   return (
-    <div className="min-h-screen bg-background" dir="rtl">
-      {/* Header */}
-      <header className="bg-card border-b border-border px-6 py-4 flex items-center justify-between sticky top-0 z-40 shadow-sm">
-        {/* Logo & Brand */}
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary via-primary/80 to-secondary flex items-center justify-center shadow-lg shadow-primary/20">
-            <BookOpen className="w-5 h-5 text-primary-foreground" />
-          </div>
-          <div className="hidden sm:block" dir="ltr">
-            <h1 className="text-xl tracking-tight">
-              <span className="text-primary font-light">Career</span>
-              <span className="text-foreground/90 font-extrabold">Book</span>
-            </h1>
-            <p className="text-[10px] text-muted-foreground tracking-widest uppercase">
-              كارير بوك
-            </p>
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div className="flex items-center gap-4">
-          <div className="hidden md:block text-right">
-            <p className="text-sm font-medium">لوحة تحكم الشركة</p>
-            <p className="text-xs text-muted-foreground">
-              {user?.companyName || "شركتك"}
-            </p>
-          </div>
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center">
-            <Building2 className="w-5 h-5 text-white" />
-          </div>
-          <Button variant="outline" onClick={handleLogout} className="gap-2">
-            <LogOut className="w-4 h-4" />
-            تسجيل الخروج
-          </Button>
-        </div>
-      </header>
-
-      <main className="p-6 pb-24 md:pb-6 space-y-6">
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard
-            title="الوظائف النشطة"
-            value="12"
-            icon={Briefcase}
-            variant="primary"
-            delay={100}
-          />
-          <StatCard
-            title="إجمالي الطلبات"
-            value="156"
-            icon={FileText}
-            variant="success"
-            delay={200}
-          />
-          <StatCard
-            title="المرشحون المتوافقون"
-            value="48"
-            icon={Users}
-            variant="info"
-            delay={300}
-          />
-          <StatCard
-            title="معدل القبول"
-            value="32%"
-            icon={TrendingUp}
-            variant="warning"
-            delay={400}
-          />
-        </div>
-        {/* Tabs */}
-        <Tabs
-          value={activeTab}
-          onValueChange={setActiveTab}
-          className="space-y-4"
-        >
-          <div className="flex flex-col items-end gap-4">
-            <div className="flex items-center justify-between w-full flex-row-reverse">
-              <TabsList className="hidden md:flex bg-muted/50 flex-wrap h-auto gap-1">
-                <TabsTrigger value="ads" className="gap-2">
-                  <Megaphone className="w-4 h-4" />
-                  الإعلانات
-                </TabsTrigger>
-                <TabsTrigger value="promotion" className="gap-2">
-                  <Megaphone className="w-4 h-4" />
-                  الترويج
-                </TabsTrigger>
-                <TabsTrigger value="applications" className="gap-2">
-                  <FileText className="w-4 h-4" />
-                  الطلبات
-                </TabsTrigger>
-                {/* <TabsTrigger value="candidates" className="gap-2">
-                  <Users className="w-4 h-4" />
-                  المرشحون
-                </TabsTrigger> */}
-                <TabsTrigger value="jobs" className="gap-2">
-                  <Briefcase className="w-4 h-4" />
-                  الوظائف
-                </TabsTrigger>
-              </TabsList>
-              {/* add new job */}
-              <Dialog open={isAddJobOpen} onOpenChange={setIsAddJobOpen}>
-                <DialogTrigger asChild>
-                  <Button className="gap-2">
-                    <Plus className="w-4 h-4" />
-                    إضافة وظيفة
-                  </Button>
-                </DialogTrigger>
+    <CompanyDashboardLayout activeTab={activeTab} onTabChange={setActiveTab}>
+      <div className="space-y-6">
+        {activeTab === "overview" && renderOverview()}
+        {activeTab === "jobs" && renderJobs()}
                 <DialogContent
                   className="max-w-lg max-h-[90vh] overflow-y-auto"
                   dir="rtl"
