@@ -74,6 +74,8 @@ import {
   Search,
   ListFilter,
   Download,
+  Crown,
+  CreditCard,
 } from "lucide-react";
 
 import { CompanyDashboardLayout } from "@/components/layout/CompanyDashboardLayout";
@@ -1908,6 +1910,137 @@ const CompanyDashboard = () => {
     </Card>
   );
 
+  const renderSubscription = () => (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="col-span-1 md:col-span-2 border-primary/20 bg-primary/5">
+          <CardHeader className="text-right">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+                  <Crown className="w-6 h-6 text-primary" />
+                </div>
+                <div className="text-right">
+                  <h3 className="text-xl font-bold">باقة الشركات الإحترافية</h3>
+                  <p className="text-sm text-muted-foreground">
+                    خطة نشطة حالياً
+                  </p>
+                </div>
+              </div>
+              <Badge className="bg-emerald-500">نشط</Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-background/50 p-4 rounded-xl border border-border/50 text-right">
+                <p className="text-sm text-muted-foreground mb-1">
+                  تاريخ التجديد القادم
+                </p>
+                <p className="font-bold">20 فبراير 2026</p>
+              </div>
+              <div className="bg-background/50 p-4 rounded-xl border border-border/50 text-right">
+                <p className="text-sm text-muted-foreground mb-1">
+                  قيمة الاشتراك
+                </p>
+                <p className="font-bold">599 ر.س / شهرياً</p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <h4 className="font-semibold text-right">
+                مميزات الباقة الحالية:
+              </h4>
+              <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {[
+                  "نشر وظائف غير محدودة",
+                  "فلترة متقدمة للمرشحين بال AI",
+                  "بانر مخصص للشركة في الصفحة الرئيسية",
+                  "دعم فني مخصص 24/7",
+                  "تقارير تحليلية مفصلة",
+                ].map((feature, i) => (
+                  <li
+                    key={i}
+                    className="flex items-center justify-start gap-2 text-right text-sm"
+                  >
+                    <span>{feature}</span>
+                    <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0" />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="flex flex-col justify-between border-dashed border-2">
+          <CardHeader className="text-right">
+            <CardTitle className="text-lg">هل تحتاج لمميزات أكثر؟</CardTitle>
+            <CardDescription className="text-right">
+              {" "}
+              قم بترقية حسابك للوصول لمميزات Enterprise والربط البرمجي الكامل
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex-1 flex flex-col justify-end gap-4">
+            <div className="p-4 bg-muted/50 rounded-lg text-right text-sm">
+              تواصل معنا للحصول على عرض سعر مخصص للمنظمات الكبيرة
+            </div>
+            <Button
+              className="w-full gap-2 h-12 text-lg font-bold"
+              onClick={() =>
+                (window.location.href = "http://localhost:8080/subscription")
+              }
+            >
+              <Sparkles className="w-5 h-5 fill-current" />
+              ترقية الباقة
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card>
+        <CardHeader className="text-right">
+          <CardTitle className="text-lg">سجل العمليات المالية</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table dir="rtl">
+            <TableHeader>
+              <TableRow>
+                <TableHead className="text-right">المبلغ</TableHead>
+                <TableHead className="text-right">التاريخ</TableHead>
+                <TableHead className="text-right">الوصف</TableHead>
+                <TableHead className="text-right">رقم الفاتورة</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {[
+                {
+                  id: "INV-001",
+                  desc: "تجديد اشتراك شهري - باقة احترافية",
+                  date: "2024-01-20",
+                  amount: "599 ر.س",
+                },
+                {
+                  id: "INV-002",
+                  desc: "تجديد اشتراك شهري - باقة احترافية",
+                  date: "2023-12-20",
+                  amount: "599 ر.س",
+                },
+              ].map((inv) => (
+                <TableRow key={inv.id}>
+                  <TableHead className="font-bold">{inv.amount}</TableHead>
+                  <TableCell className="text-muted-foreground">
+                    {inv.date}
+                  </TableCell>
+                  <TableCell>{inv.desc}</TableCell>
+                  <TableCell className="font-mono text-xs">{inv.id}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </div>
+  );
+
   // ========== MAIN RENDER ==========
 
   return (
@@ -1917,6 +2050,7 @@ const CompanyDashboard = () => {
         {activeTab === "applications" && renderApplications()}
         {activeTab === "promotion" && renderPromotion()}
         {activeTab === "ads" && renderAds()}
+        {activeTab === "subscription" && renderSubscription()}
 
         {/* Edit Job Dialog */}
         <Dialog open={isEditJobOpen} onOpenChange={setIsEditJobOpen}>

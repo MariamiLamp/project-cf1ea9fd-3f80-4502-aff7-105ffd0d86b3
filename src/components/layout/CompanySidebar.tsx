@@ -11,6 +11,7 @@ import {
   Building2,
   Image,
   Target,
+  CreditCard,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSidebarState } from "@/contexts/SidebarContext";
@@ -25,6 +26,7 @@ const navGroups = [
     items: [
       { icon: Briefcase, label: "الوظائف", value: "jobs" },
       { icon: FileText, label: "الطلبات", value: "applications" },
+      { icon: CreditCard, label: "الاشتراكات", value: "subscription" },
     ],
   },
   {
