@@ -288,6 +288,7 @@ const CompanyDashboard = () => {
   });
 
   // Ads management
+  // Ads management
   const adsHook = useAds();
   const { ads, add: addAd, remove: removeAd, getByPlacement } = adsHook;
   const [adForm, setAdForm] = useState({
@@ -307,6 +308,7 @@ const CompanyDashboard = () => {
   const [filterJob, setFilterJob] = useState<string>("all");
   const [filterExperience, setFilterExperience] = useState<string>("all");
 
+  // Applied filters state
   // Applied filters state
   const [appliedFilters, setAppliedFilters] = useState({
     status: "all",
@@ -393,6 +395,7 @@ const CompanyDashboard = () => {
 
     setJobs([...jobs, job]);
     toast({ title: "تم إضافة الوظيفة", description: "تم نشر الوظيفة بنجاح" });
+    toast({ title: "تم إضافة الوظيفة", description: "تم نشر الوظيفة بنجاح" });
     setIsAddJobOpen(false);
     setNewJob({
       title: "",
@@ -476,6 +479,7 @@ const CompanyDashboard = () => {
     setSelectedApplication(app);
     setRejectionReasonInput(app.rejectionReason || "");
     setNotesInput(app.notes || "");
+    setPendingAction(null);
     setPendingAction(null);
     setIsViewApplicationOpen(true);
     if (app.status === "pending") {
@@ -565,6 +569,7 @@ const CompanyDashboard = () => {
   const handleCopyDescription = () => {
     navigator.clipboard.writeText(generatedDescription);
     toast({ title: "تم النسخ", description: "تم نسخ الوصف إلى الحافظة" });
+    toast({ title: "تم النسخ", description: "تم نسخ الوصف إلى الحافظة" });
   };
 
   const handleToggleFeatured = (jobId: number) => {
@@ -639,6 +644,7 @@ const CompanyDashboard = () => {
       placement: adForm.placement as AdPlacement,
       enabled: false,
       status: "pending",
+
       companyName: user?.companyName || "شركة تجريبية",
       date: new Date().toISOString().split("T")[0],
       price: price,
@@ -701,6 +707,8 @@ const CompanyDashboard = () => {
         return <Badge variant="outline">{status}</Badge>;
     }
   };
+
+  // ========== RENDER FUNCTIONS ==========
 
   // ========== RENDER FUNCTIONS ==========
 
@@ -1556,6 +1564,21 @@ const CompanyDashboard = () => {
                 />
               </div>
 
+              <div className="space-y-2 text-right">
+                <Label>صورة البانر</Label>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  className="text-right cursor-pointer"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const url = URL.createObjectURL(file);
+                      setAdForm({ ...adForm, imageUrl: url });
+                    }
+                  }}
+                />
+              </div>
               <div className="space-y-2 text-right">
                 <Label>صورة البانر</Label>
                 <Input
