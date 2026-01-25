@@ -33,6 +33,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -56,6 +66,8 @@ import {
   Star,
   Download,
   DollarSign,
+  Filter,
+  RotateCcw,
   Percent,
   Package,
   Settings,
@@ -65,7 +77,23 @@ import {
   Check,
   X,
 } from "lucide-react";
+import {
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Cell,
+  PieChart,
+  Pie,
+} from "recharts";
 import { AdPlacementSelector } from "@/components/dashboard/AdPlacementSelector";
+import { DataTableFilters } from "@/components/dashboard/DataTableFilters";
+import { AdminDashboardLayout } from "@/components/layout/AdminDashboardLayout";
+import { FinancialReports } from "@/components/dashboard/FinancialReports";
 
 // Mock data - Users
 const mockUsers = [
@@ -79,6 +107,7 @@ const mockUsers = [
     appliedJobs: 12,
     joinDate: "2024-01-15",
     subscription: "مجاني",
+    location: "الرياض",
   },
   {
     id: 2,
@@ -90,6 +119,7 @@ const mockUsers = [
     appliedJobs: 8,
     joinDate: "2024-02-20",
     subscription: "احترافي",
+    location: "جدة",
   },
   {
     id: 3,
@@ -101,6 +131,7 @@ const mockUsers = [
     appliedJobs: 5,
     joinDate: "2024-03-10",
     subscription: "مجاني",
+    location: "الدمام",
   },
   {
     id: 4,
@@ -112,6 +143,7 @@ const mockUsers = [
     appliedJobs: 15,
     joinDate: "2024-01-05",
     subscription: "مميز",
+    location: "مكة المكرمة",
   },
   {
     id: 5,
@@ -135,6 +167,7 @@ const mockCompanies = [
     jobs: 15,
     employees: 250,
     industry: "تقنية المعلومات",
+    location: "الرياض",
     subscription: "شركات+",
   },
   {
@@ -145,6 +178,7 @@ const mockCompanies = [
     jobs: 8,
     employees: 500,
     industry: "المالية",
+    location: "جدة",
     subscription: "شركات",
   },
   {
@@ -155,6 +189,7 @@ const mockCompanies = [
     jobs: 12,
     employees: 150,
     industry: "البناء والتشييد",
+    location: "الدمام",
     subscription: "مجاني",
   },
   {
@@ -176,7 +211,8 @@ const mockHRProfiles = [
     email: "khaled@hr.com",
     company: "شركة التقنية المتقدمة",
     role: "مدير الموارد البشرية",
-    hiredCount: 45,
+    cvsCount: 124,
+    subscription: "احترافي",
     status: "active",
   },
   {
@@ -185,7 +221,8 @@ const mockHRProfiles = [
     email: "noura@hr.com",
     company: "مجموعة الاستثمار",
     role: "أخصائي توظيف",
-    hiredCount: 32,
+    cvsCount: 85,
+    subscription: "مجاني",
     status: "active",
   },
   {
@@ -194,7 +231,8 @@ const mockHRProfiles = [
     email: "saud@hr.com",
     company: "شركة البناء الحديث",
     role: "مدير التوظيف",
-    hiredCount: 28,
+    cvsCount: 42,
+    subscription: "مميز",
     status: "inactive",
   },
   {
@@ -203,7 +241,8 @@ const mockHRProfiles = [
     email: "hind@hr.com",
     company: "مؤسسة الصحة",
     role: "مسؤول الموارد البشرية",
-    hiredCount: 55,
+    cvsCount: 210,
+    subscription: "مميز",
     status: "active",
   },
 ];
@@ -280,6 +319,32 @@ const mockPlans = [
     isActive: true,
     type: "company",
   },
+  {
+    id: 6,
+    name: "HR الأساسية",
+    nameEn: "hr_basic",
+    price: 199,
+    period: "شهري",
+    features: ["50 بحث سيرة ذاتية", "فلترة أساسية", "دعم فني"],
+    usersCount: 120,
+    isActive: true,
+    type: "hr",
+  },
+  {
+    id: 7,
+    name: "HR الاحترافية",
+    nameEn: "hr_pro",
+    price: 450,
+    period: "شهري",
+    features: [
+      "بحث غير محدود",
+      "فلترة متقدمة بالذكاء الاصطناعي",
+      "تواصل مباشر مع المرشحين",
+    ],
+    usersCount: 45,
+    isActive: true,
+    type: "hr",
+  },
 ];
 
 // Mock Templates
@@ -354,12 +419,164 @@ const categoryLabels: Record<string, string> = {
   academic: "أكاديمي",
 };
 
+const mockPayments = [
+  {
+    id: 1,
+    user: "أحمد محمد",
+    amount: 150,
+    type: "subscription",
+    status: "completed",
+    date: "2024-06-20",
+    details: "خطة احترافية",
+  },
+  {
+    id: 2,
+    user: "شركة التقنية المتقدمة",
+    amount: 2500,
+    type: "ads",
+    status: "completed",
+    date: "2024-06-21",
+    details: "إعلان الصفحة الرئيسية",
+  },
+  {
+    id: 3,
+    user: "سارة علي",
+    amount: 45,
+    type: "template",
+    status: "completed",
+    date: "2024-06-22",
+    details: "قالب سيرة ذاتية تقنية",
+  },
+  {
+    id: 4,
+    user: "محمد خالد",
+    amount: 150,
+    type: "subscription",
+    status: "completed",
+    date: "2024-06-23",
+    details: "خطة احترافية",
+  },
+  {
+    id: 5,
+    user: "مجموعة الاستثمار",
+    amount: 1200,
+    type: "ads",
+    status: "pending",
+    date: "2024-06-24",
+    details: "إعلان جانبي",
+  },
+  {
+    id: 6,
+    user: "فاطمة أحمد",
+    amount: 290,
+    type: "subscription",
+    status: "completed",
+    date: "2024-06-25",
+    details: "خطة مميزة",
+  },
+  {
+    id: 7,
+    user: "عمر حسن",
+    amount: 79,
+    type: "template",
+    status: "completed",
+    date: "2024-06-26",
+    details: "قالب عقد عمل",
+  },
+];
+
+const revenueByMonth = [
+  { month: "يناير", revenue: 45000 },
+  { month: "فبراير", revenue: 52000 },
+  { month: "مارس", revenue: 48000 },
+  { month: "أبريل", revenue: 61000 },
+  { month: "مايو", revenue: 58000 },
+  { month: "يونيو", revenue: 65000 },
+];
+
+const revenueByType = [
+  { name: "اشتراكات", value: 35000, color: "#3b82f6" },
+  { name: "إعلانات", value: 25000, color: "#10b981" },
+  { name: "قوالب", value: 15000, color: "#f59e0b" },
+];
+
 const AdminDashboard = () => {
   const { user, logout } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeTab, setActiveTab] = useState("active_ads");
+  const [activeTab, setActiveTab] = useState("users");
+  const [financialChartMode, setFinancialChartMode] = useState<
+    "revenue" | "distribution" | "comparison"
+  >("revenue");
+  // Job Seeker filters
+  const [jobSeekerFilters, setJobSeekerFilters] = useState({
+    minAppliedJobs: 0,
+    subscription: "all",
+  });
+
+  const [appliedJobSeekerFilters, setAppliedJobSeekerFilters] = useState({
+    minAppliedJobs: 0,
+    subscription: "all",
+  });
+
+  const handleApplyJobSeekerFilters = () => {
+    setAppliedJobSeekerFilters({ ...jobSeekerFilters });
+    toast({
+      title: "تم تطبيق التصفية",
+      description: "تم تحديث قائمة الباحثين عن عمل بنجاح",
+    });
+  };
+
+  const handleResetJobSeekerFilters = () => {
+    const defaultFilters = {
+      minAppliedJobs: 0,
+      subscription: "all",
+    };
+    setJobSeekerFilters(defaultFilters);
+    setAppliedJobSeekerFilters(defaultFilters);
+    setSearchTerm("");
+    toast({
+      title: "تم مسح التصفية",
+      description: "تم استعادة قائمة الباحثين عن عمل كاملة",
+    });
+  };
+
+  // Company filters
+  const [companyFilters, setCompanyFilters] = useState({
+    location: "all",
+    industry: "all",
+    minJobs: 0,
+  });
+
+  const [appliedCompanyFilters, setAppliedCompanyFilters] = useState({
+    location: "all",
+    industry: "all",
+    minJobs: 0,
+  });
+
+  const handleApplyCompanyFilters = () => {
+    setAppliedCompanyFilters({ ...companyFilters });
+    toast({
+      title: "تم تطبيق التصفية",
+      description: "تم تحديث البيانات بناءً على اختياراتك",
+    });
+  };
+
+  const handleResetCompanyFilters = () => {
+    const defaultFilters = {
+      location: "all",
+      industry: "all",
+      minJobs: 0,
+    };
+    setCompanyFilters(defaultFilters);
+    setAppliedCompanyFilters(defaultFilters);
+    setSearchTerm("");
+    toast({
+      title: "تم مسح التصفية",
+      description: "تم استعادة كافة البيانات",
+    });
+  };
 
   // Plans state
   const [plans, setPlans] = useState(mockPlans);
@@ -373,7 +590,55 @@ const AdminDashboard = () => {
     period: "شهري",
     features: "",
     type: "jobseeker",
+    discount: 0,
+    discountStart: "",
+    discountEnd: "",
   });
+
+  const handleExportCSV = () => {
+    const headers = [
+      "ID",
+      "المستخدم",
+      "المبلغ",
+      "النوع",
+      "الحالة",
+      "التاريخ",
+      "التفاصيل",
+    ];
+    const csvData = mockPayments.map((p) => [
+      p.id,
+      p.user,
+      p.amount,
+      p.type === "subscription"
+        ? "اشتراك"
+        : p.type === "ads"
+          ? "إعلان"
+          : "قالب",
+      p.status === "completed" ? "مكتمل" : "معلق",
+      p.date,
+      p.details,
+    ]);
+
+    const csvContent = [headers, ...csvData].map((e) => e.join(",")).join("\n");
+    const blob = new Blob(["\ufeff" + csvContent], {
+      type: "text/csv;charset=utf-8;",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute(
+      "download",
+      `financial_report_${new Date().toISOString().split("T")[0]}.csv`,
+    );
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    toast({
+      title: "تم تصدير التقرير",
+      description: "تم تحميل ملف CSV بنجاح",
+    });
+  };
 
   // Templates state
   const [templates, setTemplates] = useState(mockTemplates);
@@ -387,11 +652,19 @@ const AdminDashboard = () => {
     price: 0,
     isPremium: false,
     fileName: "",
+    discount: 0,
+    discountStart: "",
+    discountEnd: "",
   });
 
-  // Ads state
-  // Create Ad state
-  const { add: addAd } = useAds();
+  // Ads functionality
+  const {
+    ads: adsRequests,
+    add: addAd,
+    update: updateAd,
+    remove: removeAd,
+  } = useAds();
+
   const [adForm, setAdForm] = useState<{
     title: string;
     description: string;
@@ -410,8 +683,8 @@ const AdminDashboard = () => {
   const [editingAdId, setEditingAdId] = useState<number | null>(null);
   const [isAdDialogOpen, setIsAdDialogOpen] = useState(false);
 
-  // Ads display state (from useAds hook)
-  const { ads: adsRequests, update: updateAd } = useAds();
+  const [templateToDelete, setTemplateToDelete] = useState<number | null>(null);
+  const [adToDelete, setAdToDelete] = useState<number | null>(null);
 
   const handleLogout = () => {
     logout();
@@ -427,6 +700,9 @@ const AdminDashboard = () => {
       period: "شهري",
       features: "",
       type: "jobseeker",
+      discount: 0,
+      discountStart: "",
+      discountEnd: "",
     });
     setIsPlanDialogOpen(true);
   };
@@ -439,6 +715,9 @@ const AdminDashboard = () => {
       period: plan.period,
       features: plan.features.join("\n"),
       type: plan.type,
+      discount: (plan as any).discount || 0,
+      discountStart: (plan as any).discountStart || "",
+      discountEnd: (plan as any).discountEnd || "",
     });
     setIsPlanDialogOpen(true);
   };
@@ -455,6 +734,9 @@ const AdminDashboard = () => {
                 period: planForm.period,
                 features: planForm.features.split("\n").filter((f) => f.trim()),
                 type: planForm.type,
+                discount: planForm.discount,
+                discountStart: planForm.discountStart,
+                discountEnd: planForm.discountEnd,
               }
             : p,
         ),
@@ -474,6 +756,9 @@ const AdminDashboard = () => {
         usersCount: 0,
         isActive: true,
         type: planForm.type,
+        discount: planForm.discount,
+        discountStart: planForm.discountStart,
+        discountEnd: planForm.discountEnd,
       };
       setPlans([...plans, newPlan]);
       toast({ title: "تمت الإضافة", description: "تم إضافة خطة اشتراك جديدة" });
@@ -496,6 +781,9 @@ const AdminDashboard = () => {
       price: 0,
       isPremium: false,
       fileName: "",
+      discount: 0,
+      discountStart: "",
+      discountEnd: "",
     });
     setIsTemplateDialogOpen(true);
   };
@@ -507,7 +795,10 @@ const AdminDashboard = () => {
       category: template.category,
       price: template.price,
       isPremium: template.isPremium,
-      fileName: "", // In a real app, this might come from the template data
+      fileName: "",
+      discount: (template as any).discount || 0,
+      discountStart: (template as any).discountStart || "",
+      discountEnd: (template as any).discountEnd || "",
     });
     setIsTemplateDialogOpen(true);
   };
@@ -523,6 +814,9 @@ const AdminDashboard = () => {
                 category: templateForm.category,
                 price: templateForm.price,
                 isPremium: templateForm.isPremium,
+                discount: templateForm.discount,
+                discountStart: templateForm.discountStart,
+                discountEnd: templateForm.discountEnd,
               }
             : t,
         ),
@@ -538,6 +832,9 @@ const AdminDashboard = () => {
         rating: 0,
         status: "active" as const,
         isPremium: templateForm.isPremium,
+        discount: templateForm.discount,
+        discountStart: templateForm.discountStart,
+        discountEnd: templateForm.discountEnd,
       };
       setTemplates([...templates, newTemplate]);
       toast({ title: "تمت الإضافة", description: "تم إضافة قالب جديد" });
@@ -560,6 +857,7 @@ const AdminDashboard = () => {
 
   const handleDeleteTemplate = (templateId: number) => {
     setTemplates(templates.filter((t) => t.id !== templateId));
+    setTemplateToDelete(null);
     toast({ title: "تم الحذف", description: "تم حذف القالب" });
   };
 
@@ -711,6 +1009,12 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleDeleteAd = (id: number) => {
+    removeAd(id);
+    setAdToDelete(null);
+    toast({ title: "تم الحذف", description: "تم حذف الإعلان بنجاح" });
+  };
+
   const stats = [
     {
       label: "إجمالي المستخدمين",
@@ -784,29 +1088,8 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background" dir="rtl">
-      {/* Header */}
-      <header className="bg-card border-b border-border px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center">
-              <Briefcase className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h1 className="font-bold text-lg">لوحة تحكم المدير</h1>
-              <p className="text-sm text-muted-foreground">
-                مرحباً، {user?.name}
-              </p>
-            </div>
-          </div>
-          <Button variant="outline" onClick={handleLogout} className="gap-2">
-            <LogOut className="w-4 h-4" />
-            تسجيل الخروج
-          </Button>
-        </div>
-      </header>
-
-      <main className="p-6 space-y-6">
+    <AdminDashboardLayout activeTab={activeTab} onTabChange={setActiveTab}>
+      <div className="space-y-6">
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {stats.map((stat, index) => (
@@ -830,67 +1113,83 @@ const AdminDashboard = () => {
           ))}
         </div>
 
-        {/* Tabs */}
+        {/* Search Bar */}
+        <div className="flex justify-start">
+          <div className="relative w-full max-w-md">
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="...بحث"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pr-10 text-right"
+            />
+          </div>
+        </div>
+
+        {/* Tabs Content */}
         <Tabs
           value={activeTab}
           onValueChange={setActiveTab}
           className="space-y-4"
         >
-          <div className="flex flex-col items-end gap-4">
-            <TabsList className="bg-muted/50 flex-wrap h-auto gap-1 p-1">
-              <TabsTrigger value="active_ads" className="gap-2">
-                <CheckCircle className="w-4 h-4" />
-                الإعلانات النشطة
-              </TabsTrigger>
-              <TabsTrigger value="create_ad" className="gap-2">
-                <Plus className="w-4 h-4" />
-                إضافة إعلان
-              </TabsTrigger>
-              <TabsTrigger value="ads" className="gap-2">
-                <Megaphone className="w-4 h-4" />
-                طلبات الإعلانات
-              </TabsTrigger>
-              <TabsTrigger value="templates" className="gap-2">
-                <LayoutTemplate className="w-4 h-4" />
-                القوالب
-              </TabsTrigger>
-              <TabsTrigger value="subscriptions" className="gap-2">
-                <CreditCard className="w-4 h-4" />
-                خطط الاشتراك
-              </TabsTrigger>
-              <TabsTrigger value="hr" className="gap-2">
-                <UserCheck className="w-4 h-4" />
-                موظفي HR
-              </TabsTrigger>
-              <TabsTrigger value="companies" className="gap-2">
-                <Building2 className="w-4 h-4" />
-                الشركات
-              </TabsTrigger>
-              <TabsTrigger value="users" className="gap-2">
-                <Users className="w-4 h-4" />
-                الباحثين عن عمل
-              </TabsTrigger>
-            </TabsList>
-
-            <div className="relative w-full max-w-md">
-              <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="...بحث"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pr-10 text-right"
-              />
-            </div>
-          </div>
-
           {/* Users Tab */}
           <TabsContent value="users">
             <Card>
               <CardHeader className="text-right [&_th]:text-right [&_td]:text-right">
-                <CardTitle className="flex items-center justify-end gap-2">
-                  <span>قائمة الباحثين عن عمل</span>
-                  <Users className="w-5 h-5" />
-                </CardTitle>
+                <div className="flex flex-col gap-4">
+                  <CardTitle className="flex items-center justify-end gap-2">
+                    <span>قائمة الباحثين عن عمل</span>
+                    <Users className="w-5 h-5" />
+                  </CardTitle>
+
+                  <DataTableFilters
+                    onClear={handleResetJobSeekerFilters}
+                    onApply={handleApplyJobSeekerFilters}
+                    hasFilters={
+                      jobSeekerFilters.minAppliedJobs !== 0 ||
+                      jobSeekerFilters.subscription !== "all" ||
+                      searchTerm !== ""
+                    }
+                  >
+                    <div className="space-y-2">
+                      <Label>الاشتراك</Label>
+                      <Select
+                        value={jobSeekerFilters.subscription}
+                        onValueChange={(v) =>
+                          setJobSeekerFilters({
+                            ...jobSeekerFilters,
+                            subscription: v,
+                          })
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="كل الاشتراكات" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">كل الاشتراكات</SelectItem>
+                          <SelectItem value="مجاني">مجاني</SelectItem>
+                          <SelectItem value="احترافي">احترافي</SelectItem>
+                          <SelectItem value="مميز">مميز</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>الحد الأدنى للوظائف المتقدم لها</Label>
+                      <Input
+                        type="number"
+                        min="0"
+                        value={jobSeekerFilters.minAppliedJobs}
+                        onChange={(e) =>
+                          setJobSeekerFilters({
+                            ...jobSeekerFilters,
+                            minAppliedJobs: Number(e.target.value),
+                          })
+                        }
+                        placeholder="0"
+                      />
+                    </div>
+                  </DataTableFilters>
+                </div>
               </CardHeader>
               <CardContent>
                 <Table
@@ -901,7 +1200,7 @@ const AdminDashboard = () => {
                     <TableRow>
                       <TableHead>الإجراءات</TableHead>
                       <TableHead>تاريخ الانضمام</TableHead>
-                      <TableHead>الوظائف المتقدم لها</TableHead>
+                      <TableHead>وظائف قدم عليها</TableHead>
                       <TableHead>نقاط السيرة</TableHead>
                       <TableHead>الاشتراك</TableHead>
                       <TableHead>الحالة</TableHead>
@@ -911,11 +1210,23 @@ const AdminDashboard = () => {
                   </TableHeader>
                   <TableBody>
                     {mockUsers
-                      .filter(
-                        (u) =>
+                      .filter((u) => {
+                        const matchesSearch =
                           u.name.includes(searchTerm) ||
-                          u.email.includes(searchTerm),
-                      )
+                          u.email.includes(searchTerm);
+                        const matchesSubscription =
+                          appliedJobSeekerFilters.subscription === "all" ||
+                          u.subscription ===
+                            appliedJobSeekerFilters.subscription;
+                        const matchesAppliedJobs =
+                          u.appliedJobs >=
+                          appliedJobSeekerFilters.minAppliedJobs;
+                        return (
+                          matchesSearch &&
+                          matchesSubscription &&
+                          matchesAppliedJobs
+                        );
+                      })
                       .map((user) => (
                         <TableRow key={user.id}>
                           <TableCell>
@@ -980,10 +1291,83 @@ const AdminDashboard = () => {
           <TabsContent value="companies">
             <Card>
               <CardHeader className="text-right [&_th]:text-right [&_td]:text-right">
-                <CardTitle className="flex items-center justify-end gap-2">
-                  <span>قائمة الشركات</span>
-                  <Building2 className="w-5 h-5" />
-                </CardTitle>
+                <div className="flex flex-col gap-4">
+                  <CardTitle className="flex items-center justify-end gap-2">
+                    <span>قائمة الشركات</span>
+                    <Building2 className="w-5 h-5" />
+                  </CardTitle>
+
+                  <DataTableFilters
+                    onClear={handleResetCompanyFilters}
+                    onApply={handleApplyCompanyFilters}
+                    hasFilters={
+                      companyFilters.location !== "all" ||
+                      companyFilters.industry !== "all" ||
+                      companyFilters.minJobs !== 0 ||
+                      searchTerm !== ""
+                    }
+                  >
+                    <div className="space-y-2">
+                      <Label>الموقع</Label>
+                      <Select
+                        value={companyFilters.location}
+                        onValueChange={(v) =>
+                          setCompanyFilters({ ...companyFilters, location: v })
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="كل المواقع" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">كل المواقع</SelectItem>
+                          <SelectItem value="الرياض">الرياض</SelectItem>
+                          <SelectItem value="جدة">جدة</SelectItem>
+                          <SelectItem value="الدمام">الدمام</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>النشاط (القطاع)</Label>
+                      <Select
+                        value={companyFilters.industry}
+                        onValueChange={(v) =>
+                          setCompanyFilters({ ...companyFilters, industry: v })
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="كل الأنشطة" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">كل الأنشطة</SelectItem>
+                          <SelectItem value="تقنية المعلومات">
+                            تقنية المعلومات
+                          </SelectItem>
+                          <SelectItem value="المالية">المالية</SelectItem>
+                          <SelectItem value="البناء والتشييد">
+                            البناء والتشييد
+                          </SelectItem>
+                          <SelectItem value="الرعاية الصحية">
+                            الرعاية الصحية
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>الحد الأدنى للوظائف</Label>
+                      <Input
+                        type="number"
+                        value={companyFilters.minJobs}
+                        onChange={(e) =>
+                          setCompanyFilters({
+                            ...companyFilters,
+                            minJobs: Number(e.target.value),
+                          })
+                        }
+                        placeholder="0"
+                      />
+                    </div>
+                  </DataTableFilters>
+                </div>
               </CardHeader>
               <CardContent>
                 <Table
@@ -993,6 +1377,7 @@ const AdminDashboard = () => {
                   <TableHeader>
                     <TableRow>
                       <TableHead>الإجراءات</TableHead>
+                      <TableHead>الموقع</TableHead>
                       <TableHead>الوظائف المنشورة</TableHead>
                       <TableHead>عدد الموظفين</TableHead>
                       <TableHead>القطاع</TableHead>
@@ -1004,11 +1389,25 @@ const AdminDashboard = () => {
                   </TableHeader>
                   <TableBody>
                     {mockCompanies
-                      .filter(
-                        (c) =>
+                      .filter((c) => {
+                        const matchesSearch =
                           c.name.includes(searchTerm) ||
-                          c.email.includes(searchTerm),
-                      )
+                          c.email.includes(searchTerm);
+                        const matchesLocation =
+                          appliedCompanyFilters.location === "all" ||
+                          c.location === appliedCompanyFilters.location;
+                        const matchesIndustry =
+                          appliedCompanyFilters.industry === "all" ||
+                          c.industry === appliedCompanyFilters.industry;
+                        const matchesJobs =
+                          c.jobs >= appliedCompanyFilters.minJobs;
+                        return (
+                          matchesSearch &&
+                          matchesLocation &&
+                          matchesIndustry &&
+                          matchesJobs
+                        );
+                      })
                       .map((company) => (
                         <TableRow key={company.id}>
                           <TableCell>
@@ -1023,6 +1422,7 @@ const AdminDashboard = () => {
                               )}
                             </div>
                           </TableCell>
+                          <TableCell>{company.location}</TableCell>
                           <TableCell>{company.jobs}</TableCell>
                           <TableCell>{company.employees}</TableCell>
                           <TableCell>{company.industry}</TableCell>
@@ -1061,6 +1461,17 @@ const AdminDashboard = () => {
             </Card>
           </TabsContent>
 
+          {/* Finance Tab */}
+          <TabsContent value="finance">
+            <FinancialReports
+              payments={mockPayments}
+              revenueByMonth={revenueByMonth}
+              revenueByType={revenueByType}
+              onExport={handleExportCSV}
+              initialChart={financialChartMode}
+            />
+          </TabsContent>
+
           {/* HR Tab */}
           <TabsContent value="hr">
             <Card>
@@ -1078,10 +1489,8 @@ const AdminDashboard = () => {
                   <TableHeader>
                     <TableRow>
                       <TableHead>الإجراءات</TableHead>
-                      <TableHead>عدد التوظيفات</TableHead>
-                      <TableHead>الحالة</TableHead>
-                      <TableHead>المسمى الوظيفي</TableHead>
-                      <TableHead>الشركة</TableHead>
+                      <TableHead>خطة الاشتراك</TableHead>
+                      <TableHead>عدد السير الذاتية</TableHead>
                       <TableHead>البريد الإلكتروني</TableHead>
                       <TableHead>الاسم</TableHead>
                     </TableRow>
@@ -1106,21 +1515,18 @@ const AdminDashboard = () => {
                             </div>
                           </TableCell>
                           <TableCell>
-                            <Badge variant="secondary">
-                              {hr.hiredCount} موظف
+                            <Badge variant="outline" className="gap-1">
+                              {hr.subscription === "مميز" && (
+                                <Crown className="w-3 h-3 text-amber-500" />
+                              )}
+                              {hr.subscription}
                             </Badge>
                           </TableCell>
                           <TableCell>
-                            <Badge
-                              variant={
-                                hr.status === "active" ? "default" : "secondary"
-                              }
-                            >
-                              {hr.status === "active" ? "نشط" : "غير نشط"}
+                            <Badge variant="secondary">
+                              {hr.cvsCount} سيرة
                             </Badge>
                           </TableCell>
-                          <TableCell>{hr.role}</TableCell>
-                          <TableCell>{hr.company}</TableCell>
                           <TableCell className="text-muted-foreground">
                             {hr.email}
                           </TableCell>
@@ -1140,7 +1546,13 @@ const AdminDashboard = () => {
             <div className="space-y-6">
               {/* Subscription Stats */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card className="border-border/50">
+                <Card
+                  className="border-border/50 cursor-pointer hover:bg-muted/30 transition-all"
+                  onClick={() => {
+                    setActiveTab("finance");
+                    setFinancialChartMode("comparison");
+                  }}
+                >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between gap-4">
                       <div>
@@ -1157,7 +1569,13 @@ const AdminDashboard = () => {
                     </div>
                   </CardContent>
                 </Card>
-                <Card className="border-border/50">
+                <Card
+                  className="border-border/50 cursor-pointer hover:bg-muted/30 transition-all"
+                  onClick={() => {
+                    setActiveTab("finance");
+                    setFinancialChartMode("revenue");
+                  }}
+                >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between gap-4">
                       <div>
@@ -1174,7 +1592,13 @@ const AdminDashboard = () => {
                     </div>
                   </CardContent>
                 </Card>
-                <Card className="border-border/50">
+                <Card
+                  className="border-border/50 cursor-pointer hover:bg-muted/30 transition-all"
+                  onClick={() => {
+                    setActiveTab("finance");
+                    setFinancialChartMode("distribution");
+                  }}
+                >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between gap-4">
                       <div>
@@ -1193,109 +1617,158 @@ const AdminDashboard = () => {
                 </Card>
               </div>
 
-              <Card>
-                <CardHeader className="flex flex-row-reverse items-center justify-between">
-                  <CardTitle className="flex items-center gap-2">
-                    <span>خطط الاشتراك</span>
-                    <CreditCard className="w-5 h-5" />
-                  </CardTitle>
-                  <Button onClick={handleAddPlan} className="gap-2">
-                    <Plus className="w-4 h-4" />
-                    إضافة خطة
-                  </Button>
-                </CardHeader>
-                <CardContent>
-                  <Table
-                    dir="ltr"
-                    className="text-right [&_th]:text-right [&_td]:text-right"
-                  >
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>الإجراءات</TableHead>
-                        <TableHead>الحالة</TableHead>
-                        <TableHead>الإيرادات</TableHead>
-                        <TableHead>عدد المشتركين</TableHead>
-                        <TableHead>المميزات</TableHead>
-                        <TableHead>السعر</TableHead>
-                        <TableHead>النوع</TableHead>
-                        <TableHead>اسم الخطة</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {plans.map((plan) => (
-                        <TableRow key={plan.id}>
-                          <TableCell>
-                            <div className="flex gap-1 justify-end">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => handleEditPlan(plan)}
-                              >
-                                <Edit className="w-4 h-4" />
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleTogglePlan(plan.id)}
-                                className={
-                                  plan.isActive
-                                    ? "text-red-600 border-red-200 hover:bg-red-50 h-8 px-3 text-xs"
-                                    : "text-emerald-600 border-emerald-200 hover:bg-emerald-50 h-8 px-3 text-xs"
-                                }
-                              >
-                                {plan.isActive ? "Stop" : "Active"}
-                              </Button>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <Badge
-                              variant={plan.isActive ? "default" : "secondary"}
-                              className={
-                                plan.isActive
-                                  ? "bg-emerald-500 hover:bg-emerald-600"
-                                  : "bg-amber-500 hover:bg-amber-600 text-white"
-                              }
-                            >
-                              {plan.isActive ? "نشطة" : "معطلة"}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="font-medium">
-                            {(plan.price * plan.usersCount).toLocaleString()}{" "}
-                            ر.س
-                          </TableCell>
-                          <TableCell>{plan.usersCount}</TableCell>
-                          <TableCell>
-                            <div className="max-w-xs mr-0 ml-auto text-right">
-                              <p className="text-sm text-muted-foreground truncate text-right">
-                                {plan.features.slice(0, 2).join("، ")}
-                                {plan.features.length > 2 && "..."}
-                              </p>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            {plan.price === 0
-                              ? "مجاني"
-                              : `${plan.price} ر.س/${plan.period}`}
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="outline">
-                              {plan.type === "jobseeker" ? "أفراد" : "شركات"}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="font-medium">
-                            <div className="flex items-center gap-2 justify-end">
-                              {plan.price > 50 && (
-                                <Crown className="w-4 h-4 text-amber-500" />
-                              )}
-                              {plan.name}
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
+              <Tabs defaultValue="jobseeker" className="space-y-6">
+                <TabsList className="bg-muted/50 p-1 flex justify-end flex-wrap gap-1">
+                  <TabsTrigger value="hr" className="gap-2">
+                    <UserCheck className="w-4 h-4" />
+                    خطط الـ HR
+                  </TabsTrigger>
+                  <TabsTrigger value="company" className="gap-2">
+                    <Building2 className="w-4 h-4" />
+                    خطط الشركات
+                  </TabsTrigger>
+                  <TabsTrigger value="jobseeker" className="gap-2">
+                    <Users className="w-4 h-4" />
+                    خطط الأفراد
+                  </TabsTrigger>
+                </TabsList>
+
+                {["jobseeker", "company", "hr"].map((type) => (
+                  <TabsContent key={type} value={type}>
+                    <Card>
+                      <CardHeader className="flex flex-row-reverse items-center justify-between">
+                        <CardTitle className="flex items-center gap-2">
+                          <span>
+                            {type === "jobseeker"
+                              ? "خطط الباحثين عن عمل"
+                              : type === "company"
+                                ? "خطط الشركات"
+                                : "خطط موظفي الـ HR"}
+                          </span>
+                          {type === "jobseeker" ? (
+                            <Users className="w-5 h-5" />
+                          ) : type === "company" ? (
+                            <Building2 className="w-5 h-5" />
+                          ) : (
+                            <UserCheck className="w-5 h-5" />
+                          )}
+                        </CardTitle>
+                        <Button onClick={handleAddPlan} className="gap-2">
+                          <Plus className="w-4 h-4" />
+                          إضافة خطة
+                        </Button>
+                      </CardHeader>
+                      <CardContent>
+                        <Table
+                          dir="ltr"
+                          className="text-right [&_th]:text-right [&_td]:text-right"
+                        >
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>الإجراءات</TableHead>
+                              <TableHead>الحالة</TableHead>
+                              <TableHead>الإيرادات</TableHead>
+                              <TableHead>عدد المشتركين</TableHead>
+                              <TableHead>المميزات</TableHead>
+                              <TableHead>السعر</TableHead>
+                              <TableHead>ID</TableHead>
+                              <TableHead>اسم الخطة</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {plans
+                              .filter((p) => p.type === type)
+                              .map((plan) => (
+                                <TableRow key={plan.id}>
+                                  <TableCell>
+                                    <div className="flex gap-2 justify-end">
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => handleEditPlan(plan)}
+                                      >
+                                        <Edit className="w-4 h-4" />
+                                      </Button>
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() =>
+                                          handleTogglePlan(plan.id)
+                                        }
+                                        className={
+                                          plan.isActive
+                                            ? "text-red-600 border-red-200 hover:bg-red-50 h-8 px-3 text-xs"
+                                            : "text-emerald-600 border-emerald-200 hover:bg-emerald-50 h-8 px-3 text-xs"
+                                        }
+                                      >
+                                        {plan.isActive ? "Stop" : "Active"}
+                                      </Button>
+                                    </div>
+                                  </TableCell>
+                                  <TableCell>
+                                    <Badge
+                                      variant={
+                                        plan.isActive ? "default" : "secondary"
+                                      }
+                                      className={
+                                        plan.isActive
+                                          ? "bg-emerald-500 hover:bg-emerald-600"
+                                          : "bg-amber-500 hover:bg-amber-600 text-white"
+                                      }
+                                    >
+                                      {plan.isActive ? "نشطة" : "معطلة"}
+                                    </Badge>
+                                  </TableCell>
+                                  <TableCell className="font-bold">
+                                    {(
+                                      plan.price * plan.usersCount
+                                    ).toLocaleString()}{" "}
+                                    ر.س
+                                  </TableCell>
+                                  <TableCell>
+                                    <Badge variant="secondary">
+                                      {plan.usersCount} مشترك
+                                    </Badge>
+                                  </TableCell>
+                                  <TableCell>
+                                    <div className="flex flex-wrap gap-1 justify-end items-center min-h-[40px]">
+                                      {plan.features.length > 2 && (
+                                        <Badge
+                                          variant="secondary"
+                                          className="text-[10px] px-1.5 h-5 min-w-[20px] justify-center"
+                                        >
+                                          +{plan.features.length - 2}
+                                        </Badge>
+                                      )}
+                                      {plan.features.slice(0, 2).map((f, i) => (
+                                        <Badge
+                                          key={i}
+                                          variant="outline"
+                                          className="text-[10px] whitespace-nowrap bg-muted/30"
+                                        >
+                                          {f}
+                                        </Badge>
+                                      ))}
+                                    </div>
+                                  </TableCell>
+                                  <TableCell className="font-mono">
+                                    {plan.price} ر.س / {plan.period}
+                                  </TableCell>
+                                  <TableCell className="text-muted-foreground">
+                                    #{plan.id}
+                                  </TableCell>
+                                  <TableCell className="font-bold">
+                                    {plan.name}
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                          </TableBody>
+                        </Table>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                ))}
+              </Tabs>
             </div>
           </TabsContent>
 
@@ -1418,7 +1891,7 @@ const AdminDashboard = () => {
                                   variant="ghost"
                                   size="icon"
                                   onClick={() =>
-                                    handleDeleteTemplate(template.id)
+                                    setTemplateToDelete(template.id)
                                   }
                                 >
                                   <Trash2 className="w-4 h-4 text-destructive" />
@@ -1532,9 +2005,9 @@ const AdminDashboard = () => {
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  onClick={() => handleDeclineAd(ad.id)}
+                                  onClick={() => setAdToDelete(ad.id)}
                                 >
-                                  <X className="w-4 h-4 text-destructive" />
+                                  <Trash2 className="w-4 h-4 text-destructive" />
                                 </Button>
                               </>
                             )}
@@ -1719,6 +2192,14 @@ const AdminDashboard = () => {
                           >
                             {ad.status === "active" ? "إيقاف" : "تنشيط"}
                           </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setAdToDelete(ad.id)}
+                            className="mr-2"
+                          >
+                            <Trash2 className="w-4 h-4 text-destructive" />
+                          </Button>
                         </TableCell>
                         <TableCell>
                           <Badge
@@ -1778,277 +2259,446 @@ const AdminDashboard = () => {
             </Card>
           </TabsContent>
         </Tabs>
-      </main>
 
-      {/* Plan Dialog */}
-      <Dialog open={isPlanDialogOpen} onOpenChange={setIsPlanDialogOpen}>
-        <DialogContent dir="rtl">
-          <DialogHeader>
-            <DialogTitle>
-              {editingPlan ? "تعديل خطة الاشتراك" : "إضافة خطة اشتراك جديدة"}
-            </DialogTitle>
-            <DialogDescription>
-              {editingPlan
-                ? "قم بتعديل تفاصيل خطة الاشتراك"
-                : "أدخل تفاصيل خطة الاشتراك الجديدة"}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label>اسم الخطة</Label>
-              <Input
-                value={planForm.name}
-                onChange={(e) =>
-                  setPlanForm({ ...planForm, name: e.target.value })
-                }
-                placeholder="مثال: احترافي"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
+        {/* Plan Dialog */}
+        <Dialog open={isPlanDialogOpen} onOpenChange={setIsPlanDialogOpen}>
+          <DialogContent dir="rtl">
+            <DialogHeader className="text-right">
+              <DialogTitle className="text-right">
+                {editingPlan ? "تعديل خطة الاشتراك" : "إضافة خطة اشتراك جديدة"}
+              </DialogTitle>
+              <DialogDescription className="text-right">
+                {editingPlan
+                  ? "قم بتعديل تفاصيل خطة الاشتراك"
+                  : "أدخل تفاصيل خطة الاشتراك الجديدة"}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label>السعر (ر.س)</Label>
+                <Label>اسم الخطة</Label>
                 <Input
-                  type="number"
-                  value={planForm.price}
+                  value={planForm.name}
                   onChange={(e) =>
-                    setPlanForm({ ...planForm, price: Number(e.target.value) })
+                    setPlanForm({ ...planForm, name: e.target.value })
                   }
+                  placeholder="مثال: احترافي"
                 />
               </div>
-              <div className="space-y-2">
-                <Label>نوع الخطة</Label>
-                <Select
-                  value={planForm.type}
-                  onValueChange={(v) => setPlanForm({ ...planForm, type: v })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="jobseeker">أفراد</SelectItem>
-                    <SelectItem value="company">شركات</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label>المميزات (سطر لكل ميزة)</Label>
-              <Textarea
-                value={planForm.features}
-                onChange={(e) =>
-                  setPlanForm({ ...planForm, features: e.target.value })
-                }
-                placeholder="ميزة 1&#10;ميزة 2&#10;ميزة 3"
-                rows={4}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsPlanDialogOpen(false)}
-            >
-              إلغاء
-            </Button>
-            <Button onClick={handleSavePlan}>حفظ</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Template Dialog */}
-      <Dialog
-        open={isTemplateDialogOpen}
-        onOpenChange={setIsTemplateDialogOpen}
-      >
-        <DialogContent dir="rtl">
-          <DialogHeader>
-            <DialogTitle>
-              {editingTemplate ? "تعديل القالب" : "إضافة قالب جديد"}
-            </DialogTitle>
-            <DialogDescription>
-              {editingTemplate
-                ? "قم بتعديل تفاصيل القالب"
-                : "أدخل تفاصيل القالب الجديد"}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label>اسم القالب</Label>
-              <Input
-                value={templateForm.name}
-                onChange={(e) =>
-                  setTemplateForm({ ...templateForm, name: e.target.value })
-                }
-                placeholder="مثال: سيرة ذاتية احترافية"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>الفئة</Label>
-                <Select
-                  value={templateForm.category}
-                  onValueChange={(v) =>
-                    setTemplateForm({ ...templateForm, category: v })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="cv">سيرة ذاتية</SelectItem>
-                    <SelectItem value="cover-letter">خطاب تقديم</SelectItem>
-                    <SelectItem value="legal">قانوني</SelectItem>
-                    <SelectItem value="business">أعمال</SelectItem>
-                    <SelectItem value="academic">أكاديمي</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>السعر (ر.س)</Label>
+                  <Input
+                    type="number"
+                    value={planForm.price}
+                    onChange={(e) =>
+                      setPlanForm({
+                        ...planForm,
+                        price: Number(e.target.value),
+                      })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>نوع الخطة</Label>
+                  <Select
+                    value={planForm.type}
+                    onValueChange={(v) => setPlanForm({ ...planForm, type: v })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="jobseeker">باحث عن عمل</SelectItem>
+                      <SelectItem value="company">شركة</SelectItem>
+                      <SelectItem value="hr">موظف HR</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               <div className="space-y-2">
-                <Label>السعر (ر.س)</Label>
-                <Input
-                  type="number"
-                  value={templateForm.price}
+                <Label>المميزات (سطر لكل ميزة)</Label>
+                <Textarea
+                  value={planForm.features}
                   onChange={(e) =>
-                    setTemplateForm({
-                      ...templateForm,
-                      price: Number(e.target.value),
-                    })
+                    setPlanForm({ ...planForm, features: e.target.value })
                   }
+                  placeholder="ميزة 1&#10;ميزة 2&#10;ميزة 3"
+                  rows={4}
                 />
               </div>
-            </div>
-            <div className="space-y-2">
-              <Label>ملف القالب (Word/PDF)</Label>
-              <Input
-                type="file"
-                accept=".doc,.docx,.pdf"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    setTemplateForm({ ...templateForm, fileName: file.name });
-                  }
-                }}
-              />
-              {templateForm.fileName && (
-                <p className="text-sm text-muted-foreground mt-1">
-                  تم اختيار الملف: {templateForm.fileName}
-                </p>
-              )}
-            </div>
-            <div className="flex items-center justify-between">
-              <Label>قالب مميز (Premium)</Label>
-              <Switch
-                checked={templateForm.isPremium}
-                onCheckedChange={(checked) =>
-                  setTemplateForm({ ...templateForm, isPremium: checked })
-                }
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsTemplateDialogOpen(false)}
-            >
-              إلغاء
-            </Button>
-            <Button onClick={handleSaveTemplate}>حفظ</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
-      {/* Ad Edit Dialog */}
-      <Dialog open={isAdDialogOpen} onOpenChange={setIsAdDialogOpen}>
-        <DialogContent
-          dir="rtl"
-          className="max-w-5xl h-[90vh] overflow-y-auto flex flex-col"
-        >
-          <DialogHeader>
-            <DialogTitle>تعديل الإعلان</DialogTitle>
-            <DialogDescription>تعديل تفاصيل الإعلان الحالي</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label>عنوان الإعلان</Label>
-              <Input
-                value={adForm.title}
-                onChange={(e) =>
-                  setAdForm({ ...adForm, title: e.target.value })
-                }
-                placeholder="عنوان الإعلان"
-              />
+              <div className="border-t pt-4 space-y-4">
+                <h4 className="font-semibold text-sm">إعدادات الخصم</h4>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label>الخصم (%)</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={planForm.discount}
+                      onChange={(e) =>
+                        setPlanForm({
+                          ...planForm,
+                          discount: Number(e.target.value),
+                        })
+                      }
+                      placeholder="0"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>تاريخ البدء</Label>
+                    <Input
+                      type="date"
+                      value={planForm.discountStart}
+                      onChange={(e) =>
+                        setPlanForm({
+                          ...planForm,
+                          discountStart: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>تاريخ الانتهاء</Label>
+                    <Input
+                      type="date"
+                      value={planForm.discountEnd}
+                      onChange={(e) =>
+                        setPlanForm({
+                          ...planForm,
+                          discountEnd: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label>الوصف</Label>
-              <Textarea
-                value={adForm.description}
-                onChange={(e) =>
-                  setAdForm({ ...adForm, description: e.target.value })
-                }
-                placeholder="وصف الإعلان"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>رابط الصورة</Label>
-              <Input
-                value={adForm.imageUrl}
-                onChange={(e) =>
-                  setAdForm({ ...adForm, imageUrl: e.target.value })
-                }
-                dir="ltr"
-                className="text-right"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>الرابط المستهدف</Label>
-              <Input
-                value={adForm.link}
-                onChange={(e) => setAdForm({ ...adForm, link: e.target.value })}
-                dir="ltr"
-                className="text-right"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>المدة</Label>
-              <Select
-                value={adForm.duration}
-                onValueChange={(v) => setAdForm({ ...adForm, duration: v })}
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setIsPlanDialogOpen(false)}
               >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1_month">شهر</SelectItem>
-                  <SelectItem value="2_months">شهرين</SelectItem>
-                  <SelectItem value="3_months">3 أشهر</SelectItem>
-                  <SelectItem value="6_months">6 أشهر</SelectItem>
-                  <SelectItem value="1_year">سنة</SelectItem>
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-muted-foreground mt-1">
-                مدة عرض الإعلان بالأشهر
-              </p>
+                إلغاء
+              </Button>
+              <Button onClick={handleSavePlan}>حفظ</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Template Dialog */}
+        <Dialog
+          open={isTemplateDialogOpen}
+          onOpenChange={setIsTemplateDialogOpen}
+        >
+          <DialogContent dir="rtl">
+            <DialogHeader className="text-right">
+              <DialogTitle className="text-right">
+                {editingTemplate ? "تعديل القالب" : "إضافة قالب جديد"}
+              </DialogTitle>
+              <DialogDescription className="text-right">
+                {editingTemplate
+                  ? "قم بتعديل تفاصيل القالب"
+                  : "أدخل تفاصيل القالب الجديد"}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label>اسم القالب</Label>
+                <Input
+                  value={templateForm.name}
+                  onChange={(e) =>
+                    setTemplateForm({ ...templateForm, name: e.target.value })
+                  }
+                  placeholder="مثال: سيرة ذاتية احترافية"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>الفئة</Label>
+                  <Select
+                    value={templateForm.category}
+                    onValueChange={(v) =>
+                      setTemplateForm({ ...templateForm, category: v })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="cv">سيرة ذاتية</SelectItem>
+                      <SelectItem value="cover-letter">خطاب تقديم</SelectItem>
+                      <SelectItem value="legal">قانوني</SelectItem>
+                      <SelectItem value="business">أعمال</SelectItem>
+                      <SelectItem value="academic">أكاديمي</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>السعر (ر.س)</Label>
+                  <Input
+                    type="number"
+                    value={templateForm.price}
+                    onChange={(e) =>
+                      setTemplateForm({
+                        ...templateForm,
+                        price: Number(e.target.value),
+                      })
+                    }
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>ملف القالب (Word/PDF)</Label>
+                <Input
+                  type="file"
+                  accept=".doc,.docx,.pdf"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setTemplateForm({ ...templateForm, fileName: file.name });
+                    }
+                  }}
+                />
+                {templateForm.fileName && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    تم اختيار الملف: {templateForm.fileName}
+                  </p>
+                )}
+              </div>
+              <div className="flex items-center justify-between">
+                <Label>قالب مميز (Premium)</Label>
+                <Switch
+                  checked={templateForm.isPremium}
+                  onCheckedChange={(checked) =>
+                    setTemplateForm({ ...templateForm, isPremium: checked })
+                  }
+                />
+              </div>
+
+              <div className="border-t pt-4 space-y-4">
+                <h4 className="font-semibold text-sm">إعدادات الخصم</h4>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label>الخصم (%)</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={templateForm.discount}
+                      onChange={(e) =>
+                        setTemplateForm({
+                          ...templateForm,
+                          discount: Number(e.target.value),
+                        })
+                      }
+                      placeholder="0"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>تاريخ البدء</Label>
+                    <Input
+                      type="date"
+                      value={templateForm.discountStart}
+                      onChange={(e) =>
+                        setTemplateForm({
+                          ...templateForm,
+                          discountStart: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>تاريخ الانتهاء</Label>
+                    <Input
+                      type="date"
+                      value={templateForm.discountEnd}
+                      onChange={(e) =>
+                        setTemplateForm({
+                          ...templateForm,
+                          discountEnd: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label>المكان</Label>
-              <AdPlacementSelector
-                selectedPlacement={adForm.placement}
-                onSelect={(value) =>
-                  setAdForm({ ...adForm, placement: value as AdPlacement })
-                }
-                adImage={adForm.imageUrl}
-              />
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setIsTemplateDialogOpen(false)}
+              >
+                إلغاء
+              </Button>
+              <Button onClick={handleSaveTemplate}>حفظ</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Ad Edit Dialog */}
+        <Dialog open={isAdDialogOpen} onOpenChange={setIsAdDialogOpen}>
+          <DialogContent
+            dir="rtl"
+            className="max-w-5xl h-[90vh] overflow-y-auto flex flex-col"
+          >
+            <DialogHeader className="text-right">
+              <DialogTitle className="text-right">تعديل الإعلان</DialogTitle>
+              <DialogDescription className="text-right">
+                تعديل تفاصيل الإعلان الحالي
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label>عنوان الإعلان</Label>
+                <Input
+                  value={adForm.title}
+                  onChange={(e) =>
+                    setAdForm({ ...adForm, title: e.target.value })
+                  }
+                  placeholder="عنوان الإعلان"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>الوصف</Label>
+                <Textarea
+                  value={adForm.description}
+                  onChange={(e) =>
+                    setAdForm({ ...adForm, description: e.target.value })
+                  }
+                  placeholder="وصف الإعلان"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>رابط الصورة</Label>
+                <Input
+                  value={adForm.imageUrl}
+                  onChange={(e) =>
+                    setAdForm({ ...adForm, imageUrl: e.target.value })
+                  }
+                  dir="ltr"
+                  className="text-right"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>الرابط المستهدف</Label>
+                <Input
+                  value={adForm.link}
+                  onChange={(e) =>
+                    setAdForm({ ...adForm, link: e.target.value })
+                  }
+                  dir="ltr"
+                  className="text-right"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>المدة</Label>
+                <Select
+                  value={adForm.duration}
+                  onValueChange={(v) => setAdForm({ ...adForm, duration: v })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1_month">شهر</SelectItem>
+                    <SelectItem value="2_months">شهرين</SelectItem>
+                    <SelectItem value="3_months">3 أشهر</SelectItem>
+                    <SelectItem value="6_months">6 أشهر</SelectItem>
+                    <SelectItem value="1_year">سنة</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1">
+                  مدة عرض الإعلان بالأشهر
+                </p>
+              </div>
+              <div className="space-y-2">
+                <Label>المكان</Label>
+                <AdPlacementSelector
+                  selectedPlacement={adForm.placement}
+                  onSelect={(value) =>
+                    setAdForm({ ...adForm, placement: value as AdPlacement })
+                  }
+                  adImage={adForm.imageUrl}
+                />
+              </div>
             </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsAdDialogOpen(false)}>
-              إلغاء
-            </Button>
-            <Button onClick={handleSaveAdRequest}>حفظ التغييرات</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setIsAdDialogOpen(false)}
+              >
+                إلغاء
+              </Button>
+              <Button onClick={handleSaveAdRequest}>حفظ التغييرات</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Template Delete Confirmation Dialog */}
+        <AlertDialog
+          open={!!templateToDelete}
+          onOpenChange={(open) => !open && setTemplateToDelete(null)}
+        >
+          <AlertDialogContent dir="rtl">
+            <AlertDialogHeader className="text-right">
+              <AlertDialogTitle className="text-right">
+                هل أنت متأكد من حذف هذا القالب؟
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-right">
+                لا يمكن التراجع عن هذا الإجراء بعد الحذف سيتم إزالة القالب
+                نهائياً من النظام.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="sm:justify-end gap-2">
+              <AlertDialogCancel onClick={() => setTemplateToDelete(null)}>
+                إلغاء
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  if (templateToDelete) handleDeleteTemplate(templateToDelete);
+                }}
+                className="bg-red-600 hover:bg-red-700 mx-0"
+              >
+                حذف
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* Ad Delete Confirmation Dialog */}
+        <AlertDialog
+          open={!!adToDelete}
+          onOpenChange={(open) => !open && setAdToDelete(null)}
+        >
+          <AlertDialogContent dir="rtl">
+            <AlertDialogHeader className="text-right">
+              <AlertDialogTitle className="text-right">
+                هل أنت متأكد من حذف هذا الإعلان؟
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-right">
+                لا يمكن التراجع عن هذا الإجراء بعد الحذف سيتم إزالة الإعلان
+                نهائياً من النظام.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="sm:justify-end gap-2">
+              <AlertDialogCancel onClick={() => setAdToDelete(null)}>
+                إلغاء
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  if (adToDelete) handleDeleteAd(adToDelete);
+                }}
+                className="bg-red-600 hover:bg-red-700 mx-0"
+              >
+                حذف
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
+    </AdminDashboardLayout>
   );
 };
 

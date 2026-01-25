@@ -1,9 +1,20 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Heart, MessageCircle, Bookmark, Share2, MoreHorizontal } from "lucide-react";
+import {
+  Heart,
+  MessageCircle,
+  Bookmark,
+  Share2,
+  MoreHorizontal,
+} from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,7 +47,13 @@ interface PostCardProps {
   onShare: (postId: string) => void;
 }
 
-const PostCard = ({ post, onLike, onSave, onComment, onShare }: PostCardProps) => {
+const PostCard = ({
+  post,
+  onLike,
+  onSave,
+  onComment,
+  onShare,
+}: PostCardProps) => {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
 
@@ -53,16 +70,32 @@ const PostCard = ({ post, onLike, onSave, onComment, onShare }: PostCardProps) =
   return (
     <Card className="overflow-hidden transition-all hover:shadow-md">
       <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <div className={cn("flex items-center gap-3", isRTL && "flex-row-reverse")}>
+        <div
+          className={cn(
+            "flex items-start justify-between",
+            isRTL && "flex-row-reverse",
+          )}
+        >
+          <div
+            className={cn(
+              "flex items-center gap-3",
+              isRTL && "flex-row-reverse",
+            )}
+          >
             <Avatar className="h-12 w-12 border-2 border-primary/10">
               <AvatarImage src={post.author.avatar} alt={post.author.name} />
               <AvatarFallback>{post.author.name.charAt(0)}</AvatarFallback>
             </Avatar>
             <div className={cn(isRTL && "text-right")}>
-              <h4 className="font-semibold text-foreground">{post.author.name}</h4>
-              <p className="text-sm text-muted-foreground">{post.author.title}</p>
-              <p className="text-xs text-muted-foreground">{formatDate(post.createdAt)}</p>
+              <h4 className="font-semibold text-foreground">
+                {post.author.name}
+              </h4>
+              <p className="text-sm text-muted-foreground">
+                {post.author.title}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {formatDate(post.createdAt)}
+              </p>
             </div>
           </div>
           <DropdownMenu>
@@ -78,9 +111,14 @@ const PostCard = ({ post, onLike, onSave, onComment, onShare }: PostCardProps) =
           </DropdownMenu>
         </div>
       </CardHeader>
-      
+
       <CardContent className="pb-3">
-        <p className={cn("text-foreground whitespace-pre-wrap", isRTL && "text-right")}>
+        <p
+          className={cn(
+            "text-foreground whitespace-pre-wrap",
+            isRTL && "text-right",
+          )}
+        >
           {post.content}
         </p>
         {post.image && (
@@ -95,12 +133,22 @@ const PostCard = ({ post, onLike, onSave, onComment, onShare }: PostCardProps) =
       </CardContent>
 
       <CardFooter className="flex-col gap-3 border-t pt-3">
-        <div className={cn("flex w-full items-center justify-between text-sm text-muted-foreground", isRTL && "flex-row-reverse")}>
+        <div
+          className={cn(
+            "flex w-full items-center justify-between text-sm text-muted-foreground",
+            isRTL && "flex-row-reverse",
+          )}
+        >
           <span>{t("blog.likesCount", { count: post.likes })}</span>
           <span>{t("blog.commentsCount", { count: post.comments })}</span>
         </div>
-        
-        <div className={cn("flex w-full items-center justify-between border-t pt-3", isRTL && "flex-row-reverse")}>
+
+        <div
+          className={cn(
+            "flex w-full items-center justify-between border-t pt-3",
+            isRTL && "flex-row-reverse",
+          )}
+        >
           <Button
             variant="ghost"
             size="sm"
@@ -110,23 +158,35 @@ const PostCard = ({ post, onLike, onSave, onComment, onShare }: PostCardProps) =
             <Heart className={cn("h-5 w-5", post.isLiked && "fill-current")} />
             {t("blog.like")}
           </Button>
-          
-          <Button variant="ghost" size="sm" onClick={() => onComment(post.id)} className="gap-2">
+
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onComment(post.id)}
+            className="gap-2"
+          >
             <MessageCircle className="h-5 w-5" />
             {t("blog.comment")}
           </Button>
-          
+
           <Button
             variant="ghost"
             size="sm"
             onClick={() => onSave(post.id)}
             className={cn("gap-2", post.isSaved && "text-primary")}
           >
-            <Bookmark className={cn("h-5 w-5", post.isSaved && "fill-current")} />
+            <Bookmark
+              className={cn("h-5 w-5", post.isSaved && "fill-current")}
+            />
             {t("blog.save")}
           </Button>
-          
-          <Button variant="ghost" size="sm" onClick={() => onShare(post.id)} className="gap-2">
+
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onShare(post.id)}
+            className="gap-2"
+          >
             <Share2 className="h-5 w-5" />
             {t("blog.share")}
           </Button>

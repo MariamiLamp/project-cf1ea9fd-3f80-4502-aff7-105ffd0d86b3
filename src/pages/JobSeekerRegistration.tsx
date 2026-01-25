@@ -76,6 +76,7 @@ const JobSeekerRegistration = () => {
   const [newExpTitle, setNewExpTitle] = useState("");
   const [newExpCompany, setNewExpCompany] = useState("");
   const [newExpDuration, setNewExpDuration] = useState("");
+  const [totalExperience, setTotalExperience] = useState("");
 
   const handleProfilePictureChange = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -608,6 +609,35 @@ const JobSeekerRegistration = () => {
 
                   {/* Work Experience */}
                   <div>
+                    <div className="mb-6 pb-6 border-b border-border/50">
+                      <Label className="flex items-center gap-2 mb-2">
+                        <Award className="w-4 h-4 text-primary  gap-2" />
+                        إجمالي سنوات الخبرة
+                      </Label>
+                      <Select
+                        value={totalExperience}
+                        onValueChange={setTotalExperience}
+                      >
+                        <SelectTrigger className="w-full h-11">
+                          <SelectValue placeholder="اختر سنوات الخبرة الإجمالية" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="no-experience">
+                            بدون خبرة
+                          </SelectItem>
+                          <SelectItem value="less-than-1">
+                            أقل من سنة
+                          </SelectItem>
+                          <SelectItem value="1-3">1-3 سنوات</SelectItem>
+                          <SelectItem value="3-5">3-5 سنوات</SelectItem>
+                          <SelectItem value="5-10">5-10 سنوات</SelectItem>
+                          <SelectItem value="more-than-10">
+                            أكثر من 10 سنوات
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
                     <Label className="flex items-center gap-2">
                       <Briefcase className="w-4 h-4" />
                       الخبرات العملية

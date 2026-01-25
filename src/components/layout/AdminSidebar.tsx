@@ -1,22 +1,26 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import {
-  Briefcase,
-  FileText,
+  Users,
+  Building2,
+  UserCheck,
   Megaphone,
+  CheckCircle,
+  Plus,
+  LayoutTemplate,
+  CreditCard,
   ChevronLeft,
   ChevronRight,
   ChevronDown,
   LogOut,
-  Building2,
-  Image,
-  Target,
-  CreditCard,
+  Settings,
+  Briefcase,
+  DollarSign,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSidebarState } from "@/contexts/SidebarContext";
 
-interface CompanySidebarProps {
+interface AdminSidebarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
 }
@@ -24,30 +28,42 @@ interface CompanySidebarProps {
 const navGroups = [
   {
     items: [
-      { icon: Briefcase, label: "الوظائف", value: "jobs" },
-      { icon: FileText, label: "الطلبات", value: "applications" },
-      { icon: CreditCard, label: "الاشتراكات", value: "subscription" },
+      { icon: Users, label: "الباحثين عن عمل", value: "users" },
+      { icon: Building2, label: "الشركات", value: "companies" },
+      { icon: UserCheck, label: "موظفي HR", value: "hr" },
     ],
+  },
+  {
+    title: "المالية",
+    icon: DollarSign,
+    items: [{ icon: DollarSign, label: "السجلات المالية", value: "finance" }],
   },
   {
     title: "الإعلانات",
     icon: Megaphone,
     items: [
-      { icon: Target, label: "الترويج", value: "promotion" },
-      { icon: Image, label: "الإعلانات", value: "ads" },
+      { icon: CheckCircle, label: "الإعلانات النشطة", value: "active_ads" },
+      { icon: Plus, label: "إضافة إعلان", value: "create_ad" },
+      { icon: Megaphone, label: "طلبات الإعلانات", value: "ads" },
+    ],
+  },
+  {
+    title: "النظام",
+    icon: Settings,
+    items: [
+      { icon: LayoutTemplate, label: "القوالب", value: "templates" },
+      { icon: CreditCard, label: "خطط الاشتراك", value: "subscriptions" },
     ],
   },
 ];
 
-export const CompanySidebar = ({
-  activeTab,
-  onTabChange,
-}: CompanySidebarProps) => {
+export const AdminSidebar = ({ activeTab, onTabChange }: AdminSidebarProps) => {
   const { collapsed, toggle } = useSidebarState();
-  const location = useLocation();
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
     {
+      المالية: true,
       الإعلانات: true,
+      النظام: true,
     },
   );
 
@@ -67,16 +83,16 @@ export const CompanySidebar = ({
     >
       {/* Logo & Brand */}
       <div className="p-6 border-b border-sidebar-border flex items-center gap-3 overflow-hidden">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center shadow-lg shadow-emerald-500/20 shrink-0">
-          <Building2 className="w-5 h-5 text-white" />
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center shadow-lg shadow-purple-500/20 shrink-0">
+          <Briefcase className="w-5 h-5 text-white" />
         </div>
         {!collapsed && (
           <div className="animate-fade-in">
             <h1 className="text-lg font-bold text-white leading-none">
-              لوحة الشركة
+              لوحة المدير
             </h1>
             <p className="text-[10px] text-sidebar-foreground/80 tracking-widest uppercase mt-0.5 font-medium">
-              Company Dashboard
+              Admin Dashboard
             </p>
           </div>
         )}
@@ -114,12 +130,12 @@ export const CompanySidebar = ({
 
               <div
                 className={cn(
-                  "space-y-2 overflow-hidden transition-all duration-300 ease-in-out px-2", // Added padding indent
+                  "space-y-2 overflow-hidden transition-all duration-300 ease-in-out px-2",
                   group.title && !collapsed
                     ? isExpanded
-                      ? "max-h-[500px] opacity-100" // Expanded
-                      : "max-h-0 opacity-0" // Collapsed
-                    : "max-h-[500px] opacity-100 px-0", // Reset padding for ungrouped/top level
+                      ? "max-h-[500px] opacity-100"
+                      : "max-h-0 opacity-0"
+                    : "max-h-[500px] opacity-100 px-0",
                 )}
               >
                 {group.items.map((item) => {

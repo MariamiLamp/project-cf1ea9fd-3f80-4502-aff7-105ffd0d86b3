@@ -21,7 +21,8 @@ const initialPosts: Post[] = [
       avatar: "/placeholder.svg",
       title: "مطور برمجيات أول",
     },
-    content: "سعيد بالإعلان عن انضمامي لفريق التقنية في شركة رائدة! 🎉\n\nرحلة البحث عن العمل كانت تحدياً، لكن بفضل الإصرار والتعلم المستمر، تحقق الحلم.\n\nنصيحتي للباحثين عن عمل: لا تستسلموا، وطوروا مهاراتكم باستمرار.",
+    content:
+      "سعيد بالإعلان عن انضمامي لفريق التقنية في شركة رائدة! 🎉\n\nرحلة البحث عن العمل كانت تحدياً، لكن بفضل الإصرار والتعلم المستمر، تحقق الحلم.\n\nنصيحتي للباحثين عن عمل: لا تستسلموا، وطوروا مهاراتكم باستمرار.",
     createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
     likes: 124,
     comments: 18,
@@ -35,7 +36,8 @@ const initialPosts: Post[] = [
       avatar: "/placeholder.svg",
       title: "مديرة موارد بشرية",
     },
-    content: "نصائح لمقابلة العمل الناجحة:\n\n1. ابحث عن الشركة جيداً\n2. حضّر أسئلة ذكية\n3. كن واثقاً ولكن متواضعاً\n4. أظهر شغفك بالمجال\n5. تابع بعد المقابلة\n\nما هي نصيحتكم المفضلة؟ 💼",
+    content:
+      "نصائح لمقابلة العمل الناجحة:\n\n1. ابحث عن الشركة جيداً\n2. حضّر أسئلة ذكية\n3. كن واثقاً ولكن متواضعاً\n4. أظهر شغفك بالمجال\n5. تابع بعد المقابلة\n\nما هي نصيحتكم المفضلة؟ 💼",
     createdAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
     likes: 89,
     comments: 32,
@@ -49,7 +51,8 @@ const initialPosts: Post[] = [
       avatar: "/placeholder.svg",
       title: "مستشار توظيف",
     },
-    content: "أخطاء شائعة في السيرة الذاتية يجب تجنبها:\n\n❌ معلومات قديمة\n❌ أخطاء إملائية\n❌ تصميم غير احترافي\n❌ عدم تخصيص السيرة للوظيفة\n\nاستخدموا أدوات فحص السيرة الذاتية المتوفرة على المنصة!",
+    content:
+      "أخطاء شائعة في السيرة الذاتية يجب تجنبها:\n\n❌ معلومات قديمة\n❌ أخطاء إملائية\n❌ تصميم غير احترافي\n❌ عدم تخصيص السيرة للوظيفة\n\nاستخدموا أدوات فحص السيرة الذاتية المتوفرة على المنصة!",
     image: "/placeholder.svg",
     createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
     likes: 256,
@@ -83,18 +86,34 @@ const initialComments: Record<string, Comment[]> = {
 };
 
 const suggestedUsers = [
-  { id: "1", name: "فاطمة الزهراء", title: "مصممة UI/UX", avatar: "/placeholder.svg" },
-  { id: "2", name: "محمد العبدالله", title: "مهندس بيانات", avatar: "/placeholder.svg" },
-  { id: "3", name: "نورة السالم", title: "محللة أعمال", avatar: "/placeholder.svg" },
+  {
+    id: "1",
+    name: "فاطمة الزهراء",
+    title: "مصممة UI/UX",
+    avatar: "/placeholder.svg",
+  },
+  {
+    id: "2",
+    name: "محمد العبدالله",
+    title: "مهندس بيانات",
+    avatar: "/placeholder.svg",
+  },
+  {
+    id: "3",
+    name: "نورة السالم",
+    title: "محللة أعمال",
+    avatar: "/placeholder.svg",
+  },
 ];
 
 const Blog = () => {
   const { t, i18n } = useTranslation();
   const { toast } = useToast();
   const isRTL = i18n.language === "ar";
-  
+
   const [posts, setPosts] = useState<Post[]>(initialPosts);
-  const [comments, setComments] = useState<Record<string, Comment[]>>(initialComments);
+  const [comments, setComments] =
+    useState<Record<string, Comment[]>>(initialComments);
   const [expandedComments, setExpandedComments] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("feed");
 
@@ -107,20 +126,22 @@ const Blog = () => {
               isLiked: !post.isLiked,
               likes: post.isLiked ? post.likes - 1 : post.likes + 1,
             }
-          : post
-      )
+          : post,
+      ),
     );
   };
 
   const handleSave = (postId: string) => {
     setPosts((prev) =>
       prev.map((post) =>
-        post.id === postId ? { ...post, isSaved: !post.isSaved } : post
-      )
+        post.id === postId ? { ...post, isSaved: !post.isSaved } : post,
+      ),
     );
     const post = posts.find((p) => p.id === postId);
     toast({
-      title: post?.isSaved ? t("blog.removedFromSaved") : t("blog.addedToSaved"),
+      title: post?.isSaved
+        ? t("blog.removedFromSaved")
+        : t("blog.addedToSaved"),
     });
   };
 
@@ -129,7 +150,9 @@ const Blog = () => {
   };
 
   const handleShare = (postId: string) => {
-    navigator.clipboard.writeText(`${window.location.origin}/blog/post/${postId}`);
+    navigator.clipboard.writeText(
+      `${window.location.origin}/blog/post/${postId}`,
+    );
     toast({ title: t("blog.linkCopied") });
   };
 
@@ -148,8 +171,8 @@ const Blog = () => {
     }));
     setPosts((prev) =>
       prev.map((post) =>
-        post.id === postId ? { ...post, comments: post.comments + 1 } : post
-      )
+        post.id === postId ? { ...post, comments: post.comments + 1 } : post,
+      ),
     );
   };
 
@@ -163,7 +186,7 @@ const Blog = () => {
               isLiked: !comment.isLiked,
               likes: comment.isLiked ? comment.likes - 1 : comment.likes + 1,
             }
-          : comment
+          : comment,
       ),
     }));
   };
@@ -196,7 +219,9 @@ const Blog = () => {
       <div dir={isRTL ? "rtl" : "ltr"} className="space-y-6">
         {/* Header */}
         <div className={cn(isRTL && "text-right")}>
-          <h1 className="text-2xl font-bold text-foreground">{t("blog.title")}</h1>
+          <h1 className="text-2xl font-bold text-foreground">
+            {t("blog.title")}
+          </h1>
           <p className="text-muted-foreground">{t("blog.subtitle")}</p>
         </div>
 
@@ -204,7 +229,12 @@ const Blog = () => {
           {/* Main Feed */}
           <div className="lg:col-span-2 space-y-6">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="w-full justify-start">
+              <TabsList
+                className={cn(
+                  "w-full",
+                  isRTL ? "justify-end" : "justify-start",
+                )}
+              >
                 <TabsTrigger value="feed" className="gap-2">
                   <TrendingUp className="h-4 w-4" />
                   {t("blog.feed")}
@@ -251,7 +281,9 @@ const Blog = () => {
                 <Card>
                   <CardContent className="py-12 text-center">
                     <Users className="mx-auto h-12 w-12 text-muted-foreground/50" />
-                    <p className="mt-4 text-muted-foreground">{t("blog.noFollowingPosts")}</p>
+                    <p className="mt-4 text-muted-foreground">
+                      {t("blog.noFollowingPosts")}
+                    </p>
                     <Button variant="outline" className="mt-4">
                       {t("blog.discoverPeople")}
                     </Button>
@@ -288,7 +320,9 @@ const Blog = () => {
                   <Card>
                     <CardContent className="py-12 text-center">
                       <Bookmark className="mx-auto h-12 w-12 text-muted-foreground/50" />
-                      <p className="mt-4 text-muted-foreground">{t("blog.noSavedPosts")}</p>
+                      <p className="mt-4 text-muted-foreground">
+                        {t("blog.noSavedPosts")}
+                      </p>
                     </CardContent>
                   </Card>
                 )}
@@ -301,22 +335,26 @@ const Blog = () => {
             {/* Suggested Users */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">{t("blog.suggestedUsers")}</CardTitle>
+                <CardTitle className="text-lg">
+                  {t("blog.suggestedUsers")}
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {suggestedUsers.map((user) => (
                   <div
                     key={user.id}
-                    className={cn("flex items-center justify-between", isRTL && "flex-row-reverse")}
+                    className="flex items-center justify-between"
                   >
-                    <div className={cn("flex items-center gap-3", isRTL && "flex-row-reverse")}>
+                    <div className="flex items-center gap-3">
                       <Avatar className="h-10 w-10">
                         <AvatarImage src={user.avatar} />
                         <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
                       </Avatar>
                       <div className={cn(isRTL && "text-right")}>
                         <p className="text-sm font-medium">{user.name}</p>
-                        <p className="text-xs text-muted-foreground">{user.title}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {user.title}
+                        </p>
                       </div>
                     </div>
                     <Button variant="outline" size="sm">
@@ -330,20 +368,29 @@ const Blog = () => {
             {/* Trending Topics */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">{t("blog.trendingTopics")}</CardTitle>
+                <CardTitle className="text-lg">
+                  {t("blog.trendingTopics")}
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                {["#التوظيف", "#السيرة_الذاتية", "#مقابلات_العمل", "#التطوير_المهني", "#العمل_عن_بعد"].map(
-                  (topic) => (
-                    <Button
-                      key={topic}
-                      variant="ghost"
-                      className={cn("w-full justify-start text-primary", isRTL && "justify-end")}
-                    >
-                      {topic}
-                    </Button>
-                  )
-                )}
+                {[
+                  "#التوظيف",
+                  "#السيرة_الذاتية",
+                  "#مقابلات_العمل",
+                  "#التطوير_المهني",
+                  "#العمل_عن_بعد",
+                ].map((topic) => (
+                  <Button
+                    key={topic}
+                    variant="ghost"
+                    className={cn(
+                      "w-full text-primary",
+                      isRTL ? "justify-start text-right" : "justify-start",
+                    )}
+                  >
+                    {topic}
+                  </Button>
+                ))}
               </CardContent>
             </Card>
           </div>

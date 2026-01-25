@@ -25,6 +25,13 @@ import {
   Building2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import ImageCropper from "@/components/ImageCropper";
 
 const CompanyRegistration = () => {
@@ -38,6 +45,7 @@ const CompanyRegistration = () => {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [industry, setIndustry] = useState("");
 
   // Step 2: Profile
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
@@ -217,6 +225,35 @@ const CompanyRegistration = () => {
                         placeholder="أدخل اسم الشركة"
                         className="pr-10"
                       />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="industry">نشاط الشركة</Label>
+                    <div className="mt-1">
+                      <Select
+                        value={industry}
+                        onValueChange={setIndustry}
+                        dir="rtl"
+                      >
+                        <SelectTrigger className="w-full h-11 rounded-xl border-border/50 hover:border-primary/50 transition-colors">
+                          <SelectValue placeholder="اختر نشاط الشركة" />
+                        </SelectTrigger>
+                        <SelectContent dir="rtl">
+                          <SelectItem value="it">تقنية المعلومات</SelectItem>
+                          <SelectItem value="finance">المالية</SelectItem>
+                          <SelectItem value="construction">
+                            البناء والتشييد
+                          </SelectItem>
+                          <SelectItem value="healthcare">
+                            الرعاية الصحية
+                          </SelectItem>
+                          <SelectItem value="education">التعليم</SelectItem>
+                          <SelectItem value="tourism">السياحة</SelectItem>
+                          <SelectItem value="retail">البيع بالتجزئة</SelectItem>
+                          <SelectItem value="other">أخرى</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
 
