@@ -77,9 +77,23 @@ import {
   Check,
   X,
 } from "lucide-react";
+import {
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Cell,
+  PieChart,
+  Pie,
+} from "recharts";
 import { AdPlacementSelector } from "@/components/dashboard/AdPlacementSelector";
 import { DataTableFilters } from "@/components/dashboard/DataTableFilters";
 import { AdminDashboardLayout } from "@/components/layout/AdminDashboardLayout";
+import { FinancialReports } from "@/components/dashboard/FinancialReports";
 
 // Mock data - Users
 const mockUsers = [
@@ -305,6 +319,32 @@ const mockPlans = [
     isActive: true,
     type: "company",
   },
+  {
+    id: 6,
+    name: "HR الأساسية",
+    nameEn: "hr_basic",
+    price: 199,
+    period: "شهري",
+    features: ["50 بحث سيرة ذاتية", "فلترة أساسية", "دعم فني"],
+    usersCount: 120,
+    isActive: true,
+    type: "hr",
+  },
+  {
+    id: 7,
+    name: "HR الاحترافية",
+    nameEn: "hr_pro",
+    price: 450,
+    period: "شهري",
+    features: [
+      "بحث غير محدود",
+      "فلترة متقدمة بالذكاء الاصطناعي",
+      "تواصل مباشر مع المرشحين",
+    ],
+    usersCount: 45,
+    isActive: true,
+    type: "hr",
+  },
 ];
 
 // Mock Templates
@@ -379,12 +419,96 @@ const categoryLabels: Record<string, string> = {
   academic: "أكاديمي",
 };
 
+const mockPayments = [
+  {
+    id: 1,
+    user: "أحمد محمد",
+    amount: 150,
+    type: "subscription",
+    status: "completed",
+    date: "2024-06-20",
+    details: "خطة احترافية",
+  },
+  {
+    id: 2,
+    user: "شركة التقنية المتقدمة",
+    amount: 2500,
+    type: "ads",
+    status: "completed",
+    date: "2024-06-21",
+    details: "إعلان الصفحة الرئيسية",
+  },
+  {
+    id: 3,
+    user: "سارة علي",
+    amount: 45,
+    type: "template",
+    status: "completed",
+    date: "2024-06-22",
+    details: "قالب سيرة ذاتية تقنية",
+  },
+  {
+    id: 4,
+    user: "محمد خالد",
+    amount: 150,
+    type: "subscription",
+    status: "completed",
+    date: "2024-06-23",
+    details: "خطة احترافية",
+  },
+  {
+    id: 5,
+    user: "مجموعة الاستثمار",
+    amount: 1200,
+    type: "ads",
+    status: "pending",
+    date: "2024-06-24",
+    details: "إعلان جانبي",
+  },
+  {
+    id: 6,
+    user: "فاطمة أحمد",
+    amount: 290,
+    type: "subscription",
+    status: "completed",
+    date: "2024-06-25",
+    details: "خطة مميزة",
+  },
+  {
+    id: 7,
+    user: "عمر حسن",
+    amount: 79,
+    type: "template",
+    status: "completed",
+    date: "2024-06-26",
+    details: "قالب عقد عمل",
+  },
+];
+
+const revenueByMonth = [
+  { month: "يناير", revenue: 45000 },
+  { month: "فبراير", revenue: 52000 },
+  { month: "مارس", revenue: 48000 },
+  { month: "أبريل", revenue: 61000 },
+  { month: "مايو", revenue: 58000 },
+  { month: "يونيو", revenue: 65000 },
+];
+
+const revenueByType = [
+  { name: "اشتراكات", value: 35000, color: "#3b82f6" },
+  { name: "إعلانات", value: 25000, color: "#10b981" },
+  { name: "قوالب", value: 15000, color: "#f59e0b" },
+];
+
 const AdminDashboard = () => {
   const { user, logout } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("users");
+  const [financialChartMode, setFinancialChartMode] = useState<
+    "revenue" | "distribution" | "comparison"
+  >("revenue");
   // Job Seeker filters
   const [jobSeekerFilters, setJobSeekerFilters] = useState({
     minAppliedJobs: 0,
@@ -470,6 +594,51 @@ const AdminDashboard = () => {
     discountStart: "",
     discountEnd: "",
   });
+
+  const handleExportCSV = () => {
+    const headers = [
+      "ID",
+      "المستخدم",
+      "المبلغ",
+      "النوع",
+      "الحالة",
+      "التاريخ",
+      "التفاصيل",
+    ];
+    const csvData = mockPayments.map((p) => [
+      p.id,
+      p.user,
+      p.amount,
+      p.type === "subscription"
+        ? "اشتراك"
+        : p.type === "ads"
+          ? "إعلان"
+          : "قالب",
+      p.status === "completed" ? "مكتمل" : "معلق",
+      p.date,
+      p.details,
+    ]);
+
+    const csvContent = [headers, ...csvData].map((e) => e.join(",")).join("\n");
+    const blob = new Blob(["\ufeff" + csvContent], {
+      type: "text/csv;charset=utf-8;",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute(
+      "download",
+      `financial_report_${new Date().toISOString().split("T")[0]}.csv`,
+    );
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    toast({
+      title: "تم تصدير التقرير",
+      description: "تم تحميل ملف CSV بنجاح",
+    });
+  };
 
   // Templates state
   const [templates, setTemplates] = useState(mockTemplates);
@@ -992,7 +1161,6 @@ const AdminDashboard = () => {
                             subscription: v,
                           })
                         }
-                        dir="rtl"
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="كل الاشتراكات" />
@@ -1146,7 +1314,6 @@ const AdminDashboard = () => {
                         onValueChange={(v) =>
                           setCompanyFilters({ ...companyFilters, location: v })
                         }
-                        dir="rtl"
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="كل المواقع" />
@@ -1166,7 +1333,6 @@ const AdminDashboard = () => {
                         onValueChange={(v) =>
                           setCompanyFilters({ ...companyFilters, industry: v })
                         }
-                        dir="rtl"
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="كل الأنشطة" />
@@ -1295,6 +1461,17 @@ const AdminDashboard = () => {
             </Card>
           </TabsContent>
 
+          {/* Finance Tab */}
+          <TabsContent value="finance">
+            <FinancialReports
+              payments={mockPayments}
+              revenueByMonth={revenueByMonth}
+              revenueByType={revenueByType}
+              onExport={handleExportCSV}
+              initialChart={financialChartMode}
+            />
+          </TabsContent>
+
           {/* HR Tab */}
           <TabsContent value="hr">
             <Card>
@@ -1369,7 +1546,13 @@ const AdminDashboard = () => {
             <div className="space-y-6">
               {/* Subscription Stats */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card className="border-border/50">
+                <Card
+                  className="border-border/50 cursor-pointer hover:bg-muted/30 transition-all"
+                  onClick={() => {
+                    setActiveTab("finance");
+                    setFinancialChartMode("comparison");
+                  }}
+                >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between gap-4">
                       <div>
@@ -1386,7 +1569,13 @@ const AdminDashboard = () => {
                     </div>
                   </CardContent>
                 </Card>
-                <Card className="border-border/50">
+                <Card
+                  className="border-border/50 cursor-pointer hover:bg-muted/30 transition-all"
+                  onClick={() => {
+                    setActiveTab("finance");
+                    setFinancialChartMode("revenue");
+                  }}
+                >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between gap-4">
                       <div>
@@ -1403,7 +1592,13 @@ const AdminDashboard = () => {
                     </div>
                   </CardContent>
                 </Card>
-                <Card className="border-border/50">
+                <Card
+                  className="border-border/50 cursor-pointer hover:bg-muted/30 transition-all"
+                  onClick={() => {
+                    setActiveTab("finance");
+                    setFinancialChartMode("distribution");
+                  }}
+                >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between gap-4">
                       <div>
@@ -1422,109 +1617,158 @@ const AdminDashboard = () => {
                 </Card>
               </div>
 
-              <Card>
-                <CardHeader className="flex flex-row-reverse items-center justify-between">
-                  <CardTitle className="flex items-center gap-2">
-                    <span>خطط الاشتراك</span>
-                    <CreditCard className="w-5 h-5" />
-                  </CardTitle>
-                  <Button onClick={handleAddPlan} className="gap-2">
-                    <Plus className="w-4 h-4" />
-                    إضافة خطة
-                  </Button>
-                </CardHeader>
-                <CardContent>
-                  <Table
-                    dir="ltr"
-                    className="text-right [&_th]:text-right [&_td]:text-right"
-                  >
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>الإجراءات</TableHead>
-                        <TableHead>الحالة</TableHead>
-                        <TableHead>الإيرادات</TableHead>
-                        <TableHead>عدد المشتركين</TableHead>
-                        <TableHead>المميزات</TableHead>
-                        <TableHead>السعر</TableHead>
-                        <TableHead>النوع</TableHead>
-                        <TableHead>اسم الخطة</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {plans.map((plan) => (
-                        <TableRow key={plan.id}>
-                          <TableCell>
-                            <div className="flex gap-1 justify-end">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => handleEditPlan(plan)}
-                              >
-                                <Edit className="w-4 h-4" />
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleTogglePlan(plan.id)}
-                                className={
-                                  plan.isActive
-                                    ? "text-red-600 border-red-200 hover:bg-red-50 h-8 px-3 text-xs"
-                                    : "text-emerald-600 border-emerald-200 hover:bg-emerald-50 h-8 px-3 text-xs"
-                                }
-                              >
-                                {plan.isActive ? "Stop" : "Active"}
-                              </Button>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <Badge
-                              variant={plan.isActive ? "default" : "secondary"}
-                              className={
-                                plan.isActive
-                                  ? "bg-emerald-500 hover:bg-emerald-600"
-                                  : "bg-amber-500 hover:bg-amber-600 text-white"
-                              }
-                            >
-                              {plan.isActive ? "نشطة" : "معطلة"}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="font-medium">
-                            {(plan.price * plan.usersCount).toLocaleString()}{" "}
-                            ر.س
-                          </TableCell>
-                          <TableCell>{plan.usersCount}</TableCell>
-                          <TableCell>
-                            <div className="max-w-xs mr-0 ml-auto text-right">
-                              <p className="text-sm text-muted-foreground truncate text-right">
-                                {plan.features.slice(0, 2).join("، ")}
-                                {plan.features.length > 2 && "..."}
-                              </p>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            {plan.price === 0
-                              ? "مجاني"
-                              : `${plan.price} ر.س/${plan.period}`}
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="outline">
-                              {plan.type === "jobseeker" ? "أفراد" : "شركات"}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="font-medium">
-                            <div className="flex items-center gap-2 justify-end">
-                              {plan.price > 50 && (
-                                <Crown className="w-4 h-4 text-amber-500" />
-                              )}
-                              {plan.name}
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
+              <Tabs defaultValue="jobseeker" className="space-y-6">
+                <TabsList className="bg-muted/50 p-1 flex justify-end flex-wrap gap-1">
+                  <TabsTrigger value="hr" className="gap-2">
+                    <UserCheck className="w-4 h-4" />
+                    خطط الـ HR
+                  </TabsTrigger>
+                  <TabsTrigger value="company" className="gap-2">
+                    <Building2 className="w-4 h-4" />
+                    خطط الشركات
+                  </TabsTrigger>
+                  <TabsTrigger value="jobseeker" className="gap-2">
+                    <Users className="w-4 h-4" />
+                    خطط الأفراد
+                  </TabsTrigger>
+                </TabsList>
+
+                {["jobseeker", "company", "hr"].map((type) => (
+                  <TabsContent key={type} value={type}>
+                    <Card>
+                      <CardHeader className="flex flex-row-reverse items-center justify-between">
+                        <CardTitle className="flex items-center gap-2">
+                          <span>
+                            {type === "jobseeker"
+                              ? "خطط الباحثين عن عمل"
+                              : type === "company"
+                                ? "خطط الشركات"
+                                : "خطط موظفي الـ HR"}
+                          </span>
+                          {type === "jobseeker" ? (
+                            <Users className="w-5 h-5" />
+                          ) : type === "company" ? (
+                            <Building2 className="w-5 h-5" />
+                          ) : (
+                            <UserCheck className="w-5 h-5" />
+                          )}
+                        </CardTitle>
+                        <Button onClick={handleAddPlan} className="gap-2">
+                          <Plus className="w-4 h-4" />
+                          إضافة خطة
+                        </Button>
+                      </CardHeader>
+                      <CardContent>
+                        <Table
+                          dir="ltr"
+                          className="text-right [&_th]:text-right [&_td]:text-right"
+                        >
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>الإجراءات</TableHead>
+                              <TableHead>الحالة</TableHead>
+                              <TableHead>الإيرادات</TableHead>
+                              <TableHead>عدد المشتركين</TableHead>
+                              <TableHead>المميزات</TableHead>
+                              <TableHead>السعر</TableHead>
+                              <TableHead>ID</TableHead>
+                              <TableHead>اسم الخطة</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {plans
+                              .filter((p) => p.type === type)
+                              .map((plan) => (
+                                <TableRow key={plan.id}>
+                                  <TableCell>
+                                    <div className="flex gap-2 justify-end">
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => handleEditPlan(plan)}
+                                      >
+                                        <Edit className="w-4 h-4" />
+                                      </Button>
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() =>
+                                          handleTogglePlan(plan.id)
+                                        }
+                                        className={
+                                          plan.isActive
+                                            ? "text-red-600 border-red-200 hover:bg-red-50 h-8 px-3 text-xs"
+                                            : "text-emerald-600 border-emerald-200 hover:bg-emerald-50 h-8 px-3 text-xs"
+                                        }
+                                      >
+                                        {plan.isActive ? "Stop" : "Active"}
+                                      </Button>
+                                    </div>
+                                  </TableCell>
+                                  <TableCell>
+                                    <Badge
+                                      variant={
+                                        plan.isActive ? "default" : "secondary"
+                                      }
+                                      className={
+                                        plan.isActive
+                                          ? "bg-emerald-500 hover:bg-emerald-600"
+                                          : "bg-amber-500 hover:bg-amber-600 text-white"
+                                      }
+                                    >
+                                      {plan.isActive ? "نشطة" : "معطلة"}
+                                    </Badge>
+                                  </TableCell>
+                                  <TableCell className="font-bold">
+                                    {(
+                                      plan.price * plan.usersCount
+                                    ).toLocaleString()}{" "}
+                                    ر.س
+                                  </TableCell>
+                                  <TableCell>
+                                    <Badge variant="secondary">
+                                      {plan.usersCount} مشترك
+                                    </Badge>
+                                  </TableCell>
+                                  <TableCell>
+                                    <div className="flex flex-wrap gap-1 justify-end items-center min-h-[40px]">
+                                      {plan.features.length > 2 && (
+                                        <Badge
+                                          variant="secondary"
+                                          className="text-[10px] px-1.5 h-5 min-w-[20px] justify-center"
+                                        >
+                                          +{plan.features.length - 2}
+                                        </Badge>
+                                      )}
+                                      {plan.features.slice(0, 2).map((f, i) => (
+                                        <Badge
+                                          key={i}
+                                          variant="outline"
+                                          className="text-[10px] whitespace-nowrap bg-muted/30"
+                                        >
+                                          {f}
+                                        </Badge>
+                                      ))}
+                                    </div>
+                                  </TableCell>
+                                  <TableCell className="font-mono">
+                                    {plan.price} ر.س / {plan.period}
+                                  </TableCell>
+                                  <TableCell className="text-muted-foreground">
+                                    #{plan.id}
+                                  </TableCell>
+                                  <TableCell className="font-bold">
+                                    {plan.name}
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                          </TableBody>
+                        </Table>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                ))}
+              </Tabs>
             </div>
           </TabsContent>
 
@@ -2064,8 +2308,9 @@ const AdminDashboard = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="jobseeker">أفراد</SelectItem>
-                      <SelectItem value="company">شركات</SelectItem>
+                      <SelectItem value="jobseeker">باحث عن عمل</SelectItem>
+                      <SelectItem value="company">شركة</SelectItem>
+                      <SelectItem value="hr">موظف HR</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

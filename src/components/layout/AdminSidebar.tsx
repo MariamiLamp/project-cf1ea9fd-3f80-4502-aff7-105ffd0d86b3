@@ -15,6 +15,7 @@ import {
   LogOut,
   Settings,
   Briefcase,
+  DollarSign,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSidebarState } from "@/contexts/SidebarContext";
@@ -31,6 +32,11 @@ const navGroups = [
       { icon: Building2, label: "الشركات", value: "companies" },
       { icon: UserCheck, label: "موظفي HR", value: "hr" },
     ],
+  },
+  {
+    title: "المالية",
+    icon: DollarSign,
+    items: [{ icon: DollarSign, label: "السجلات المالية", value: "finance" }],
   },
   {
     title: "الإعلانات",
@@ -55,6 +61,7 @@ export const AdminSidebar = ({ activeTab, onTabChange }: AdminSidebarProps) => {
   const { collapsed, toggle } = useSidebarState();
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
     {
+      المالية: true,
       الإعلانات: true,
       النظام: true,
     },
