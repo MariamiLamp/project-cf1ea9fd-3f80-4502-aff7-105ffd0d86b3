@@ -33,6 +33,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -66,6 +76,7 @@ import {
   X,
 } from "lucide-react";
 import { AdPlacementSelector } from "@/components/dashboard/AdPlacementSelector";
+import { AdminDashboardLayout } from "@/components/layout/AdminDashboardLayout";
 
 // Mock data - Users
 const mockUsers = [
@@ -359,7 +370,7 @@ const AdminDashboard = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeTab, setActiveTab] = useState("active_ads");
+  const [activeTab, setActiveTab] = useState("users");
 
   // Plans state
   const [plans, setPlans] = useState(mockPlans);
@@ -373,6 +384,9 @@ const AdminDashboard = () => {
     period: "شهري",
     features: "",
     type: "jobseeker",
+    discount: 0,
+    discountStart: "",
+    discountEnd: "",
   });
 
   // Templates state
@@ -387,11 +401,19 @@ const AdminDashboard = () => {
     price: 0,
     isPremium: false,
     fileName: "",
+    discount: 0,
+    discountStart: "",
+    discountEnd: "",
   });
 
-  // Ads state
-  // Create Ad state
-  const { add: addAd } = useAds();
+  // Ads functionality
+  const {
+    ads: adsRequests,
+    add: addAd,
+    update: updateAd,
+    remove: removeAd,
+  } = useAds();
+
   const [adForm, setAdForm] = useState<{
     title: string;
     description: string;
@@ -410,8 +432,8 @@ const AdminDashboard = () => {
   const [editingAdId, setEditingAdId] = useState<number | null>(null);
   const [isAdDialogOpen, setIsAdDialogOpen] = useState(false);
 
-  // Ads display state (from useAds hook)
-  const { ads: adsRequests, update: updateAd } = useAds();
+  const [templateToDelete, setTemplateToDelete] = useState<number | null>(null);
+  const [adToDelete, setAdToDelete] = useState<number | null>(null);
 
   const handleLogout = () => {
     logout();
@@ -427,6 +449,9 @@ const AdminDashboard = () => {
       period: "شهري",
       features: "",
       type: "jobseeker",
+      discount: 0,
+      discountStart: "",
+      discountEnd: "",
     });
     setIsPlanDialogOpen(true);
   };
@@ -439,6 +464,9 @@ const AdminDashboard = () => {
       period: plan.period,
       features: plan.features.join("\n"),
       type: plan.type,
+      discount: (plan as any).discount || 0,
+      discountStart: (plan as any).discountStart || "",
+      discountEnd: (plan as any).discountEnd || "",
     });
     setIsPlanDialogOpen(true);
   };
@@ -455,6 +483,9 @@ const AdminDashboard = () => {
                 period: planForm.period,
                 features: planForm.features.split("\n").filter((f) => f.trim()),
                 type: planForm.type,
+                discount: planForm.discount,
+                discountStart: planForm.discountStart,
+                discountEnd: planForm.discountEnd,
               }
             : p,
         ),
@@ -474,6 +505,9 @@ const AdminDashboard = () => {
         usersCount: 0,
         isActive: true,
         type: planForm.type,
+        discount: planForm.discount,
+        discountStart: planForm.discountStart,
+        discountEnd: planForm.discountEnd,
       };
       setPlans([...plans, newPlan]);
       toast({ title: "تمت الإضافة", description: "تم إضافة خطة اشتراك جديدة" });
@@ -496,6 +530,9 @@ const AdminDashboard = () => {
       price: 0,
       isPremium: false,
       fileName: "",
+      discount: 0,
+      discountStart: "",
+      discountEnd: "",
     });
     setIsTemplateDialogOpen(true);
   };
@@ -507,7 +544,10 @@ const AdminDashboard = () => {
       category: template.category,
       price: template.price,
       isPremium: template.isPremium,
-      fileName: "", // In a real app, this might come from the template data
+      fileName: "",
+      discount: (template as any).discount || 0,
+      discountStart: (template as any).discountStart || "",
+      discountEnd: (template as any).discountEnd || "",
     });
     setIsTemplateDialogOpen(true);
   };
@@ -523,6 +563,9 @@ const AdminDashboard = () => {
                 category: templateForm.category,
                 price: templateForm.price,
                 isPremium: templateForm.isPremium,
+                discount: templateForm.discount,
+                discountStart: templateForm.discountStart,
+                discountEnd: templateForm.discountEnd,
               }
             : t,
         ),
@@ -538,6 +581,9 @@ const AdminDashboard = () => {
         rating: 0,
         status: "active" as const,
         isPremium: templateForm.isPremium,
+        discount: templateForm.discount,
+        discountStart: templateForm.discountStart,
+        discountEnd: templateForm.discountEnd,
       };
       setTemplates([...templates, newTemplate]);
       toast({ title: "تمت الإضافة", description: "تم إضافة قالب جديد" });
@@ -560,6 +606,7 @@ const AdminDashboard = () => {
 
   const handleDeleteTemplate = (templateId: number) => {
     setTemplates(templates.filter((t) => t.id !== templateId));
+    setTemplateToDelete(null);
     toast({ title: "تم الحذف", description: "تم حذف القالب" });
   };
 
@@ -711,6 +758,12 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleDeleteAd = (id: number) => {
+    removeAd(id);
+    setAdToDelete(null);
+    toast({ title: "تم الحذف", description: "تم حذف الإعلان بنجاح" });
+  };
+
   const stats = [
     {
       label: "إجمالي المستخدمين",
@@ -784,29 +837,8 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background" dir="rtl">
-      {/* Header */}
-      <header className="bg-card border-b border-border px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center">
-              <Briefcase className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h1 className="font-bold text-lg">لوحة تحكم المدير</h1>
-              <p className="text-sm text-muted-foreground">
-                مرحباً، {user?.name}
-              </p>
-            </div>
-          </div>
-          <Button variant="outline" onClick={handleLogout} className="gap-2">
-            <LogOut className="w-4 h-4" />
-            تسجيل الخروج
-          </Button>
-        </div>
-      </header>
-
-      <main className="p-6 space-y-6">
+    <AdminDashboardLayout activeTab={activeTab} onTabChange={setActiveTab}>
+      <div className="space-y-6">
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {stats.map((stat, index) => (
@@ -830,59 +862,25 @@ const AdminDashboard = () => {
           ))}
         </div>
 
-        {/* Tabs */}
+        {/* Search Bar */}
+        <div className="flex justify-start">
+          <div className="relative w-full max-w-md">
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="...بحث"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pr-10 text-right"
+            />
+          </div>
+        </div>
+
+        {/* Tabs Content */}
         <Tabs
           value={activeTab}
           onValueChange={setActiveTab}
           className="space-y-4"
         >
-          <div className="flex flex-col items-end gap-4">
-            <TabsList className="bg-muted/50 flex-wrap h-auto gap-1 p-1">
-              <TabsTrigger value="active_ads" className="gap-2">
-                <CheckCircle className="w-4 h-4" />
-                الإعلانات النشطة
-              </TabsTrigger>
-              <TabsTrigger value="create_ad" className="gap-2">
-                <Plus className="w-4 h-4" />
-                إضافة إعلان
-              </TabsTrigger>
-              <TabsTrigger value="ads" className="gap-2">
-                <Megaphone className="w-4 h-4" />
-                طلبات الإعلانات
-              </TabsTrigger>
-              <TabsTrigger value="templates" className="gap-2">
-                <LayoutTemplate className="w-4 h-4" />
-                القوالب
-              </TabsTrigger>
-              <TabsTrigger value="subscriptions" className="gap-2">
-                <CreditCard className="w-4 h-4" />
-                خطط الاشتراك
-              </TabsTrigger>
-              <TabsTrigger value="hr" className="gap-2">
-                <UserCheck className="w-4 h-4" />
-                موظفي HR
-              </TabsTrigger>
-              <TabsTrigger value="companies" className="gap-2">
-                <Building2 className="w-4 h-4" />
-                الشركات
-              </TabsTrigger>
-              <TabsTrigger value="users" className="gap-2">
-                <Users className="w-4 h-4" />
-                الباحثين عن عمل
-              </TabsTrigger>
-            </TabsList>
-
-            <div className="relative w-full max-w-md">
-              <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="...بحث"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pr-10 text-right"
-              />
-            </div>
-          </div>
-
           {/* Users Tab */}
           <TabsContent value="users">
             <Card>
@@ -1418,7 +1416,7 @@ const AdminDashboard = () => {
                                   variant="ghost"
                                   size="icon"
                                   onClick={() =>
-                                    handleDeleteTemplate(template.id)
+                                    setTemplateToDelete(template.id)
                                   }
                                 >
                                   <Trash2 className="w-4 h-4 text-destructive" />
@@ -1532,9 +1530,9 @@ const AdminDashboard = () => {
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  onClick={() => handleDeclineAd(ad.id)}
+                                  onClick={() => setAdToDelete(ad.id)}
                                 >
-                                  <X className="w-4 h-4 text-destructive" />
+                                  <Trash2 className="w-4 h-4 text-destructive" />
                                 </Button>
                               </>
                             )}
@@ -1719,6 +1717,14 @@ const AdminDashboard = () => {
                           >
                             {ad.status === "active" ? "إيقاف" : "تنشيط"}
                           </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setAdToDelete(ad.id)}
+                            className="mr-2"
+                          >
+                            <Trash2 className="w-4 h-4 text-destructive" />
+                          </Button>
                         </TableCell>
                         <TableCell>
                           <Badge
@@ -1778,277 +1784,445 @@ const AdminDashboard = () => {
             </Card>
           </TabsContent>
         </Tabs>
-      </main>
 
-      {/* Plan Dialog */}
-      <Dialog open={isPlanDialogOpen} onOpenChange={setIsPlanDialogOpen}>
-        <DialogContent dir="rtl">
-          <DialogHeader>
-            <DialogTitle>
-              {editingPlan ? "تعديل خطة الاشتراك" : "إضافة خطة اشتراك جديدة"}
-            </DialogTitle>
-            <DialogDescription>
-              {editingPlan
-                ? "قم بتعديل تفاصيل خطة الاشتراك"
-                : "أدخل تفاصيل خطة الاشتراك الجديدة"}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label>اسم الخطة</Label>
-              <Input
-                value={planForm.name}
-                onChange={(e) =>
-                  setPlanForm({ ...planForm, name: e.target.value })
-                }
-                placeholder="مثال: احترافي"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
+        {/* Plan Dialog */}
+        <Dialog open={isPlanDialogOpen} onOpenChange={setIsPlanDialogOpen}>
+          <DialogContent dir="rtl">
+            <DialogHeader className="text-right">
+              <DialogTitle className="text-right">
+                {editingPlan ? "تعديل خطة الاشتراك" : "إضافة خطة اشتراك جديدة"}
+              </DialogTitle>
+              <DialogDescription className="text-right">
+                {editingPlan
+                  ? "قم بتعديل تفاصيل خطة الاشتراك"
+                  : "أدخل تفاصيل خطة الاشتراك الجديدة"}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label>السعر (ر.س)</Label>
+                <Label>اسم الخطة</Label>
                 <Input
-                  type="number"
-                  value={planForm.price}
+                  value={planForm.name}
                   onChange={(e) =>
-                    setPlanForm({ ...planForm, price: Number(e.target.value) })
+                    setPlanForm({ ...planForm, name: e.target.value })
                   }
+                  placeholder="مثال: احترافي"
                 />
               </div>
-              <div className="space-y-2">
-                <Label>نوع الخطة</Label>
-                <Select
-                  value={planForm.type}
-                  onValueChange={(v) => setPlanForm({ ...planForm, type: v })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="jobseeker">أفراد</SelectItem>
-                    <SelectItem value="company">شركات</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label>المميزات (سطر لكل ميزة)</Label>
-              <Textarea
-                value={planForm.features}
-                onChange={(e) =>
-                  setPlanForm({ ...planForm, features: e.target.value })
-                }
-                placeholder="ميزة 1&#10;ميزة 2&#10;ميزة 3"
-                rows={4}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsPlanDialogOpen(false)}
-            >
-              إلغاء
-            </Button>
-            <Button onClick={handleSavePlan}>حفظ</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Template Dialog */}
-      <Dialog
-        open={isTemplateDialogOpen}
-        onOpenChange={setIsTemplateDialogOpen}
-      >
-        <DialogContent dir="rtl">
-          <DialogHeader>
-            <DialogTitle>
-              {editingTemplate ? "تعديل القالب" : "إضافة قالب جديد"}
-            </DialogTitle>
-            <DialogDescription>
-              {editingTemplate
-                ? "قم بتعديل تفاصيل القالب"
-                : "أدخل تفاصيل القالب الجديد"}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label>اسم القالب</Label>
-              <Input
-                value={templateForm.name}
-                onChange={(e) =>
-                  setTemplateForm({ ...templateForm, name: e.target.value })
-                }
-                placeholder="مثال: سيرة ذاتية احترافية"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>الفئة</Label>
-                <Select
-                  value={templateForm.category}
-                  onValueChange={(v) =>
-                    setTemplateForm({ ...templateForm, category: v })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="cv">سيرة ذاتية</SelectItem>
-                    <SelectItem value="cover-letter">خطاب تقديم</SelectItem>
-                    <SelectItem value="legal">قانوني</SelectItem>
-                    <SelectItem value="business">أعمال</SelectItem>
-                    <SelectItem value="academic">أكاديمي</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>السعر (ر.س)</Label>
+                  <Input
+                    type="number"
+                    value={planForm.price}
+                    onChange={(e) =>
+                      setPlanForm({
+                        ...planForm,
+                        price: Number(e.target.value),
+                      })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>نوع الخطة</Label>
+                  <Select
+                    value={planForm.type}
+                    onValueChange={(v) => setPlanForm({ ...planForm, type: v })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="jobseeker">أفراد</SelectItem>
+                      <SelectItem value="company">شركات</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               <div className="space-y-2">
-                <Label>السعر (ر.س)</Label>
-                <Input
-                  type="number"
-                  value={templateForm.price}
+                <Label>المميزات (سطر لكل ميزة)</Label>
+                <Textarea
+                  value={planForm.features}
                   onChange={(e) =>
-                    setTemplateForm({
-                      ...templateForm,
-                      price: Number(e.target.value),
-                    })
+                    setPlanForm({ ...planForm, features: e.target.value })
                   }
+                  placeholder="ميزة 1&#10;ميزة 2&#10;ميزة 3"
+                  rows={4}
                 />
               </div>
-            </div>
-            <div className="space-y-2">
-              <Label>ملف القالب (Word/PDF)</Label>
-              <Input
-                type="file"
-                accept=".doc,.docx,.pdf"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    setTemplateForm({ ...templateForm, fileName: file.name });
-                  }
-                }}
-              />
-              {templateForm.fileName && (
-                <p className="text-sm text-muted-foreground mt-1">
-                  تم اختيار الملف: {templateForm.fileName}
-                </p>
-              )}
-            </div>
-            <div className="flex items-center justify-between">
-              <Label>قالب مميز (Premium)</Label>
-              <Switch
-                checked={templateForm.isPremium}
-                onCheckedChange={(checked) =>
-                  setTemplateForm({ ...templateForm, isPremium: checked })
-                }
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsTemplateDialogOpen(false)}
-            >
-              إلغاء
-            </Button>
-            <Button onClick={handleSaveTemplate}>حفظ</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
-      {/* Ad Edit Dialog */}
-      <Dialog open={isAdDialogOpen} onOpenChange={setIsAdDialogOpen}>
-        <DialogContent
-          dir="rtl"
-          className="max-w-5xl h-[90vh] overflow-y-auto flex flex-col"
-        >
-          <DialogHeader>
-            <DialogTitle>تعديل الإعلان</DialogTitle>
-            <DialogDescription>تعديل تفاصيل الإعلان الحالي</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label>عنوان الإعلان</Label>
-              <Input
-                value={adForm.title}
-                onChange={(e) =>
-                  setAdForm({ ...adForm, title: e.target.value })
-                }
-                placeholder="عنوان الإعلان"
-              />
+              <div className="border-t pt-4 space-y-4">
+                <h4 className="font-semibold text-sm">إعدادات الخصم</h4>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label>الخصم (%)</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={planForm.discount}
+                      onChange={(e) =>
+                        setPlanForm({
+                          ...planForm,
+                          discount: Number(e.target.value),
+                        })
+                      }
+                      placeholder="0"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>تاريخ البدء</Label>
+                    <Input
+                      type="date"
+                      value={planForm.discountStart}
+                      onChange={(e) =>
+                        setPlanForm({
+                          ...planForm,
+                          discountStart: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>تاريخ الانتهاء</Label>
+                    <Input
+                      type="date"
+                      value={planForm.discountEnd}
+                      onChange={(e) =>
+                        setPlanForm({
+                          ...planForm,
+                          discountEnd: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label>الوصف</Label>
-              <Textarea
-                value={adForm.description}
-                onChange={(e) =>
-                  setAdForm({ ...adForm, description: e.target.value })
-                }
-                placeholder="وصف الإعلان"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>رابط الصورة</Label>
-              <Input
-                value={adForm.imageUrl}
-                onChange={(e) =>
-                  setAdForm({ ...adForm, imageUrl: e.target.value })
-                }
-                dir="ltr"
-                className="text-right"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>الرابط المستهدف</Label>
-              <Input
-                value={adForm.link}
-                onChange={(e) => setAdForm({ ...adForm, link: e.target.value })}
-                dir="ltr"
-                className="text-right"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>المدة</Label>
-              <Select
-                value={adForm.duration}
-                onValueChange={(v) => setAdForm({ ...adForm, duration: v })}
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setIsPlanDialogOpen(false)}
               >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1_month">شهر</SelectItem>
-                  <SelectItem value="2_months">شهرين</SelectItem>
-                  <SelectItem value="3_months">3 أشهر</SelectItem>
-                  <SelectItem value="6_months">6 أشهر</SelectItem>
-                  <SelectItem value="1_year">سنة</SelectItem>
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-muted-foreground mt-1">
-                مدة عرض الإعلان بالأشهر
-              </p>
+                إلغاء
+              </Button>
+              <Button onClick={handleSavePlan}>حفظ</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Template Dialog */}
+        <Dialog
+          open={isTemplateDialogOpen}
+          onOpenChange={setIsTemplateDialogOpen}
+        >
+          <DialogContent dir="rtl">
+            <DialogHeader className="text-right">
+              <DialogTitle className="text-right">
+                {editingTemplate ? "تعديل القالب" : "إضافة قالب جديد"}
+              </DialogTitle>
+              <DialogDescription className="text-right">
+                {editingTemplate
+                  ? "قم بتعديل تفاصيل القالب"
+                  : "أدخل تفاصيل القالب الجديد"}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label>اسم القالب</Label>
+                <Input
+                  value={templateForm.name}
+                  onChange={(e) =>
+                    setTemplateForm({ ...templateForm, name: e.target.value })
+                  }
+                  placeholder="مثال: سيرة ذاتية احترافية"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>الفئة</Label>
+                  <Select
+                    value={templateForm.category}
+                    onValueChange={(v) =>
+                      setTemplateForm({ ...templateForm, category: v })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="cv">سيرة ذاتية</SelectItem>
+                      <SelectItem value="cover-letter">خطاب تقديم</SelectItem>
+                      <SelectItem value="legal">قانوني</SelectItem>
+                      <SelectItem value="business">أعمال</SelectItem>
+                      <SelectItem value="academic">أكاديمي</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>السعر (ر.س)</Label>
+                  <Input
+                    type="number"
+                    value={templateForm.price}
+                    onChange={(e) =>
+                      setTemplateForm({
+                        ...templateForm,
+                        price: Number(e.target.value),
+                      })
+                    }
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>ملف القالب (Word/PDF)</Label>
+                <Input
+                  type="file"
+                  accept=".doc,.docx,.pdf"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setTemplateForm({ ...templateForm, fileName: file.name });
+                    }
+                  }}
+                />
+                {templateForm.fileName && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    تم اختيار الملف: {templateForm.fileName}
+                  </p>
+                )}
+              </div>
+              <div className="flex items-center justify-between">
+                <Label>قالب مميز (Premium)</Label>
+                <Switch
+                  checked={templateForm.isPremium}
+                  onCheckedChange={(checked) =>
+                    setTemplateForm({ ...templateForm, isPremium: checked })
+                  }
+                />
+              </div>
+
+              <div className="border-t pt-4 space-y-4">
+                <h4 className="font-semibold text-sm">إعدادات الخصم</h4>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label>الخصم (%)</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={templateForm.discount}
+                      onChange={(e) =>
+                        setTemplateForm({
+                          ...templateForm,
+                          discount: Number(e.target.value),
+                        })
+                      }
+                      placeholder="0"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>تاريخ البدء</Label>
+                    <Input
+                      type="date"
+                      value={templateForm.discountStart}
+                      onChange={(e) =>
+                        setTemplateForm({
+                          ...templateForm,
+                          discountStart: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>تاريخ الانتهاء</Label>
+                    <Input
+                      type="date"
+                      value={templateForm.discountEnd}
+                      onChange={(e) =>
+                        setTemplateForm({
+                          ...templateForm,
+                          discountEnd: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label>المكان</Label>
-              <AdPlacementSelector
-                selectedPlacement={adForm.placement}
-                onSelect={(value) =>
-                  setAdForm({ ...adForm, placement: value as AdPlacement })
-                }
-                adImage={adForm.imageUrl}
-              />
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setIsTemplateDialogOpen(false)}
+              >
+                إلغاء
+              </Button>
+              <Button onClick={handleSaveTemplate}>حفظ</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Ad Edit Dialog */}
+        <Dialog open={isAdDialogOpen} onOpenChange={setIsAdDialogOpen}>
+          <DialogContent
+            dir="rtl"
+            className="max-w-5xl h-[90vh] overflow-y-auto flex flex-col"
+          >
+            <DialogHeader className="text-right">
+              <DialogTitle className="text-right">تعديل الإعلان</DialogTitle>
+              <DialogDescription className="text-right">
+                تعديل تفاصيل الإعلان الحالي
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label>عنوان الإعلان</Label>
+                <Input
+                  value={adForm.title}
+                  onChange={(e) =>
+                    setAdForm({ ...adForm, title: e.target.value })
+                  }
+                  placeholder="عنوان الإعلان"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>الوصف</Label>
+                <Textarea
+                  value={adForm.description}
+                  onChange={(e) =>
+                    setAdForm({ ...adForm, description: e.target.value })
+                  }
+                  placeholder="وصف الإعلان"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>رابط الصورة</Label>
+                <Input
+                  value={adForm.imageUrl}
+                  onChange={(e) =>
+                    setAdForm({ ...adForm, imageUrl: e.target.value })
+                  }
+                  dir="ltr"
+                  className="text-right"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>الرابط المستهدف</Label>
+                <Input
+                  value={adForm.link}
+                  onChange={(e) =>
+                    setAdForm({ ...adForm, link: e.target.value })
+                  }
+                  dir="ltr"
+                  className="text-right"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>المدة</Label>
+                <Select
+                  value={adForm.duration}
+                  onValueChange={(v) => setAdForm({ ...adForm, duration: v })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1_month">شهر</SelectItem>
+                    <SelectItem value="2_months">شهرين</SelectItem>
+                    <SelectItem value="3_months">3 أشهر</SelectItem>
+                    <SelectItem value="6_months">6 أشهر</SelectItem>
+                    <SelectItem value="1_year">سنة</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1">
+                  مدة عرض الإعلان بالأشهر
+                </p>
+              </div>
+              <div className="space-y-2">
+                <Label>المكان</Label>
+                <AdPlacementSelector
+                  selectedPlacement={adForm.placement}
+                  onSelect={(value) =>
+                    setAdForm({ ...adForm, placement: value as AdPlacement })
+                  }
+                  adImage={adForm.imageUrl}
+                />
+              </div>
             </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsAdDialogOpen(false)}>
-              إلغاء
-            </Button>
-            <Button onClick={handleSaveAdRequest}>حفظ التغييرات</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setIsAdDialogOpen(false)}
+              >
+                إلغاء
+              </Button>
+              <Button onClick={handleSaveAdRequest}>حفظ التغييرات</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Template Delete Confirmation Dialog */}
+        <AlertDialog
+          open={!!templateToDelete}
+          onOpenChange={(open) => !open && setTemplateToDelete(null)}
+        >
+          <AlertDialogContent dir="rtl">
+            <AlertDialogHeader className="text-right">
+              <AlertDialogTitle className="text-right">
+                هل أنت متأكد من حذف هذا القالب؟
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-right">
+                لا يمكن التراجع عن هذا الإجراء بعد الحذف سيتم إزالة القالب
+                نهائياً من النظام.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="sm:justify-end gap-2">
+              <AlertDialogCancel onClick={() => setTemplateToDelete(null)}>
+                إلغاء
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  if (templateToDelete) handleDeleteTemplate(templateToDelete);
+                }}
+                className="bg-red-600 hover:bg-red-700 mx-0"
+              >
+                حذف
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* Ad Delete Confirmation Dialog */}
+        <AlertDialog
+          open={!!adToDelete}
+          onOpenChange={(open) => !open && setAdToDelete(null)}
+        >
+          <AlertDialogContent dir="rtl">
+            <AlertDialogHeader className="text-right">
+              <AlertDialogTitle className="text-right">
+                هل أنت متأكد من حذف هذا الإعلان؟
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-right">
+                لا يمكن التراجع عن هذا الإجراء بعد الحذف سيتم إزالة الإعلان
+                نهائياً من النظام.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="sm:justify-end gap-2">
+              <AlertDialogCancel onClick={() => setAdToDelete(null)}>
+                إلغاء
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  if (adToDelete) handleDeleteAd(adToDelete);
+                }}
+                className="bg-red-600 hover:bg-red-700 mx-0"
+              >
+                حذف
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
+    </AdminDashboardLayout>
   );
 };
 
