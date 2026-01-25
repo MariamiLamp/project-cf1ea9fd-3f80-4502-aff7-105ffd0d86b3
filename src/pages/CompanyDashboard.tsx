@@ -41,6 +41,16 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import useAds, { AdPlacement } from "@/hooks/use-ads";
@@ -286,6 +296,7 @@ const CompanyDashboard = () => {
     placement: "hero-bottom",
     duration: "1_month",
   });
+  const [adToDelete, setAdToDelete] = useState<string | null>(null);
 
   // Filters for Applications
   const [filterStatus, setFilterStatus] = useState<string>("all");
@@ -797,7 +808,7 @@ const CompanyDashboard = () => {
       </div>
       <Card>
         <CardHeader className="text-right">
-          <div className="flex items-center justify-between flex-row-reverse">
+          <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2">
               <Briefcase className="w-5 h-5" />
               <span>الوظائف المنشورة</span>
@@ -1074,7 +1085,23 @@ const CompanyDashboard = () => {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="secondary">{job.applications} طلب</Badge>
+                    <Badge
+                      variant="secondary"
+                      className="cursor-pointer hover:bg-secondary/80 transition-colors"
+                      onClick={() => {
+                        setFilterJob(job.title);
+                        setAppliedFilters({
+                          status: "all",
+                          date: "",
+                          matchScore: "all",
+                          experience: "all",
+                          job: job.title,
+                        });
+                        setActiveTab("applications");
+                      }}
+                    >
+                      {job.applications} طلب
+                    </Badge>
                   </TableCell>
                   <TableCell>
                     {job.location.split(" - ")[1] || job.location}
@@ -1263,11 +1290,13 @@ const CompanyDashboard = () => {
                               setFilterJob("all");
                               setFilterDate("");
                               setFilterMatchScore("all");
+                              setFilterExperience("all");
                               setAppliedFilters({
                                 status: "all",
                                 job: "all",
                                 date: "",
                                 matchScore: "all",
+                                experience: "all",
                               });
                             }}
                           >
@@ -1284,43 +1313,11 @@ const CompanyDashboard = () => {
               {/* Desktop Filters */}
               <div className="hidden md:flex flex-wrap items-center justify-start gap-3 w-full">
                 <div className="flex flex-wrap items-center gap-2">
-                  <div className="flex items-center gap-2 border-r pr-2 mr-2">
-                    {(appliedFilters.status !== "all" ||
-                      appliedFilters.job !== "all" ||
-                      appliedFilters.date ||
-                      appliedFilters.matchScore !== "all") && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setFilterStatus("all");
-                          setFilterJob("all");
-                          setFilterDate("");
-                          setFilterMatchScore("all");
-                          setAppliedFilters({
-                            status: "all",
-                            job: "all",
-                            date: "",
-                            matchScore: "all",
-                          });
-                        }}
-                        className="h-8 w-[130px] min-w-fit gap-2"
-                      >
-                        <X className="w-3 h-3" />
-                        مسح
-                      </Button>
-                    )}
-                    <Button
-                      size="sm"
-                      onClick={handleApplyFilters}
-                      className="h-8 w-[130px] gap-2"
-                    >
-                      <ListFilter className="w-3 h-3" />
-                      تصفية
-                    </Button>
-                  </div>
-
-                  <Select value={filterStatus} onValueChange={setFilterStatus}>
+                  <Select
+                    dir="rtl"
+                    value={filterStatus}
+                    onValueChange={setFilterStatus}
+                  >
                     <SelectTrigger className="w-[130px] h-8 text-xs">
                       <SelectValue placeholder="الحالة" />
                     </SelectTrigger>
@@ -1336,7 +1333,11 @@ const CompanyDashboard = () => {
                     </SelectContent>
                   </Select>
 
-                  <Select value={filterJob} onValueChange={setFilterJob}>
+                  <Select
+                    dir="rtl"
+                    value={filterJob}
+                    onValueChange={setFilterJob}
+                  >
                     <SelectTrigger className="w-[150px] h-8 text-xs">
                       <SelectValue placeholder="الوظيفة" />
                     </SelectTrigger>
@@ -1358,10 +1359,14 @@ const CompanyDashboard = () => {
                   />
 
                   <Select
+                    dir="rtl"
                     value={filterMatchScore}
                     onValueChange={setFilterMatchScore}
                   >
-                    <SelectTrigger className="w-[130px] h-8 text-xs">
+                    <SelectTrigger className="h-8 text-xs gap-2 w-[200px]">
+                      <span className="text-muted-foreground whitespace-nowrap">
+                        نسبة التوافق:
+                      </span>
                       <SelectValue placeholder="نسبة التوافق" />
                     </SelectTrigger>
                     <SelectContent>
@@ -1371,6 +1376,44 @@ const CompanyDashboard = () => {
                       <SelectItem value="70">70% فما فوق</SelectItem>
                     </SelectContent>
                   </Select>
+
+                  <div className="flex items-center gap-2 border-r pr-2 mr-2">
+                    {(appliedFilters.status !== "all" ||
+                      appliedFilters.job !== "all" ||
+                      appliedFilters.date ||
+                      appliedFilters.matchScore !== "all") && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setFilterStatus("all");
+                          setFilterJob("all");
+                          setFilterDate("");
+                          setFilterMatchScore("all");
+                          setFilterExperience("all");
+                          setAppliedFilters({
+                            status: "all",
+                            job: "all",
+                            date: "",
+                            matchScore: "all",
+                            experience: "all",
+                          });
+                        }}
+                        className="h-8 w-[130px] min-w-fit gap-2"
+                      >
+                        <X className="w-3 h-3" />
+                        مسح
+                      </Button>
+                    )}
+                    <Button
+                      size="sm"
+                      onClick={handleApplyFilters}
+                      className="h-8 w-[130px] gap-2"
+                    >
+                      <ListFilter className="w-3 h-3" />
+                      تصفية
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1392,6 +1435,7 @@ const CompanyDashboard = () => {
                 <TableHead>الحالة</TableHead>
                 <TableHead>تاريخ التقديم</TableHead>
                 <TableHead>نسبة التوافق</TableHead>
+                <TableHead>مدة الخبرة</TableHead>
                 <TableHead>الوظيفة</TableHead>
                 <TableHead>اسم المتقدم</TableHead>
               </TableRow>
@@ -1424,6 +1468,7 @@ const CompanyDashboard = () => {
                         {app.matchScore}%
                       </Badge>
                     </TableCell>
+                    <TableCell>{app.experience}</TableCell>
                     <TableCell>{app.jobTitle}</TableCell>
                     <TableCell className="font-medium">
                       <button
@@ -1437,7 +1482,7 @@ const CompanyDashboard = () => {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8">
+                  <TableCell colSpan={7} className="text-center py-8">
                     <div className="flex flex-col items-center gap-3 text-muted-foreground">
                       <Search className="w-8 h-8 opacity-20" />
                       <p>لا توجد طلبات تطابق معايير البحث</p>
@@ -1486,7 +1531,7 @@ const CompanyDashboard = () => {
       </div>
       <Card>
         <CardHeader className="text-right">
-          <CardTitle className="flex items-center justify-end gap-2">
+          <CardTitle className="flex items-center gap-2">
             <span>بانر الشركة</span>
             <Image className="w-5 h-5 text-primary" />
           </CardTitle>
@@ -1496,14 +1541,6 @@ const CompanyDashboard = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid md:grid-cols-2 gap-4">
-            <div className="h-[600px] sticky top-4">
-              <AdPlacementSelector
-                selectedPlacement={adForm.placement}
-                onSelect={(value) => setAdForm({ ...adForm, placement: value })}
-                adImage={adForm.imageUrl}
-              />
-            </div>
-
             <div className="space-y-4">
               <div className="space-y-2 text-right">
                 <Label>عنوان البانر</Label>
@@ -1577,13 +1614,21 @@ const CompanyDashboard = () => {
                 </Button>
               </div>
             </div>
+
+            <div className="h-[600px] sticky top-4">
+              <AdPlacementSelector
+                selectedPlacement={adForm.placement}
+                onSelect={(value) => setAdForm({ ...adForm, placement: value })}
+                adImage={adForm.imageUrl}
+              />
+            </div>
           </div>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader className="text-right">
-          <CardTitle className="flex items-center justify-end gap-2">
+          <CardTitle className="flex items-center gap-2">
             <span>الوظائف المميزة</span>
             <Star className="w-5 h-5 text-amber-500" />
           </CardTitle>
@@ -1691,7 +1736,7 @@ const CompanyDashboard = () => {
       </div>
       <Card>
         <CardHeader className="text-right">
-          <CardTitle className="flex items-center justify-end gap-2">
+          <CardTitle className="flex items-center gap-2">
             <span>الإعلانات الحالية</span>
             <Megaphone className="w-5 h-5 text-primary" />
           </CardTitle>
@@ -1711,16 +1756,6 @@ const CompanyDashboard = () => {
                   key={a.id}
                   className="flex items-center justify-between p-2 border rounded-md"
                 >
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleRemoveAd(a.id)}
-                      className="text-destructive"
-                    >
-                      حذف
-                    </Button>
-                  </div>
                   <div className="flex items-center gap-3">
                     <div className="w-24 h-12 rounded overflow-hidden bg-muted">
                       <img
@@ -1740,19 +1775,59 @@ const CompanyDashboard = () => {
                       </div>
                     </div>
                   </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setAdToDelete(String(a.id))}
+                      className="text-destructive"
+                    >
+                      حذف
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
           )}
         </CardContent>
       </Card>
+
+      <AlertDialog
+        open={!!adToDelete}
+        onOpenChange={(open) => !open && setAdToDelete(null)}
+      >
+        <AlertDialogContent dir="rtl">
+          <AlertDialogHeader className="text-right sm:text-right">
+            <AlertDialogTitle className="text-right">
+              هل أنت متأكد من حذف هذا الإعلان؟
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-right">
+              لا يمكن التراجع عن هذا الإجراء بعد الحذف.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="sm:justify-end gap-2">
+            <AlertDialogCancel onClick={() => setAdToDelete(null)}>
+              إلغاء
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (adToDelete) handleRemoveAd(adToDelete as any);
+                setAdToDelete(null);
+              }}
+              className="bg-red-600 hover:bg-red-700 mx-0"
+            >
+              حذف
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 
   const renderGenerator = () => (
     <Card>
       <CardHeader className="text-right">
-        <CardTitle className="flex items-center justify-end gap-2">
+        <CardTitle className="flex items-center gap-2">
           <span>مولد الوصف الوظيفي</span>
           <Sparkles className="w-5 h-5 text-primary" />
         </CardTitle>
@@ -1915,6 +1990,23 @@ const CompanyDashboard = () => {
                       <p className="font-bold text-lg">
                         {selectedApplication.matchScore}%
                       </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 pt-2">
+                    <Label className="text-base font-semibold">المهارات</Label>
+                    <div className="flex flex-wrap gap-2">
+                      {candidates
+                        .find((c) => c.id === selectedApplication.candidateId)
+                        ?.skills?.map((skill) => (
+                          <Badge
+                            key={skill}
+                            variant="secondary"
+                            className="bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200"
+                          >
+                            {skill}
+                          </Badge>
+                        ))}
                     </div>
                   </div>
 
