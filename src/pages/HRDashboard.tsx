@@ -41,8 +41,10 @@ import {
   Download,
   User,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import useAds from "@/hooks/use-ads";
 
 // Mock CVs created by HR
 interface CreatedCV {
@@ -134,6 +136,9 @@ const HRDashboard = () => {
   const [showNewCVDialog, setShowNewCVDialog] = useState(false);
   const [newCandidateName, setNewCandidateName] = useState("");
   const [newJobTitle, setNewJobTitle] = useState("");
+  const adsHook = useAds();
+  const heroAds = adsHook.getByPlacement("hero-bottom");
+  const atsAds = adsHook.getByPlacement("ats-bottom");
 
   const handleCreateNewCV = () => {
     if (!newCandidateName.trim() || !newJobTitle.trim()) {
@@ -178,10 +183,30 @@ const HRDashboard = () => {
 
   return (
     <DashboardLayout>
-      {/* Welcome Section */}
       <div className="mb-8">
         <WelcomeCard userName={user?.name || "مسؤول الموارد البشرية"} />
       </div>
+
+      {/* Hero placement ad */}
+      {heroAds.length > 0 && (
+        <div className="mb-6 group">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium mr-1">
+              إعلان برعاية
+            </span>
+          </div>
+          <Link
+            to={heroAds[0].link || "/subscription"}
+            className="block overflow-hidden rounded-xl border border-border/50 hover:border-primary/30 transition-all hover:shadow-lg"
+          >
+            <img
+              src={heroAds[0].imageUrl}
+              alt={heroAds[0].title || "Premium Subscription Ad"}
+              className="w-full h-auto max-h-[200px] object-cover transition-transform duration-500 group-hover:scale-[1.01]"
+            />
+          </Link>
+        </div>
+      )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -221,6 +246,27 @@ const HRDashboard = () => {
             {/* Right Column */}
             <div className="space-y-6">
               <CVScoreCard />
+
+              {/* ATS placement ad */}
+              {atsAds.length > 0 && (
+                <div className="mt-4 group">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium mr-1">
+                      إعلان برعاية
+                    </span>
+                  </div>
+                  <Link
+                    to={atsAds[0].link || "/cv-check"}
+                    className="block overflow-hidden rounded-xl border border-border/50 hover:border-primary/30 transition-all hover:shadow-lg"
+                  >
+                    <img
+                      src={atsAds[0].imageUrl}
+                      alt={atsAds[0].title || "ATS Check Ad"}
+                      className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                    />
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </TabsContent>
