@@ -187,7 +187,8 @@ const mockHRProfiles = [
     email: "khaled@hr.com",
     company: "شركة التقنية المتقدمة",
     role: "مدير الموارد البشرية",
-    hiredCount: 45,
+    cvsCount: 124,
+    subscription: "احترافي",
     status: "active",
   },
   {
@@ -196,7 +197,8 @@ const mockHRProfiles = [
     email: "noura@hr.com",
     company: "مجموعة الاستثمار",
     role: "أخصائي توظيف",
-    hiredCount: 32,
+    cvsCount: 85,
+    subscription: "مجاني",
     status: "active",
   },
   {
@@ -205,7 +207,8 @@ const mockHRProfiles = [
     email: "saud@hr.com",
     company: "شركة البناء الحديث",
     role: "مدير التوظيف",
-    hiredCount: 28,
+    cvsCount: 42,
+    subscription: "مميز",
     status: "inactive",
   },
   {
@@ -214,7 +217,8 @@ const mockHRProfiles = [
     email: "hind@hr.com",
     company: "مؤسسة الصحة",
     role: "مسؤول الموارد البشرية",
-    hiredCount: 55,
+    cvsCount: 210,
+    subscription: "مميز",
     status: "active",
   },
 ];
@@ -1076,10 +1080,8 @@ const AdminDashboard = () => {
                   <TableHeader>
                     <TableRow>
                       <TableHead>الإجراءات</TableHead>
-                      <TableHead>عدد التوظيفات</TableHead>
-                      <TableHead>الحالة</TableHead>
-                      <TableHead>المسمى الوظيفي</TableHead>
-                      <TableHead>الشركة</TableHead>
+                      <TableHead>خطة الاشتراك</TableHead>
+                      <TableHead>عدد السير الذاتية</TableHead>
                       <TableHead>البريد الإلكتروني</TableHead>
                       <TableHead>الاسم</TableHead>
                     </TableRow>
@@ -1104,21 +1106,18 @@ const AdminDashboard = () => {
                             </div>
                           </TableCell>
                           <TableCell>
-                            <Badge variant="secondary">
-                              {hr.hiredCount} موظف
+                            <Badge variant="outline" className="gap-1">
+                              {hr.subscription === "مميز" && (
+                                <Crown className="w-3 h-3 text-amber-500" />
+                              )}
+                              {hr.subscription}
                             </Badge>
                           </TableCell>
                           <TableCell>
-                            <Badge
-                              variant={
-                                hr.status === "active" ? "default" : "secondary"
-                              }
-                            >
-                              {hr.status === "active" ? "نشط" : "غير نشط"}
+                            <Badge variant="secondary">
+                              {hr.cvsCount} سيرة
                             </Badge>
                           </TableCell>
-                          <TableCell>{hr.role}</TableCell>
-                          <TableCell>{hr.company}</TableCell>
                           <TableCell className="text-muted-foreground">
                             {hr.email}
                           </TableCell>
