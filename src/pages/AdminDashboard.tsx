@@ -66,6 +66,8 @@ import {
   Star,
   Download,
   DollarSign,
+  Filter,
+  RotateCcw,
   Percent,
   Package,
   Settings,
@@ -76,6 +78,7 @@ import {
   X,
 } from "lucide-react";
 import { AdPlacementSelector } from "@/components/dashboard/AdPlacementSelector";
+import { DataTableFilters } from "@/components/dashboard/DataTableFilters";
 import { AdminDashboardLayout } from "@/components/layout/AdminDashboardLayout";
 
 // Mock data - Users
@@ -90,6 +93,7 @@ const mockUsers = [
     appliedJobs: 12,
     joinDate: "2024-01-15",
     subscription: "مجاني",
+    location: "الرياض",
   },
   {
     id: 2,
@@ -101,6 +105,7 @@ const mockUsers = [
     appliedJobs: 8,
     joinDate: "2024-02-20",
     subscription: "احترافي",
+    location: "جدة",
   },
   {
     id: 3,
@@ -112,6 +117,7 @@ const mockUsers = [
     appliedJobs: 5,
     joinDate: "2024-03-10",
     subscription: "مجاني",
+    location: "الدمام",
   },
   {
     id: 4,
@@ -123,6 +129,7 @@ const mockUsers = [
     appliedJobs: 15,
     joinDate: "2024-01-05",
     subscription: "مميز",
+    location: "مكة المكرمة",
   },
   {
     id: 5,
@@ -146,6 +153,7 @@ const mockCompanies = [
     jobs: 15,
     employees: 250,
     industry: "تقنية المعلومات",
+    location: "الرياض",
     subscription: "شركات+",
   },
   {
@@ -156,6 +164,7 @@ const mockCompanies = [
     jobs: 8,
     employees: 500,
     industry: "المالية",
+    location: "جدة",
     subscription: "شركات",
   },
   {
@@ -166,6 +175,7 @@ const mockCompanies = [
     jobs: 12,
     employees: 150,
     industry: "البناء والتشييد",
+    location: "الدمام",
     subscription: "مجاني",
   },
   {
@@ -375,6 +385,74 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("users");
+  // Job Seeker filters
+  const [jobSeekerFilters, setJobSeekerFilters] = useState({
+    minAppliedJobs: 0,
+    subscription: "all",
+  });
+
+  const [appliedJobSeekerFilters, setAppliedJobSeekerFilters] = useState({
+    minAppliedJobs: 0,
+    subscription: "all",
+  });
+
+  const handleApplyJobSeekerFilters = () => {
+    setAppliedJobSeekerFilters({ ...jobSeekerFilters });
+    toast({
+      title: "تم تطبيق التصفية",
+      description: "تم تحديث قائمة الباحثين عن عمل بنجاح",
+    });
+  };
+
+  const handleResetJobSeekerFilters = () => {
+    const defaultFilters = {
+      minAppliedJobs: 0,
+      subscription: "all",
+    };
+    setJobSeekerFilters(defaultFilters);
+    setAppliedJobSeekerFilters(defaultFilters);
+    setSearchTerm("");
+    toast({
+      title: "تم مسح التصفية",
+      description: "تم استعادة قائمة الباحثين عن عمل كاملة",
+    });
+  };
+
+  // Company filters
+  const [companyFilters, setCompanyFilters] = useState({
+    location: "all",
+    industry: "all",
+    minJobs: 0,
+  });
+
+  const [appliedCompanyFilters, setAppliedCompanyFilters] = useState({
+    location: "all",
+    industry: "all",
+    minJobs: 0,
+  });
+
+  const handleApplyCompanyFilters = () => {
+    setAppliedCompanyFilters({ ...companyFilters });
+    toast({
+      title: "تم تطبيق التصفية",
+      description: "تم تحديث البيانات بناءً على اختياراتك",
+    });
+  };
+
+  const handleResetCompanyFilters = () => {
+    const defaultFilters = {
+      location: "all",
+      industry: "all",
+      minJobs: 0,
+    };
+    setCompanyFilters(defaultFilters);
+    setAppliedCompanyFilters(defaultFilters);
+    setSearchTerm("");
+    toast({
+      title: "تم مسح التصفية",
+      description: "تم استعادة كافة البيانات",
+    });
+  };
 
   // Plans state
   const [plans, setPlans] = useState(mockPlans);
@@ -889,10 +967,61 @@ const AdminDashboard = () => {
           <TabsContent value="users">
             <Card>
               <CardHeader className="text-right [&_th]:text-right [&_td]:text-right">
-                <CardTitle className="flex items-center justify-end gap-2">
-                  <span>قائمة الباحثين عن عمل</span>
-                  <Users className="w-5 h-5" />
-                </CardTitle>
+                <div className="flex flex-col gap-4">
+                  <CardTitle className="flex items-center justify-end gap-2">
+                    <span>قائمة الباحثين عن عمل</span>
+                    <Users className="w-5 h-5" />
+                  </CardTitle>
+
+                  <DataTableFilters
+                    onClear={handleResetJobSeekerFilters}
+                    onApply={handleApplyJobSeekerFilters}
+                    hasFilters={
+                      jobSeekerFilters.minAppliedJobs !== 0 ||
+                      jobSeekerFilters.subscription !== "all" ||
+                      searchTerm !== ""
+                    }
+                  >
+                    <div className="space-y-2">
+                      <Label>الاشتراك</Label>
+                      <Select
+                        value={jobSeekerFilters.subscription}
+                        onValueChange={(v) =>
+                          setJobSeekerFilters({
+                            ...jobSeekerFilters,
+                            subscription: v,
+                          })
+                        }
+                        dir="rtl"
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="كل الاشتراكات" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">كل الاشتراكات</SelectItem>
+                          <SelectItem value="مجاني">مجاني</SelectItem>
+                          <SelectItem value="احترافي">احترافي</SelectItem>
+                          <SelectItem value="مميز">مميز</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>الحد الأدنى للوظائف المتقدم لها</Label>
+                      <Input
+                        type="number"
+                        min="0"
+                        value={jobSeekerFilters.minAppliedJobs}
+                        onChange={(e) =>
+                          setJobSeekerFilters({
+                            ...jobSeekerFilters,
+                            minAppliedJobs: Number(e.target.value),
+                          })
+                        }
+                        placeholder="0"
+                      />
+                    </div>
+                  </DataTableFilters>
+                </div>
               </CardHeader>
               <CardContent>
                 <Table
@@ -903,7 +1032,7 @@ const AdminDashboard = () => {
                     <TableRow>
                       <TableHead>الإجراءات</TableHead>
                       <TableHead>تاريخ الانضمام</TableHead>
-                      <TableHead>الوظائف المتقدم لها</TableHead>
+                      <TableHead>وظائف قدم عليها</TableHead>
                       <TableHead>نقاط السيرة</TableHead>
                       <TableHead>الاشتراك</TableHead>
                       <TableHead>الحالة</TableHead>
@@ -913,11 +1042,23 @@ const AdminDashboard = () => {
                   </TableHeader>
                   <TableBody>
                     {mockUsers
-                      .filter(
-                        (u) =>
+                      .filter((u) => {
+                        const matchesSearch =
                           u.name.includes(searchTerm) ||
-                          u.email.includes(searchTerm),
-                      )
+                          u.email.includes(searchTerm);
+                        const matchesSubscription =
+                          appliedJobSeekerFilters.subscription === "all" ||
+                          u.subscription ===
+                            appliedJobSeekerFilters.subscription;
+                        const matchesAppliedJobs =
+                          u.appliedJobs >=
+                          appliedJobSeekerFilters.minAppliedJobs;
+                        return (
+                          matchesSearch &&
+                          matchesSubscription &&
+                          matchesAppliedJobs
+                        );
+                      })
                       .map((user) => (
                         <TableRow key={user.id}>
                           <TableCell>
@@ -982,10 +1123,85 @@ const AdminDashboard = () => {
           <TabsContent value="companies">
             <Card>
               <CardHeader className="text-right [&_th]:text-right [&_td]:text-right">
-                <CardTitle className="flex items-center justify-end gap-2">
-                  <span>قائمة الشركات</span>
-                  <Building2 className="w-5 h-5" />
-                </CardTitle>
+                <div className="flex flex-col gap-4">
+                  <CardTitle className="flex items-center justify-end gap-2">
+                    <span>قائمة الشركات</span>
+                    <Building2 className="w-5 h-5" />
+                  </CardTitle>
+
+                  <DataTableFilters
+                    onClear={handleResetCompanyFilters}
+                    onApply={handleApplyCompanyFilters}
+                    hasFilters={
+                      companyFilters.location !== "all" ||
+                      companyFilters.industry !== "all" ||
+                      companyFilters.minJobs !== 0 ||
+                      searchTerm !== ""
+                    }
+                  >
+                    <div className="space-y-2">
+                      <Label>الموقع</Label>
+                      <Select
+                        value={companyFilters.location}
+                        onValueChange={(v) =>
+                          setCompanyFilters({ ...companyFilters, location: v })
+                        }
+                        dir="rtl"
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="كل المواقع" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">كل المواقع</SelectItem>
+                          <SelectItem value="الرياض">الرياض</SelectItem>
+                          <SelectItem value="جدة">جدة</SelectItem>
+                          <SelectItem value="الدمام">الدمام</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>النشاط (القطاع)</Label>
+                      <Select
+                        value={companyFilters.industry}
+                        onValueChange={(v) =>
+                          setCompanyFilters({ ...companyFilters, industry: v })
+                        }
+                        dir="rtl"
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="كل الأنشطة" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">كل الأنشطة</SelectItem>
+                          <SelectItem value="تقنية المعلومات">
+                            تقنية المعلومات
+                          </SelectItem>
+                          <SelectItem value="المالية">المالية</SelectItem>
+                          <SelectItem value="البناء والتشييد">
+                            البناء والتشييد
+                          </SelectItem>
+                          <SelectItem value="الرعاية الصحية">
+                            الرعاية الصحية
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>الحد الأدنى للوظائف</Label>
+                      <Input
+                        type="number"
+                        value={companyFilters.minJobs}
+                        onChange={(e) =>
+                          setCompanyFilters({
+                            ...companyFilters,
+                            minJobs: Number(e.target.value),
+                          })
+                        }
+                        placeholder="0"
+                      />
+                    </div>
+                  </DataTableFilters>
+                </div>
               </CardHeader>
               <CardContent>
                 <Table
@@ -995,6 +1211,7 @@ const AdminDashboard = () => {
                   <TableHeader>
                     <TableRow>
                       <TableHead>الإجراءات</TableHead>
+                      <TableHead>الموقع</TableHead>
                       <TableHead>الوظائف المنشورة</TableHead>
                       <TableHead>عدد الموظفين</TableHead>
                       <TableHead>القطاع</TableHead>
@@ -1006,11 +1223,25 @@ const AdminDashboard = () => {
                   </TableHeader>
                   <TableBody>
                     {mockCompanies
-                      .filter(
-                        (c) =>
+                      .filter((c) => {
+                        const matchesSearch =
                           c.name.includes(searchTerm) ||
-                          c.email.includes(searchTerm),
-                      )
+                          c.email.includes(searchTerm);
+                        const matchesLocation =
+                          appliedCompanyFilters.location === "all" ||
+                          c.location === appliedCompanyFilters.location;
+                        const matchesIndustry =
+                          appliedCompanyFilters.industry === "all" ||
+                          c.industry === appliedCompanyFilters.industry;
+                        const matchesJobs =
+                          c.jobs >= appliedCompanyFilters.minJobs;
+                        return (
+                          matchesSearch &&
+                          matchesLocation &&
+                          matchesIndustry &&
+                          matchesJobs
+                        );
+                      })
                       .map((company) => (
                         <TableRow key={company.id}>
                           <TableCell>
@@ -1025,6 +1256,7 @@ const AdminDashboard = () => {
                               )}
                             </div>
                           </TableCell>
+                          <TableCell>{company.location}</TableCell>
                           <TableCell>{company.jobs}</TableCell>
                           <TableCell>{company.employees}</TableCell>
                           <TableCell>{company.industry}</TableCell>
