@@ -1,15 +1,12 @@
 import { Link, useLocation } from "react-router-dom";
 import {
-  LayoutDashboard,
   Briefcase,
   FileText,
   Megaphone,
-  Settings,
   ChevronLeft,
   ChevronRight,
   LogOut,
   Building2,
-  Sparkles,
   Image,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -21,16 +18,10 @@ interface CompanySidebarProps {
 }
 
 const navItems = [
-  { icon: LayoutDashboard, label: "لوحة التحكم", value: "overview" },
   { icon: Briefcase, label: "الوظائف", value: "jobs" },
   { icon: FileText, label: "الطلبات", value: "applications" },
   { icon: Megaphone, label: "الترويج", value: "promotion" },
   { icon: Image, label: "الإعلانات", value: "ads" },
-  { icon: Sparkles, label: "مولد الوصف", value: "generator" },
-];
-
-const bottomNavItems = [
-  { icon: Settings, label: "الإعدادات", path: "/settings" },
 ];
 
 export const CompanySidebar = ({ activeTab, onTabChange }: CompanySidebarProps) => {
@@ -96,16 +87,6 @@ export const CompanySidebar = ({ activeTab, onTabChange }: CompanySidebarProps) 
 
       {/* Bottom Navigation */}
       <div className="p-4 border-t border-sidebar-border space-y-2">
-        {bottomNavItems.map((item) => (
-          <Link
-            key={item.path}
-            to={item.path}
-            className={cn("nav-item", collapsed && "justify-center px-2")}
-          >
-            <item.icon className="w-5 h-5 text-sidebar-foreground/70 shrink-0" />
-            {!collapsed && <span>{item.label}</span>}
-          </Link>
-        ))}
         <Link
           to="/auth"
           className={cn("nav-item w-full", collapsed && "justify-center px-2")}
