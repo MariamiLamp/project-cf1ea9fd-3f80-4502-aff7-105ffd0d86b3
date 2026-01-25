@@ -318,7 +318,7 @@ const CompanyDashboard = () => {
     status: "",
   });
 
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState("jobs");
 
   const handleLogout = () => {
     logout();
@@ -641,6 +641,13 @@ const CompanyDashboard = () => {
   );
 
   const renderJobs = () => (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard title="الوظائف النشطة" value="12" icon={Briefcase} variant="primary" delay={100} />
+        <StatCard title="إجمالي الطلبات" value="156" icon={FileText} variant="success" delay={200} />
+        <StatCard title="المرشحون المتوافقون" value="48" icon={Users} variant="info" delay={300} />
+        <StatCard title="معدل القبول" value="32%" icon={TrendingUp} variant="warning" delay={400} />
+      </div>
     <Card>
       <CardHeader className="text-right">
         <div className="flex items-center justify-between">
@@ -870,9 +877,17 @@ const CompanyDashboard = () => {
         </Table>
       </CardContent>
     </Card>
+    </div>
   );
 
   const renderApplications = () => (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard title="الوظائف النشطة" value="12" icon={Briefcase} variant="primary" delay={100} />
+        <StatCard title="إجمالي الطلبات" value="156" icon={FileText} variant="success" delay={200} />
+        <StatCard title="المرشحون المتوافقون" value="48" icon={Users} variant="info" delay={300} />
+        <StatCard title="معدل القبول" value="32%" icon={TrendingUp} variant="warning" delay={400} />
+      </div>
     <Card>
       <CardHeader>
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 w-full">
@@ -1111,10 +1126,17 @@ const CompanyDashboard = () => {
         </Table>
       </CardContent>
     </Card>
+    </div>
   );
 
   const renderPromotion = () => (
     <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard title="الوظائف النشطة" value="12" icon={Briefcase} variant="primary" delay={100} />
+        <StatCard title="إجمالي الطلبات" value="156" icon={FileText} variant="success" delay={200} />
+        <StatCard title="المرشحون المتوافقون" value="48" icon={Users} variant="info" delay={300} />
+        <StatCard title="معدل القبول" value="32%" icon={TrendingUp} variant="warning" delay={400} />
+      </div>
       <Card>
         <CardHeader className="text-right">
           <CardTitle className="flex items-center justify-end gap-2">
@@ -1246,6 +1268,13 @@ const CompanyDashboard = () => {
   );
 
   const renderAds = () => (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard title="الوظائف النشطة" value="12" icon={Briefcase} variant="primary" delay={100} />
+        <StatCard title="إجمالي الطلبات" value="156" icon={FileText} variant="success" delay={200} />
+        <StatCard title="المرشحون المتوافقون" value="48" icon={Users} variant="info" delay={300} />
+        <StatCard title="معدل القبول" value="32%" icon={TrendingUp} variant="warning" delay={400} />
+      </div>
     <Card>
       <CardHeader className="text-right">
         <CardTitle className="flex items-center justify-end gap-2">
@@ -1281,6 +1310,7 @@ const CompanyDashboard = () => {
         )}
       </CardContent>
     </Card>
+    </div>
   );
 
   const renderGenerator = () => (
@@ -1342,12 +1372,10 @@ const CompanyDashboard = () => {
   return (
     <CompanyDashboardLayout activeTab={activeTab} onTabChange={setActiveTab}>
       <div className="space-y-6">
-        {activeTab === "overview" && renderOverview()}
         {activeTab === "jobs" && renderJobs()}
         {activeTab === "applications" && renderApplications()}
         {activeTab === "promotion" && renderPromotion()}
         {activeTab === "ads" && renderAds()}
-        {activeTab === "generator" && renderGenerator()}
 
         {/* Edit Job Dialog */}
         <Dialog open={isEditJobOpen} onOpenChange={setIsEditJobOpen}>
