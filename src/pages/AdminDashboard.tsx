@@ -1617,17 +1617,20 @@ const AdminDashboard = () => {
                 </Card>
               </div>
 
-              <Tabs defaultValue="jobseeker" className="space-y-6">
-                <TabsList className="bg-muted/50 p-1 flex justify-end flex-wrap gap-1">
-                  <TabsTrigger value="hr" className="gap-2">
+              <Tabs
+                defaultValue="jobseeker"
+                className="space-y-6 w-full overflow-hidden"
+              >
+                <TabsList className="bg-muted/50 p-1 flex justify-start md:justify-end overflow-x-auto no-scrollbar gap-1 w-full whitespace-nowrap">
+                  <TabsTrigger value="hr" className="gap-2 shrink-0">
                     <UserCheck className="w-4 h-4" />
                     خطط الـ HR
                   </TabsTrigger>
-                  <TabsTrigger value="company" className="gap-2">
+                  <TabsTrigger value="company" className="gap-2 shrink-0">
                     <Building2 className="w-4 h-4" />
                     خطط الشركات
                   </TabsTrigger>
-                  <TabsTrigger value="jobseeker" className="gap-2">
+                  <TabsTrigger value="jobseeker" className="gap-2 shrink-0">
                     <Users className="w-4 h-4" />
                     خطط الأفراد
                   </TabsTrigger>
@@ -1636,8 +1639,8 @@ const AdminDashboard = () => {
                 {["jobseeker", "company", "hr"].map((type) => (
                   <TabsContent key={type} value={type}>
                     <Card>
-                      <CardHeader className="flex flex-row-reverse items-center justify-between">
-                        <CardTitle className="flex items-center gap-2">
+                      <CardHeader className="flex flex-col md:flex-row-reverse items-start md:items-center justify-between gap-4 p-4 md:p-6">
+                        <CardTitle className="flex items-center gap-2 text-base md:text-lg">
                           <span>
                             {type === "jobseeker"
                               ? "خطط الباحثين عن عمل"
@@ -1646,124 +1649,147 @@ const AdminDashboard = () => {
                                 : "خطط موظفي الـ HR"}
                           </span>
                           {type === "jobseeker" ? (
-                            <Users className="w-5 h-5" />
+                            <Users className="w-5 h-5 text-primary" />
                           ) : type === "company" ? (
-                            <Building2 className="w-5 h-5" />
+                            <Building2 className="w-5 h-5 text-primary" />
                           ) : (
-                            <UserCheck className="w-5 h-5" />
+                            <UserCheck className="w-5 h-5 text-primary" />
                           )}
                         </CardTitle>
-                        <Button onClick={handleAddPlan} className="gap-2">
+                        <Button
+                          onClick={handleAddPlan}
+                          className="gap-2 w-full md:w-auto h-9 md:h-10 text-xs md:text-sm"
+                        >
                           <Plus className="w-4 h-4" />
                           إضافة خطة
                         </Button>
                       </CardHeader>
-                      <CardContent>
-                        <Table
-                          dir="ltr"
-                          className="text-right [&_th]:text-right [&_td]:text-right"
-                        >
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>الإجراءات</TableHead>
-                              <TableHead>الحالة</TableHead>
-                              <TableHead>الإيرادات</TableHead>
-                              <TableHead>عدد المشتركين</TableHead>
-                              <TableHead>المميزات</TableHead>
-                              <TableHead>السعر</TableHead>
-                              <TableHead>ID</TableHead>
-                              <TableHead>اسم الخطة</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {plans
-                              .filter((p) => p.type === type)
-                              .map((plan) => (
-                                <TableRow key={plan.id}>
-                                  <TableCell>
-                                    <div className="flex gap-2 justify-end">
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() => handleEditPlan(plan)}
-                                      >
-                                        <Edit className="w-4 h-4" />
-                                      </Button>
-                                      <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() =>
-                                          handleTogglePlan(plan.id)
+                      <CardContent className="p-0">
+                        <div className="overflow-x-auto relative">
+                          <Table
+                            dir="ltr"
+                            className="text-right [&_th]:text-right [&_td]:text-right"
+                          >
+                            <TableHeader>
+                              <TableRow className="bg-muted/30">
+                                <TableHead className="text-right">
+                                  الإجراءات
+                                </TableHead>
+                                <TableHead className="text-right">
+                                  الحالة
+                                </TableHead>
+                                <TableHead className="text-right">
+                                  الإيرادات
+                                </TableHead>
+                                <TableHead className="text-right font-medium">
+                                  عدد المشتركين
+                                </TableHead>
+                                <TableHead className="text-right">
+                                  المميزات
+                                </TableHead>
+                                <TableHead className="text-right">
+                                  السعر
+                                </TableHead>
+                                <TableHead className="text-right">ID</TableHead>
+                                <TableHead className="text-right font-black sticky right-0 bg-background z-10 shadow-[-4px_0_10px_-4px_rgba(0,0,0,0.1)]">
+                                  اسم الخطة
+                                </TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {plans
+                                .filter((p) => p.type === type)
+                                .map((plan) => (
+                                  <TableRow key={plan.id}>
+                                    <TableCell>
+                                      <div className="flex gap-2 justify-end">
+                                        <Button
+                                          variant="ghost"
+                                          size="icon"
+                                          onClick={() => handleEditPlan(plan)}
+                                        >
+                                          <Edit className="w-4 h-4" />
+                                        </Button>
+                                        <Button
+                                          variant="outline"
+                                          size="sm"
+                                          onClick={() =>
+                                            handleTogglePlan(plan.id)
+                                          }
+                                          className={
+                                            plan.isActive
+                                              ? "text-red-600 border-red-200 hover:bg-red-50 h-8 px-3 text-xs"
+                                              : "text-emerald-600 border-emerald-200 hover:bg-emerald-50 h-8 px-3 text-xs"
+                                          }
+                                        >
+                                          {plan.isActive ? "Stop" : "Active"}
+                                        </Button>
+                                      </div>
+                                    </TableCell>
+                                    <TableCell>
+                                      <Badge
+                                        variant={
+                                          plan.isActive
+                                            ? "default"
+                                            : "secondary"
                                         }
                                         className={
                                           plan.isActive
-                                            ? "text-red-600 border-red-200 hover:bg-red-50 h-8 px-3 text-xs"
-                                            : "text-emerald-600 border-emerald-200 hover:bg-emerald-50 h-8 px-3 text-xs"
+                                            ? "bg-emerald-500 hover:bg-emerald-600"
+                                            : "bg-amber-500 hover:bg-amber-600 text-white"
                                         }
                                       >
-                                        {plan.isActive ? "Stop" : "Active"}
-                                      </Button>
-                                    </div>
-                                  </TableCell>
-                                  <TableCell>
-                                    <Badge
-                                      variant={
-                                        plan.isActive ? "default" : "secondary"
-                                      }
-                                      className={
-                                        plan.isActive
-                                          ? "bg-emerald-500 hover:bg-emerald-600"
-                                          : "bg-amber-500 hover:bg-amber-600 text-white"
-                                      }
-                                    >
-                                      {plan.isActive ? "نشطة" : "معطلة"}
-                                    </Badge>
-                                  </TableCell>
-                                  <TableCell className="font-bold">
-                                    {(
-                                      plan.price * plan.usersCount
-                                    ).toLocaleString()}{" "}
-                                    ر.س
-                                  </TableCell>
-                                  <TableCell>
-                                    <Badge variant="secondary">
-                                      {plan.usersCount} مشترك
-                                    </Badge>
-                                  </TableCell>
-                                  <TableCell>
-                                    <div className="flex flex-wrap gap-1 justify-end items-center min-h-[40px]">
-                                      {plan.features.length > 2 && (
-                                        <Badge
-                                          variant="secondary"
-                                          className="text-[10px] px-1.5 h-5 min-w-[20px] justify-center"
-                                        >
-                                          +{plan.features.length - 2}
-                                        </Badge>
-                                      )}
-                                      {plan.features.slice(0, 2).map((f, i) => (
-                                        <Badge
-                                          key={i}
-                                          variant="outline"
-                                          className="text-[10px] whitespace-nowrap bg-muted/30"
-                                        >
-                                          {f}
-                                        </Badge>
-                                      ))}
-                                    </div>
-                                  </TableCell>
-                                  <TableCell className="font-mono">
-                                    {plan.price} ر.س / {plan.period}
-                                  </TableCell>
-                                  <TableCell className="text-muted-foreground">
-                                    #{plan.id}
-                                  </TableCell>
-                                  <TableCell className="font-bold">
-                                    {plan.name}
-                                  </TableCell>
-                                </TableRow>
-                              ))}
-                          </TableBody>
-                        </Table>
+                                        {plan.isActive ? "نشطة" : "معطلة"}
+                                      </Badge>
+                                    </TableCell>
+                                    <TableCell className="font-bold">
+                                      {(
+                                        plan.price * plan.usersCount
+                                      ).toLocaleString()}{" "}
+                                      ر.س
+                                    </TableCell>
+                                    <TableCell>
+                                      <Badge variant="secondary">
+                                        {plan.usersCount} مشترك
+                                      </Badge>
+                                    </TableCell>
+                                    <TableCell>
+                                      <div className="flex flex-wrap gap-1 justify-end items-center min-h-[40px]">
+                                        {plan.features.length > 2 && (
+                                          <Badge
+                                            variant="secondary"
+                                            className="text-[10px] px-1.5 h-5 min-w-[20px] justify-center"
+                                          >
+                                            +{plan.features.length - 2}
+                                          </Badge>
+                                        )}
+                                        {plan.features
+                                          .slice(0, 2)
+                                          .map((f, i) => (
+                                            <Badge
+                                              key={i}
+                                              variant="outline"
+                                              className="text-[10px] whitespace-nowrap bg-muted/30"
+                                            >
+                                              {f}
+                                            </Badge>
+                                          ))}
+                                      </div>
+                                    </TableCell>
+                                    <TableCell className="font-mono">
+                                      {plan.price} ر.س / {plan.period}
+                                    </TableCell>
+                                    <TableCell className="text-muted-foreground">
+                                      #{plan.id}
+                                    </TableCell>
+                                    <TableCell className="font-bold sticky right-0 bg-background/95 backdrop-blur-sm z-10 shadow-[-4px_0_10px_-4px_rgba(0,0,0,0.1)]">
+                                      {plan.name}
+                                    </TableCell>
+                                  </TableRow>
+                                ))}
+                            </TableBody>
+                          </Table>
+                        </div>
                       </CardContent>
                     </Card>
                   </TabsContent>

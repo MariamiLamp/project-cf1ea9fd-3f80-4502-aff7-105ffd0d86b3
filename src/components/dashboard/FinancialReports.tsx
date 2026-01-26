@@ -18,6 +18,7 @@ import {
   Download,
   LayoutTemplate,
   Megaphone,
+  FileText,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -50,6 +51,51 @@ interface FinancialReportsProps {
   onExport: () => void;
   initialChart?: "revenue" | "distribution" | "comparison";
 }
+
+const MONTS_LABELS = [
+  "Jan. 2026",
+  "Feb. 2026",
+  "Mar. 2026",
+  "Apr. 2026",
+  "May. 2026",
+  "Jun. 2026",
+  "Jul. 2026",
+  "Aug. 2026",
+  "Sep. 2026",
+  "Oct. 2026",
+  "Nov. 2026",
+  "Dec. 2026",
+];
+
+const REVENUE_TYPES = [
+  "Job Seeker",
+  "C.V. Writer",
+  "Companies",
+  "Advertisements",
+  "Templets",
+];
+
+const REVENUE_OVERVIEW_DATA: Record<
+  string,
+  Record<string, { qty?: number; amount?: number }>
+> = {
+  "Job Seeker": {
+    "Jan. 2026": { qty: 20, amount: 2000 },
+    "Feb. 2026": { qty: 30, amount: 3000 },
+  },
+  "C.V. Writer": {
+    "Jan. 2026": { qty: 15, amount: 1500 },
+  },
+  Companies: {
+    "Jan. 2026": { qty: 10, amount: 1000 },
+  },
+  Advertisements: {
+    "Jan. 2026": { qty: 10, amount: 1000 },
+  },
+  Templets: {
+    "Jan. 2026": { qty: 6, amount: 600 },
+  },
+};
 
 export const FinancialReports: React.FC<FinancialReportsProps> = ({
   payments,
@@ -144,8 +190,12 @@ export const FinancialReports: React.FC<FinancialReportsProps> = ({
         </Card>
       </div>
 
-      <Tabs defaultValue="charts" className="space-y-6">
-        <TabsList className="bg-muted/50 p-1 flex justify-end flex-wrap gap-1">
+      <Tabs defaultValue="charts" className="space-y-6 w-full overflow-hidden">
+        <TabsList className="bg-muted/50 p-1 flex justify-start md:justify-end overflow-x-auto no-scrollbar gap-1 w-full whitespace-nowrap">
+          <TabsTrigger value="revenue_overview" className="gap-2">
+            <FileText className="w-4 h-4" />
+            نظرة عامة على الإيرادات
+          </TabsTrigger>
           <TabsTrigger value="templates_pay" className="gap-2">
             <LayoutTemplate className="w-4 h-4" />
             دفعات القوالب
@@ -163,6 +213,101 @@ export const FinancialReports: React.FC<FinancialReportsProps> = ({
             الرسوم البيانية
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="revenue_overview" className="w-full">
+          <Card className="card-elevated overflow-hidden border-none shadow-2xl bg-card w-full">
+            <CardHeader className="bg-secondary text-white p-4 md:p-6 border-b-4 border-primary">
+              <div className="flex items-center justify-between gap-4">
+                <div className="bg-primary/20 p-2 rounded-lg shrink-0">
+                  <FileText className="w-5 h-5 md:w-6 md:h-6 text-primary-light" />
+                </div>
+                <div className="text-right flex-1 min-w-0">
+                  <CardTitle className="text-base md:text-xl font-black tracking-tight truncate">
+                    نظرة عامة على الإيرادات (2026)
+                  </CardTitle>
+                  <p className="text-[10px] md:text-xs text-secondary-foreground/60 mt-0.5 md:mt-1 font-medium truncate">
+                    الإحصائيات الشهرية المفصلة حسب نوع الإيرادات
+                  </p>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto relative scrollbar-thin scrollbar-thumb-muted-foreground/20">
+                <Table
+                  className="border-collapse min-w-[1600px] w-full"
+                  dir="ltr"
+                >
+                  <TableHeader>
+                    <TableRow className="bg-secondary/5 border-b border-border/50">
+                      <TableHead
+                        className="text-center font-black text-secondary uppercase tracking-widest text-[10px] md:text-xs sticky left-0 bg-card z-30 w-[140px] md:w-[180px] border-r border-border/60 shadow-[4px_0_12px_rgba(0,0,0,0.08)] py-4 md:py-6"
+                        rowSpan={2}
+                      >
+                        Revenue type
+                      </TableHead>
+                      {MONTS_LABELS.map((month) => (
+                        <TableHead
+                          key={month}
+                          className="text-center border-r border-border/40 font-black text-secondary text-xs md:text-sm last:border-r-0 py-3 md:py-4 bg-muted/20"
+                          colSpan={2}
+                        >
+                          {month}
+                        </TableHead>
+                      ))}
+                    </TableRow>
+                    <TableRow className="bg-card border-b border-border/50">
+                      {MONTS_LABELS.map((month) => (
+                        <React.Fragment key={`${month}-sub`}>
+                          <TableHead className="text-center border-r border-border/10 text-[8px] md:text-[9px] uppercase tracking-widest font-black text-muted-foreground/70 py-2 md:py-3">
+                            Qty.
+                          </TableHead>
+                          <TableHead className="text-center border-r border-border/40 text-[8px] md:text-[9px] uppercase tracking-widest font-black text-primary py-2 md:py-3 bg-primary/[0.02] last:border-r-0">
+                            Amount
+                          </TableHead>
+                        </React.Fragment>
+                      ))}
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody className="[&_tr:nth-child(even)]:bg-muted/10">
+                    {REVENUE_TYPES.map((type) => (
+                      <TableRow
+                        key={type}
+                        className="hover:bg-primary/10 transition-colors group border-b border-border/30 last:border-0"
+                      >
+                        <TableCell className="font-black border-r border-r border-border/60 sticky left-0 bg-card/95 backdrop-blur-md z-20 w-[140px] md:w-[180px] text-secondary group-hover:text-primary transition-colors shadow-[4px_0_12px_rgba(0,0,0,0.05)] py-4 md:py-5 text-xs md:text-sm">
+                          {type}
+                        </TableCell>
+                        {MONTS_LABELS.map((month) => {
+                          const data = REVENUE_OVERVIEW_DATA[type]?.[month];
+                          return (
+                            <React.Fragment key={`${type}-${month}`}>
+                              <TableCell className="text-center border-r border-border/10 text-[10px] md:text-xs font-bold text-muted-foreground/60 py-4 md:py-5">
+                                {data?.qty || "—"}
+                              </TableCell>
+                              <TableCell className="text-center border-r border-border/40 text-[11px] md:text-sm font-black text-foreground py-4 md:py-5 bg-primary/[0.01] last:border-r-0">
+                                {data?.amount ? (
+                                  <span className="text-primary font-black">
+                                    {data.amount.toLocaleString(undefined, {
+                                      minimumFractionDigits: 2,
+                                    })}
+                                  </span>
+                                ) : (
+                                  <span className="opacity-20 text-[10px] font-medium">
+                                    0.00
+                                  </span>
+                                )}
+                              </TableCell>
+                            </React.Fragment>
+                          );
+                        })}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="subs_pay">
           <Card className="border-border/50">
