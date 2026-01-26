@@ -76,6 +76,7 @@ import {
   Download,
   Crown,
   CreditCard,
+  Building2,
 } from "lucide-react";
 
 import { CompanyDashboardLayout } from "@/components/layout/CompanyDashboardLayout";
@@ -300,6 +301,16 @@ const CompanyDashboard = () => {
     duration: "1_month",
   });
   const [adToDelete, setAdToDelete] = useState<string | null>(null);
+  const [companyInfo, setCompanyInfo] = useState({
+    name: user?.companyName || "تيك سوليوشنز",
+    email: user?.email || "contact@techsolutions.com",
+    phone: "0501234567",
+    website: "www.techsolutions.com",
+    bio: "شركة رائدة في مجال حلول البرمجيات والذكاء الاصطناعي، نسعى دائماً للابتكار وتقديم أفضل الخدمات لعملائنا.",
+    location: "السعودية، الرياض",
+    logo: "",
+  });
+  const [isEditingSettings, setIsEditingSettings] = useState(false);
 
   // Filters for Applications
   const [filterStatus, setFilterStatus] = useState<string>("all");
@@ -2064,6 +2075,174 @@ const CompanyDashboard = () => {
     </div>
   );
 
+  const handleSaveSettings = () => {
+    setIsEditingSettings(false);
+    toast({
+      title: "تم الحفظ",
+      description: "تم تحديث بيانات الشركة بنجاح",
+    });
+  };
+
+  const renderSettings = () => (
+    <div className="space-y-6">
+      <Card className="border-border">
+        <CardHeader className="text-right">
+          <CardTitle className="flex items-center justify-start gap-2">
+            <span>بيانات الشركة</span>
+            <Building2 className="w-5 h-5 text-primary" />
+          </CardTitle>
+          <CardDescription className="text-right">
+            إدارة معلومات شركتك والهوية البصرية
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="flex flex-col md:flex-row items-center gap-8 pb-6 border-b">
+            <div className="relative group">
+              <div className="w-32 h-32 rounded-2xl bg-muted flex items-center justify-center border-2 border-dashed border-primary/20 overflow-hidden">
+                {companyInfo.logo ? (
+                  <img
+                    src={companyInfo.logo}
+                    alt="Company Logo"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <Building2 className="w-12 h-12 text-primary/40" />
+                )}
+              </div>
+              {isEditingSettings && (
+                <label className="absolute inset-0 flex items-center justify-center bg-black/40 text-white rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                  <div className="flex flex-col items-center gap-1">
+                    <Plus className="w-6 h-6" />
+                    <span className="text-[10px] font-bold">تغيير الشعار</span>
+                  </div>
+                  <input
+                    type="file"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                          setCompanyInfo({
+                            ...companyInfo,
+                            logo: reader.result as string,
+                          });
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                  />
+                </label>
+              )}
+            </div>
+            <div className="flex-1 text-right space-y-1">
+              <h3 className="text-xl font-bold">{companyInfo.name}</h3>
+              <p className="text-sm text-muted-foreground">
+                قم بتحديث شعار شركتك ليظهر في إعلانات الوظائف والملف الشخصي
+              </p>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="space-y-2 text-right">
+              <Label htmlFor="company-name">اسم الشركة</Label>
+              <Input
+                id="company-name"
+                value={companyInfo.name}
+                onChange={(e) =>
+                  setCompanyInfo({ ...companyInfo, name: e.target.value })
+                }
+                className="text-right"
+                disabled={!isEditingSettings}
+              />
+            </div>
+            <div className="space-y-2 text-right">
+              <Label htmlFor="company-email">البريد الإلكتروني للشركة</Label>
+              <Input
+                id="company-email"
+                type="email"
+                value={companyInfo.email}
+                onChange={(e) =>
+                  setCompanyInfo({ ...companyInfo, email: e.target.value })
+                }
+                className="text-left"
+                dir="ltr"
+                disabled={!isEditingSettings}
+              />
+            </div>
+            <div className="space-y-2 text-right">
+              <Label htmlFor="company-phone">رقم الهاتف</Label>
+              <Input
+                id="company-phone"
+                value={companyInfo.phone}
+                onChange={(e) =>
+                  setCompanyInfo({ ...companyInfo, phone: e.target.value })
+                }
+                className="text-left"
+                dir="ltr"
+                disabled={!isEditingSettings}
+              />
+            </div>
+            <div className="space-y-2 text-right">
+              <Label htmlFor="company-website">الموقع الإلكتروني</Label>
+              <Input
+                id="company-website"
+                value={companyInfo.website}
+                onChange={(e) =>
+                  setCompanyInfo({ ...companyInfo, website: e.target.value })
+                }
+                className="text-left"
+                dir="ltr"
+                disabled={!isEditingSettings}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2 text-right">
+            <Label htmlFor="company-bio">نبذة عن الشركة</Label>
+            <Textarea
+              id="company-bio"
+              value={companyInfo.bio}
+              onChange={(e) =>
+                setCompanyInfo({ ...companyInfo, bio: e.target.value })
+              }
+              rows={4}
+              className="text-right"
+              disabled={!isEditingSettings}
+            />
+          </div>
+
+          <div className="flex justify-start pt-4 gap-3">
+            {isEditingSettings ? (
+              <>
+                <Button onClick={handleSaveSettings} className="gap-2">
+                  <CheckCircle className="w-4 h-4" />
+                  حفظ التغييرات
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsEditingSettings(false)}
+                >
+                  إلغاء
+                </Button>
+              </>
+            ) : (
+              <Button
+                variant="outline"
+                onClick={() => setIsEditingSettings(true)}
+                className="gap-2"
+              >
+                <Edit className="w-4 h-4" />
+                تعديل البيانات
+              </Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+
   // ========== MAIN RENDER ==========
 
   return (
@@ -2074,6 +2253,7 @@ const CompanyDashboard = () => {
         {activeTab === "promotion" && renderPromotion()}
         {activeTab === "ads" && renderAds()}
         {activeTab === "subscription" && renderSubscription()}
+        {activeTab === "settings" && renderSettings()}
 
         {/* Edit Job Dialog */}
         <Dialog open={isEditJobOpen} onOpenChange={setIsEditJobOpen}>
