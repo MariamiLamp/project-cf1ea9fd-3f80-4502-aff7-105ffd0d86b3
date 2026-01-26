@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -79,7 +79,7 @@ const mockSavedRoadmaps: SavedRoadmap[] = [
     goal: "مطور أول (Senior Developer)",
     currentRole: "مطور مبتدئ",
     createdAt: "2024-01-15",
-    progress: 35,
+    progress: 0,
     phases: [
       {
         id: "phase-1",
@@ -93,7 +93,7 @@ const mockSavedRoadmaps: SavedRoadmap[] = [
             description: "تعلم الأنماط المتقدمة والـ Generics والـ Decorators",
             type: "technology",
             duration: "٣ أسابيع",
-            completed: true,
+            completed: false,
             resources: [
               { name: "TypeScript Deep Dive", skills: ["Generics", "Types"] },
               { name: "Effective TypeScript", skills: ["Best Practices"] },
@@ -105,7 +105,7 @@ const mockSavedRoadmaps: SavedRoadmap[] = [
             description: "فهم مبادئ SOLID وأنماط التصميم",
             type: "course",
             duration: "٤ أسابيع",
-            completed: true,
+            completed: false,
             resources: [
               { name: "Clean Code", skills: ["SOLID", "Refactoring"] },
               { name: "Design Patterns", skills: ["Singleton", "Observer"] },
@@ -154,7 +154,7 @@ const mockSavedRoadmaps: SavedRoadmap[] = [
     goal: "مدير منتجات (Product Manager)",
     currentRole: "محلل أعمال",
     createdAt: "2024-02-20",
-    progress: 60,
+    progress: 0,
     phases: [
       {
         id: "phase-1",
@@ -168,7 +168,7 @@ const mockSavedRoadmaps: SavedRoadmap[] = [
             description: "إتقان منهجيات العمل المرنة",
             type: "course",
             duration: "٣ أسابيع",
-            completed: true,
+            completed: false,
             resources: [{ name: "Scrum Guide", skills: ["Scrum", "Agile"] }],
           },
           {
@@ -177,7 +177,7 @@ const mockSavedRoadmaps: SavedRoadmap[] = [
             description: "دراسة المنافسين واحتياجات العملاء",
             type: "exercise",
             duration: "٤ أسابيع",
-            completed: true,
+            completed: false,
           },
         ],
       },
@@ -188,7 +188,7 @@ const mockSavedRoadmaps: SavedRoadmap[] = [
     goal: "مهندس DevOps",
     currentRole: "مطور Backend",
     createdAt: "2024-03-10",
-    progress: 15,
+    progress: 0,
     phases: [
       {
         id: "phase-1",
@@ -254,8 +254,24 @@ const CareerPath = () => {
       });
     });
     setCompletedItems(completed);
+    setCompletedResources(new Set());
+    setAcquiredSkills(new Set());
     setOpenPhases(new Set(["phase-1"]));
   };
+
+  // Automatically update the progress of the current roadmap in the saved list
+  useEffect(() => {
+    if (selectedRoadmap && !isNewRoadmap) {
+      const currentProgress = getProgressPercentage();
+      setSavedRoadmaps((prev) =>
+        prev.map((roadmap) =>
+          roadmap.id === selectedRoadmap.id
+            ? { ...roadmap, progress: currentProgress }
+            : roadmap,
+        ),
+      );
+    }
+  }, [completedItems, selectedRoadmap, isNewRoadmap]);
 
   const handleSaveRoadmap = () => {
     if (!selectedRoadmap) return;
@@ -368,11 +384,41 @@ const CareerPath = () => {
   const toggleItemCompletion = (itemId: string) => {
     setCompletedItems((prev) => {
       const newSet = new Set(prev);
-      if (newSet.has(itemId)) {
-        newSet.delete(itemId);
-      } else {
+      const isCompleting = !newSet.has(itemId);
+
+      if (isCompleting) {
         newSet.add(itemId);
+      } else {
+        newSet.delete(itemId);
       }
+
+      // Automatically sync resources
+      if (selectedRoadmap) {
+        let foundItem: any = null;
+        for (const phase of selectedRoadmap.phases) {
+          const item = phase.items.find((i) => i.id === itemId);
+          if (item) {
+            foundItem = item;
+            break;
+          }
+        }
+
+        if (foundItem && foundItem.resources) {
+          setCompletedResources((prevResources) => {
+            const newResources = new Set(prevResources);
+            foundItem.resources.forEach((_: any, idx: number) => {
+              const resourceKey = `${itemId}-resource-${idx}`;
+              if (isCompleting) {
+                newResources.add(resourceKey);
+              } else {
+                newResources.delete(resourceKey);
+              }
+            });
+            return newResources;
+          });
+        }
+      }
+
       return newSet;
     });
   };
@@ -471,11 +517,56 @@ const CareerPath = () => {
     const resourceKey = `${itemId}-resource-${idx}`;
     setCompletedResources((prev) => {
       const newSet = new Set(prev);
-      if (newSet.has(resourceKey)) {
-        newSet.delete(resourceKey);
-      } else {
+      const isCompleting = !newSet.has(resourceKey);
+
+      if (isCompleting) {
         newSet.add(resourceKey);
+      } else {
+        newSet.delete(resourceKey);
       }
+
+      // Check if all resources for this item are completed
+      if (selectedRoadmap) {
+        // Find the item
+        let foundItem: any = null;
+        for (const phase of selectedRoadmap.phases) {
+          const item = phase.items.find((i) => i.id === itemId);
+          if (item) {
+            foundItem = item;
+            break;
+          }
+        }
+
+        if (foundItem && foundItem.resources) {
+          const allResourcesCompleted = foundItem.resources.every(
+            (_: any, index: number) => {
+              const key = `${itemId}-resource-${index}`;
+              // If we are completing the current one, it's effectively completed.
+              // If we are un-completing the current one, it's effectively NOT completed.
+              if (key === resourceKey) return isCompleting;
+              return newSet.has(key);
+            },
+          );
+
+          if (allResourcesCompleted) {
+            setCompletedItems((prevItems) => {
+              const newItems = new Set(prevItems);
+              newItems.add(itemId);
+              return newItems;
+            });
+          } else {
+            // If not all resources are completed, we might want to uncheck the parent item
+            // However, the user might have manually checked it.
+            // But following "automatically" logic usually implies syncing.
+            setCompletedItems((prevItems) => {
+              const newItems = new Set(prevItems);
+              newItems.delete(itemId);
+              return newItems;
+            });
+          }
+        }
+      }
+
       return newSet;
     });
   };
@@ -815,27 +906,27 @@ const CareerPath = () => {
                                   <div
                                     className={`p-4 rounded-xl border transition-all duration-300 ${
                                       isCompleted
-                                        ? "bg-success/5 border-success/30 shadow-sm"
+                                        ? "bg-[#f0fdf4] border-success/30 shadow-sm"
                                         : "bg-white border-border/50 hover:border-primary/30 shadow-sm"
                                     }`}
                                   >
                                     <div className="flex items-center justify-between w-full">
-                                      {/* Right side: Title and Checkbox */}
-                                      <div className="flex items-center gap-4">
+                                      {/* Right side: Checkbox, Title and Info */}
+                                      <div className="flex items-center gap-4 flex-1 justify-start">
                                         <Checkbox
                                           checked={isCompleted}
                                           onCheckedChange={() =>
                                             toggleItemCompletion(item.id)
                                           }
-                                          className="rounded-full h-6 w-6 border-muted-foreground/30 data-[state=checked]:bg-success data-[state=checked]:border-success transition-all duration-300 transform active:scale-90"
+                                          className="rounded-full h-6 w-6 border-muted-foreground/30 data-[state=checked]:bg-success data-[state=checked]:border-success transition-all duration-300 transform active:scale-90 shrink-0"
                                         />
                                         <div className="text-right">
-                                          <div className="flex items-center gap-2 justify-end">
+                                          <div className="flex items-center gap-2 justify-start">
                                             <a
                                               href={`https://www.google.com/search?q=${encodeURIComponent(item.title)}`}
                                               target="_blank"
                                               rel="noopener noreferrer"
-                                              className={`font-black text-sm hover:text-primary transition-colors ${isCompleted ? "line-through text-muted-foreground" : "text-[#0f172a]"}`}
+                                              className="font-black text-sm hover:opacity-80 transition-all text-[#0f172a]"
                                             >
                                               {item.title}
                                             </a>
@@ -847,7 +938,7 @@ const CareerPath = () => {
                                               {getItemTypeLabel(item.type)}
                                             </Badge>
                                           </div>
-                                          <p className="text-[11px] text-muted-foreground font-medium mt-1">
+                                          <p className="text-[11px] text-muted-foreground font-medium mt-1 text-right">
                                             {item.description}
                                           </p>
                                         </div>
@@ -873,9 +964,9 @@ const CareerPath = () => {
 
                                     <CollapsibleContent>
                                       <div className="mt-4 pt-4 border-t border-dashed border-border/60">
-                                        <div className="flex items-center gap-2 mb-4">
+                                        <div className="flex items-center gap-2 mb-3 justify-start">
                                           <BookOpen className="h-4 w-4 text-[#0f172a]" />
-                                          <span className="text-xs font-bold text-[#0f172a]">
+                                          <span className="text-[11px] font-bold text-[#0f172a]">
                                             المصادر والمراجع
                                           </span>
                                         </div>
@@ -893,41 +984,64 @@ const CareerPath = () => {
                                                   key={idx}
                                                   className={`flex items-center justify-between p-3 rounded-xl border transition-all duration-300 ${
                                                     isResourceCompleted
-                                                      ? "bg-success/5 border-success/30"
-                                                      : "bg-muted/30 border-border/40"
+                                                      ? "bg-[#f0fdf4]/50 border-[#bbf7d0]/50"
+                                                      : "bg-white border-border/40"
                                                   }`}
                                                 >
+                                                  {/* Text on the right */}
                                                   <div className="text-right">
                                                     <a
                                                       href={`https://www.google.com/search?q=${encodeURIComponent(resource.name)}`}
                                                       target="_blank"
                                                       rel="noopener noreferrer"
-                                                      className={`text-sm font-bold hover:text-primary transition-colors ${isResourceCompleted ? "line-through text-muted-foreground" : "text-[#0f172a]"}`}
+                                                      className={`text-sm font-bold hover:opacity-80 transition-all ${isResourceCompleted ? "text-muted-foreground line-through decoration-border" : "text-[#0f172a]"}`}
                                                     >
                                                       {resource.name}
                                                     </a>
-                                                    {resource.skills && (
-                                                      <div className="flex gap-1 mt-1">
-                                                        {resource.skills.map(
-                                                          (skill) => (
-                                                            <Badge
-                                                              key={skill}
-                                                              variant="secondary"
-                                                              className="text-[9px] h-4 px-1.5 font-bold bg-white text-muted-foreground"
-                                                            >
-                                                              {skill}
-                                                            </Badge>
-                                                          ),
-                                                        )}
-                                                      </div>
-                                                    )}
+                                                    {isResourceCompleted &&
+                                                      resource.skills && (
+                                                        <div className="mt-2 text-right animate-in fade-in slide-in-from-top-1 duration-300">
+                                                          <span className="text-[10px] text-[#94a3b8] mb-1 block">
+                                                            المهارات المكتسبة:
+                                                          </span>
+                                                          <div className="flex gap-1.5 justify-end">
+                                                            {resource.skills.map(
+                                                              (skill) => {
+                                                                const isAcquired =
+                                                                  acquiredSkills.has(
+                                                                    skill,
+                                                                  );
+                                                                return (
+                                                                  <Badge
+                                                                    key={skill}
+                                                                    variant="secondary"
+                                                                    onClick={() =>
+                                                                      toggleSkill(
+                                                                        skill,
+                                                                      )
+                                                                    }
+                                                                    className={`text-[9px] h-5 px-2 rounded-full font-bold transition-all cursor-pointer ${
+                                                                      isAcquired
+                                                                        ? "bg-[#0f172a] text-white"
+                                                                        : "bg-[#f1f5f9] text-[#64748b] hover:bg-[#e2e8f0]"
+                                                                    }`}
+                                                                  >
+                                                                    {skill}
+                                                                    {isAcquired && (
+                                                                      <Check className="h-2.5 w-2.5 ms-1" />
+                                                                    )}
+                                                                  </Badge>
+                                                                );
+                                                              },
+                                                            )}
+                                                          </div>
+                                                        </div>
+                                                      )}
                                                   </div>
+
+                                                  {/* Button on the left */}
                                                   <Button
-                                                    variant={
-                                                      isResourceCompleted
-                                                        ? "success"
-                                                        : "outline"
-                                                    }
+                                                    variant="outline"
                                                     size="sm"
                                                     onClick={() =>
                                                       handleCompleteResource(
@@ -935,12 +1049,15 @@ const CareerPath = () => {
                                                         idx,
                                                       )
                                                     }
-                                                    className={`h-8 px-4 text-xs font-bold rounded-lg ${
+                                                    className={`h-8 px-4 text-xs font-bold rounded-lg transition-all ${
                                                       isResourceCompleted
-                                                        ? "bg-success text-white"
-                                                        : "bg-white text-muted-foreground hover:text-success border-border/60"
+                                                        ? "bg-[#f0fdf4] text-[#16a34a] border-[#bbf7d0] hover:bg-[#dcfce7]"
+                                                        : "bg-white text-[#64748b] border-border/60 hover:text-[#0f172a] hover:border-[#0f172a]/30"
                                                     }`}
                                                   >
+                                                    {isResourceCompleted && (
+                                                      <Check className="h-3.5 w-3.5 me-1.5" />
+                                                    )}
                                                     {isResourceCompleted
                                                       ? "مكتمل"
                                                       : "اكتمل"}
