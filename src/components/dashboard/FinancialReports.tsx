@@ -235,27 +235,30 @@ export const FinancialReports: React.FC<FinancialReportsProps> = ({
         </Card>
       </div>
 
-      <Tabs defaultValue="charts" className="space-y-6 w-full overflow-hidden">
+      <Tabs
+        defaultValue="revenue_overview"
+        className="space-y-6 w-full overflow-hidden"
+      >
         <TabsList className="bg-muted/50 p-1 flex justify-start md:justify-end overflow-x-auto no-scrollbar gap-1 w-full whitespace-nowrap">
-          <TabsTrigger value="revenue_overview" className="gap-2">
-            <FileText className="w-4 h-4" />
-            نظرة عامة على الإيرادات
-          </TabsTrigger>
-          <TabsTrigger value="templates_pay" className="gap-2">
-            <LayoutTemplate className="w-4 h-4" />
-            دفعات القوالب
-          </TabsTrigger>
-          <TabsTrigger value="ads_pay" className="gap-2">
-            <Megaphone className="w-4 h-4" />
-            دفعات الإعلانات
+          <TabsTrigger value="charts" className="gap-2">
+            <TrendingUp className="w-4 h-4" />
+            الرسوم البيانية
           </TabsTrigger>
           <TabsTrigger value="subs_pay" className="gap-2">
             <CreditCard className="w-4 h-4" />
             دفعات الاشتراكات
           </TabsTrigger>
-          <TabsTrigger value="charts" className="gap-2">
-            <TrendingUp className="w-4 h-4" />
-            الرسوم البيانية
+          <TabsTrigger value="ads_pay" className="gap-2">
+            <Megaphone className="w-4 h-4" />
+            دفعات الإعلانات
+          </TabsTrigger>
+          <TabsTrigger value="templates_pay" className="gap-2">
+            <LayoutTemplate className="w-4 h-4" />
+            دفعات القوالب
+          </TabsTrigger>
+          <TabsTrigger value="revenue_overview" className="gap-2">
+            <FileText className="w-4 h-4" />
+            نظرة عامة على الإيرادات
           </TabsTrigger>
         </TabsList>
 
