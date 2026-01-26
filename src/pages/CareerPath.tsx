@@ -40,7 +40,9 @@ import {
   Map,
   Calendar,
   Eye,
+  Save,
 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface RoadmapItem {
   id: string;
@@ -67,6 +69,7 @@ interface SavedRoadmap {
   createdAt: string;
   progress: number;
   phases: RoadmapPhase[];
+  isSaved?: boolean;
 }
 
 // Mock saved roadmaps data
@@ -207,9 +210,11 @@ const mockSavedRoadmaps: SavedRoadmap[] = [
 ];
 
 const CareerPath = () => {
-  const [savedRoadmaps] = useState<SavedRoadmap[]>(mockSavedRoadmaps);
+  const { toast } = useToast();
+  const [savedRoadmaps, setSavedRoadmaps] = useState<SavedRoadmap[]>(mockSavedRoadmaps);
   const [selectedRoadmap, setSelectedRoadmap] = useState<SavedRoadmap | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [isNewRoadmap, setIsNewRoadmap] = useState(false);
   
   // Form state
   const [goal, setGoal] = useState("");
@@ -227,6 +232,7 @@ const CareerPath = () => {
   const handleSelectRoadmap = (roadmap: SavedRoadmap) => {
     setSelectedRoadmap(roadmap);
     setShowForm(false);
+    setIsNewRoadmap(false);
     // Initialize completed items based on roadmap data
     const completed = new Set<string>();
     roadmap.phases.forEach(phase => {
@@ -238,6 +244,20 @@ const CareerPath = () => {
     });
     setCompletedItems(completed);
     setOpenPhases(new Set(["phase-1"]));
+  };
+
+  const handleSaveRoadmap = () => {
+    if (!selectedRoadmap) return;
+    
+    const roadmapToSave = { ...selectedRoadmap, isSaved: true };
+    setSavedRoadmaps(prev => [roadmapToSave, ...prev]);
+    setSelectedRoadmap(roadmapToSave);
+    setIsNewRoadmap(false);
+    
+    toast({
+      title: "تم الحفظ بنجاح",
+      description: "تم حفظ المسار المهني في قائمة المسارات المحفوظة",
+    });
   };
 
   const handleNewRoadmap = () => {
@@ -330,6 +350,7 @@ const CareerPath = () => {
       setSelectedRoadmap(generatedRoadmap);
       setShowForm(false);
       setIsGenerating(false);
+      setIsNewRoadmap(true);
       setCompletedItems(new Set());
       setOpenPhases(new Set(["phase-1"]));
     }, 2500);
@@ -569,6 +590,12 @@ const CareerPath = () => {
                         </p>
                       </div>
                       <div className="flex items-center gap-4">
+                        {isNewRoadmap && (
+                          <Button onClick={handleSaveRoadmap} className="gap-2">
+                            <Save className="h-4 w-4" />
+                            حفظ المسار
+                          </Button>
+                        )}
                         <div className="text-center">
                           <div className="text-3xl font-bold text-primary">
                             {getProgressPercentage()}%
