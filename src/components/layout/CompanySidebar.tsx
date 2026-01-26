@@ -28,7 +28,6 @@ const navGroups = [
       { icon: Briefcase, label: "الوظائف", value: "jobs" },
       { icon: FileText, label: "الطلبات", value: "applications" },
       { icon: CreditCard, label: "الاشتراكات", value: "subscription" },
-      { icon: Settings, label: "الإعدادات", value: "settings" },
     ],
   },
   {
@@ -159,8 +158,29 @@ export const CompanySidebar = ({
         })}
       </nav>
 
-      {/* Bottom Navigation */}
       <div className="p-4 border-t border-sidebar-border space-y-2">
+        <button
+          onClick={() => onTabChange("settings")}
+          className={cn(
+            "nav-item w-full",
+            activeTab === "settings" && "active",
+            collapsed && "justify-center px-2",
+          )}
+        >
+          <Settings
+            className={cn(
+              "w-5 h-5 transition-colors shrink-0",
+              activeTab === "settings"
+                ? "text-sidebar-primary"
+                : "text-sidebar-foreground/70 group-hover:text-sidebar-foreground",
+            )}
+          />
+          {!collapsed && <span>الإعدادات</span>}
+          {activeTab === "settings" && !collapsed && (
+            <div className="mr-auto w-1.5 h-1.5 rounded-full bg-sidebar-primary" />
+          )}
+        </button>
+
         <Link
           to="/auth"
           className={cn("nav-item w-full", collapsed && "justify-center px-2")}
