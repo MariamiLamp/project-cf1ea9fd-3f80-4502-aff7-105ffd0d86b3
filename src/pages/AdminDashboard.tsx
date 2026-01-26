@@ -424,10 +424,10 @@ const mockPayments = [
     id: 1,
     user: "أحمد محمد",
     amount: 150,
-    type: "subscription",
+    type: "jobseeker",
     status: "completed",
     date: "2024-06-20",
-    details: "خطة احترافية",
+    details: "خطة احترافية - باحث عن عمل",
   },
   {
     id: 2,
@@ -451,10 +451,10 @@ const mockPayments = [
     id: 4,
     user: "محمد خالد",
     amount: 150,
-    type: "subscription",
+    type: "jobseeker",
     status: "completed",
     date: "2024-06-23",
-    details: "خطة احترافية",
+    details: "خطة احترافية - باحث عن عمل",
   },
   {
     id: 5,
@@ -469,35 +469,85 @@ const mockPayments = [
     id: 6,
     user: "فاطمة أحمد",
     amount: 290,
-    type: "subscription",
+    type: "hr",
     status: "completed",
     date: "2024-06-25",
-    details: "خطة مميزة",
+    details: "خطة مميزة - HR",
   },
   {
     id: 7,
     user: "عمر حسن",
     amount: 79,
-    type: "template",
+    type: "company",
     status: "completed",
     date: "2024-06-26",
-    details: "قالب عقد عمل",
+    details: "خطة شركات",
   },
 ];
 
 const revenueByMonth = [
-  { month: "يناير", revenue: 45000 },
-  { month: "فبراير", revenue: 52000 },
-  { month: "مارس", revenue: 48000 },
-  { month: "أبريل", revenue: 61000 },
-  { month: "مايو", revenue: 58000 },
-  { month: "يونيو", revenue: 65000 },
+  {
+    month: "يناير",
+    revenue: 45000,
+    jobseeker: 15000,
+    company: 12000,
+    hr: 8000,
+    ads: 6000,
+    template: 4000,
+  },
+  {
+    month: "فبراير",
+    revenue: 52000,
+    jobseeker: 18000,
+    company: 14000,
+    hr: 9000,
+    ads: 7000,
+    template: 4000,
+  },
+  {
+    month: "مارس",
+    revenue: 48000,
+    jobseeker: 16000,
+    company: 13000,
+    hr: 8500,
+    ads: 6500,
+    template: 4000,
+  },
+  {
+    month: "أبريل",
+    revenue: 61000,
+    jobseeker: 22000,
+    company: 16000,
+    hr: 10000,
+    ads: 8000,
+    template: 5000,
+  },
+  {
+    month: "مايو",
+    revenue: 58000,
+    jobseeker: 20000,
+    company: 15000,
+    hr: 9500,
+    ads: 8500,
+    template: 5000,
+  },
+  {
+    month: "يونيو",
+    revenue: 65000,
+    jobseeker: 25000,
+    company: 18000,
+    hr: 11000,
+    ads: 6000,
+    template: 5000,
+  },
 ];
 
 const revenueByType = [
-  { name: "اشتراكات", value: 35000, color: "#3b82f6" },
-  { name: "إعلانات", value: 25000, color: "#10b981" },
-  { name: "قوالب", value: 15000, color: "#f59e0b" },
+  { name: "باحثين", value: 35000, fill: "#3b82f6" },
+  { name: "شركات", value: 25000, fill: "#10b981" },
+  { name: "HR", value: 15000, fill: "#a855f7" },
+  { name: "إعلانات", value: 12000, fill: "#f97316" },
+  { name: "قوالب", value: 8000, fill: "#f59e0b" },
 ];
 
 const AdminDashboard = () => {
@@ -609,11 +659,15 @@ const AdminDashboard = () => {
       p.id,
       p.user,
       p.amount,
-      p.type === "subscription"
-        ? "اشتراك"
-        : p.type === "ads"
-          ? "إعلان"
-          : "قالب",
+      p.type === "jobseeker"
+        ? "اشتراك باحث"
+        : p.type === "company"
+          ? "اشتراك شركات"
+          : p.type === "hr"
+            ? "اشتراك HR"
+            : p.type === "ads"
+              ? "إعلان"
+              : "قالب",
       p.status === "completed" ? "مكتمل" : "معلق",
       p.date,
       p.details,
