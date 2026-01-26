@@ -529,9 +529,98 @@ const CareerPath = () => {
         </div>
 
         {/* Main Layout: Two columns */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6" dir="rtl">
+          {/* Right Side: Saved Roadmaps Table */}
+          <div className="lg:col-span-1">
+            <Card className="card-elevated">
+              <CardHeader className="pb-4">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Map className="h-5 w-5" />
+                    المسارات المحفوظة
+                  </CardTitle>
+                  <Button
+                    onClick={handleNewRoadmap}
+                    size="sm"
+                    className="gap-2"
+                  >
+                    <Plus className="h-4 w-4" />
+                    جديد
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="p-0">
+                <Table dir="rtl">
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-right">الهدف المهني</TableHead>
+                      <TableHead className="text-right">التقدم</TableHead>
+                      <TableHead className="text-center w-12"></TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {savedRoadmaps.map((roadmap) => (
+                      <TableRow
+                        key={roadmap.id}
+                        className={`cursor-pointer transition-colors hover:bg-muted/50 ${
+                          selectedRoadmap?.id === roadmap.id
+                            ? "bg-primary/5"
+                            : ""
+                        }`}
+                        onClick={() => handleSelectRoadmap(roadmap)}
+                      >
+                        <TableCell className="text-right">
+                          <div className="text-right">
+                            <div className="font-bold text-sm text-[#0f172a]">
+                              {roadmap.goal}
+                            </div>
+                            <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1 justify-start">
+                              <Calendar className="h-3 w-3" />
+                              {roadmap.createdAt}
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center gap-2 justify-end">
+                            <span className="text-sm font-medium">
+                              {roadmap.progress}%
+                            </span>
+                            <div className="w-16 h-2 bg-muted rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-primary rounded-full transition-all"
+                                style={{ width: `${roadmap.progress}%` }}
+                              />
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+
+                {savedRoadmaps.length === 0 && (
+                  <div className="p-8 text-center">
+                    <Map className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                    <p className="text-muted-foreground text-sm">
+                      لا توجد مسارات محفوظة بعد
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
           {/* Left Side: Roadmap Viewer / Form */}
-          <div className="lg:col-span-2 order-2 lg:order-1">
+          <div className="lg:col-span-2">
             {showForm ? (
               /* Goal Setting Form */
               <Card className="card-elevated">
@@ -894,95 +983,6 @@ const CareerPath = () => {
                 </CardContent>
               </Card>
             )}
-          </div>
-
-          {/* Right Side: Saved Roadmaps Table */}
-          <div className="lg:col-span-1 order-1 lg:order-2">
-            <Card className="card-elevated">
-              <CardHeader className="pb-4">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Map className="h-5 w-5" />
-                    المسارات المحفوظة
-                  </CardTitle>
-                  <Button
-                    onClick={handleNewRoadmap}
-                    size="sm"
-                    className="gap-2"
-                  >
-                    <Plus className="h-4 w-4" />
-                    جديد
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="p-0">
-                <Table dir="rtl">
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="text-right">الهدف المهني</TableHead>
-                      <TableHead className="text-right">التقدم</TableHead>
-                      <TableHead className="text-center w-12"></TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {savedRoadmaps.map((roadmap) => (
-                      <TableRow
-                        key={roadmap.id}
-                        className={`cursor-pointer transition-colors hover:bg-muted/50 ${
-                          selectedRoadmap?.id === roadmap.id
-                            ? "bg-primary/5"
-                            : ""
-                        }`}
-                        onClick={() => handleSelectRoadmap(roadmap)}
-                      >
-                        <TableCell className="text-right">
-                          <div className="text-right">
-                            <div className="font-bold text-sm text-[#0f172a]">
-                              {roadmap.goal}
-                            </div>
-                            <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1 justify-start">
-                              <Calendar className="h-3 w-3" />
-                              {roadmap.createdAt}
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex items-center gap-2 justify-end">
-                            <span className="text-sm font-medium">
-                              {roadmap.progress}%
-                            </span>
-                            <div className="w-16 h-2 bg-muted rounded-full overflow-hidden">
-                              <div
-                                className="h-full bg-primary rounded-full transition-all"
-                                style={{ width: `${roadmap.progress}%` }}
-                              />
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-
-                {savedRoadmaps.length === 0 && (
-                  <div className="p-8 text-center">
-                    <Map className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-                    <p className="text-muted-foreground text-sm">
-                      لا توجد مسارات محفوظة بعد
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
           </div>
         </div>
       </div>
