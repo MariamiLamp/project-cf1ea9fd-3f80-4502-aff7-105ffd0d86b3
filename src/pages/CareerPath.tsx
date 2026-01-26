@@ -662,7 +662,7 @@ const CareerPath = () => {
                       >
                         <TableCell className="text-right">
                           <div className="text-right">
-                            <div className="font-bold text-sm text-[#0f172a]">
+                            <div className="font-bold text-sm text-foreground">
                               {roadmap.goal}
                             </div>
                             <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1 justify-start">
@@ -794,7 +794,7 @@ const CareerPath = () => {
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between mb-4">
                       <div className="text-right">
-                        <h2 className="text-xl font-bold text-[#0f172a]">
+                        <h2 className="text-xl font-bold text-foreground">
                           {selectedRoadmap.goal}
                         </h2>
                         <p className="text-muted-foreground text-sm">
@@ -843,17 +843,17 @@ const CareerPath = () => {
                         key={phase.id}
                         open={openPhases.has(phase.id)}
                         onOpenChange={() => togglePhase(phase.id)}
-                        className="overflow-hidden bg-[#f8fafc] rounded-2xl border border-border/50 shadow-sm"
+                        className="overflow-hidden bg-muted/30 rounded-2xl border border-border/50 shadow-sm"
                       >
                         <CollapsibleTrigger className="w-full">
-                          <div className="flex items-center justify-between py-4 px-5 bg-white">
+                          <div className="flex items-center justify-between py-4 px-5 bg-card">
                             {/* Right side: Title and Step Number */}
                             <div className="flex items-center gap-5">
-                              <div className="w-10 h-10 rounded-xl bg-[#0f172a] flex items-center justify-center text-white text-lg font-black shadow-[0_4px_12px_rgba(15,23,42,0.3)]">
+                              <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center text-secondary-foreground text-lg font-black shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
                                 {phaseIndex + 1}
                               </div>
                               <div className="text-right">
-                                <h3 className="text-base font-black text-[#0f172a] leading-tight">
+                                <h3 className="text-base font-black text-foreground leading-tight">
                                   {phase.title}
                                 </h3>
                                 <p className="text-xs text-muted-foreground font-medium mt-0.5">
@@ -867,12 +867,12 @@ const CareerPath = () => {
                               <div className="flex items-center gap-2">
                                 <Badge
                                   variant="outline"
-                                  className="text-[11px] h-6 border-[#0f172a]/10 text-[#0f172a] bg-[#0f172a]/5 font-medium px-2 rounded-lg"
+                                  className="text-[11px] h-6 border-primary/20 text-primary bg-primary/10 font-medium px-2 rounded-lg"
                                 >
                                   <Clock className="h-3 w-3 ms-1" />
                                   {phase.duration}
                                 </Badge>
-                                <span className="text-sm font-bold text-[#0f172a]">
+                                <span className="text-sm font-bold text-foreground">
                                   {
                                     phase.items.filter((i) =>
                                       completedItems.has(i.id),
@@ -888,7 +888,7 @@ const CareerPath = () => {
                               )}
                             </div>
                           </div>
-                          <div className="h-1.5 w-full bg-[#0f172a]" />
+                          <div className="h-1.5 w-full bg-primary" />
                         </CollapsibleTrigger>
 
                         <CollapsibleContent>
@@ -906,8 +906,8 @@ const CareerPath = () => {
                                   <div
                                     className={`p-4 rounded-xl border transition-all duration-300 ${
                                       isCompleted
-                                        ? "bg-[#f0fdf4] border-success/30 shadow-sm"
-                                        : "bg-white border-border/50 hover:border-primary/30 shadow-sm"
+                                        ? "bg-success/10 border-success/30 shadow-sm"
+                                        : "bg-card border-border/50 hover:border-primary/30 shadow-sm"
                                     }`}
                                   >
                                     <div className="flex items-center justify-between w-full">
@@ -926,7 +926,7 @@ const CareerPath = () => {
                                               href={`https://www.google.com/search?q=${encodeURIComponent(item.title)}`}
                                               target="_blank"
                                               rel="noopener noreferrer"
-                                              className="font-black text-sm hover:opacity-80 transition-all text-[#0f172a]"
+                                              className="font-black text-sm hover:opacity-80 transition-all text-foreground"
                                             >
                                               {item.title}
                                             </a>
@@ -946,7 +946,7 @@ const CareerPath = () => {
 
                                       {/* Left side: Toggle and Duration */}
                                       <div className="flex items-center gap-3">
-                                        <Badge className="bg-[#0f172a] text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-md">
+                                        <Badge className="bg-secondary text-secondary-foreground text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-md">
                                           <Clock className="h-3 w-3" />
                                           {item.duration}
                                         </Badge>
@@ -965,8 +965,8 @@ const CareerPath = () => {
                                     <CollapsibleContent>
                                       <div className="mt-4 pt-4 border-t border-dashed border-border/60">
                                         <div className="flex items-center gap-2 mb-3 justify-start">
-                                          <BookOpen className="h-4 w-4 text-[#0f172a]" />
-                                          <span className="text-[11px] font-bold text-[#0f172a]">
+                                          <BookOpen className="h-4 w-4 text-primary" />
+                                          <span className="text-[11px] font-bold text-foreground">
                                             المصادر والمراجع
                                           </span>
                                         </div>
@@ -984,8 +984,8 @@ const CareerPath = () => {
                                                   key={idx}
                                                   className={`flex items-center justify-between p-3 rounded-xl border transition-all duration-300 ${
                                                     isResourceCompleted
-                                                      ? "bg-[#f0fdf4]/50 border-[#bbf7d0]/50"
-                                                      : "bg-white border-border/40"
+                                                      ? "bg-success/5 border-success/20"
+                                                      : "bg-muted/30 border-border/40"
                                                   }`}
                                                 >
                                                   {/* Text on the right */}
@@ -994,7 +994,7 @@ const CareerPath = () => {
                                                       href={`https://www.google.com/search?q=${encodeURIComponent(resource.name)}`}
                                                       target="_blank"
                                                       rel="noopener noreferrer"
-                                                      className={`text-sm font-bold hover:opacity-80 transition-all ${isResourceCompleted ? "text-muted-foreground line-through decoration-border" : "text-[#0f172a]"}`}
+                                                      className={`text-sm font-bold hover:opacity-80 transition-all ${isResourceCompleted ? "text-muted-foreground line-through decoration-border" : "text-foreground"}`}
                                                     >
                                                       {resource.name}
                                                     </a>
@@ -1004,7 +1004,7 @@ const CareerPath = () => {
                                                           <span className="text-[10px] text-[#94a3b8] mb-1 block">
                                                             المهارات المكتسبة:
                                                           </span>
-                                                          <div className="flex gap-1.5 justify-end">
+                                                          <div className="flex gap-1.5 justify-start">
                                                             {resource.skills.map(
                                                               (skill) => {
                                                                 const isAcquired =
@@ -1022,8 +1022,8 @@ const CareerPath = () => {
                                                                     }
                                                                     className={`text-[9px] h-5 px-2 rounded-full font-bold transition-all cursor-pointer ${
                                                                       isAcquired
-                                                                        ? "bg-[#0f172a] text-white"
-                                                                        : "bg-[#f1f5f9] text-[#64748b] hover:bg-[#e2e8f0]"
+                                                                        ? "bg-primary text-primary-foreground"
+                                                                        : "bg-muted text-muted-foreground hover:bg-muted/80"
                                                                     }`}
                                                                   >
                                                                     {skill}
@@ -1051,8 +1051,8 @@ const CareerPath = () => {
                                                     }
                                                     className={`h-8 px-4 text-xs font-bold rounded-lg transition-all ${
                                                       isResourceCompleted
-                                                        ? "bg-[#f0fdf4] text-[#16a34a] border-[#bbf7d0] hover:bg-[#dcfce7]"
-                                                        : "bg-white text-[#64748b] border-border/60 hover:text-[#0f172a] hover:border-[#0f172a]/30"
+                                                        ? "bg-success/10 text-success border-success/20 hover:bg-success/20"
+                                                        : "bg-card text-muted-foreground border-border hover:text-foreground hover:border-primary/30"
                                                     }`}
                                                   >
                                                     {isResourceCompleted && (
