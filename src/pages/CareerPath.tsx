@@ -135,8 +135,14 @@ const mockSavedRoadmaps: SavedRoadmap[] = [
             duration: "٦ أسابيع",
             completed: false,
             resources: [
-              { name: "System Design Interview", skills: ["Scalability", "Architecture"] },
-              { name: "Designing Data-Intensive Applications", skills: ["Databases", "Distributed Systems"] },
+              {
+                name: "System Design Interview",
+                skills: ["Scalability", "Architecture"],
+              },
+              {
+                name: "Designing Data-Intensive Applications",
+                skills: ["Databases", "Distributed Systems"],
+              },
             ],
           },
         ],
@@ -163,9 +169,7 @@ const mockSavedRoadmaps: SavedRoadmap[] = [
             type: "course",
             duration: "٣ أسابيع",
             completed: true,
-            resources: [
-              { name: "Scrum Guide", skills: ["Scrum", "Agile"] },
-            ],
+            resources: [{ name: "Scrum Guide", skills: ["Scrum", "Agile"] }],
           },
           {
             id: "item-2",
@@ -211,21 +215,28 @@ const mockSavedRoadmaps: SavedRoadmap[] = [
 
 const CareerPath = () => {
   const { toast } = useToast();
-  const [savedRoadmaps, setSavedRoadmaps] = useState<SavedRoadmap[]>(mockSavedRoadmaps);
-  const [selectedRoadmap, setSelectedRoadmap] = useState<SavedRoadmap | null>(null);
+  const [savedRoadmaps, setSavedRoadmaps] =
+    useState<SavedRoadmap[]>(mockSavedRoadmaps);
+  const [selectedRoadmap, setSelectedRoadmap] = useState<SavedRoadmap | null>(
+    null,
+  );
   const [showForm, setShowForm] = useState(false);
   const [isNewRoadmap, setIsNewRoadmap] = useState(false);
-  
+
   // Form state
   const [goal, setGoal] = useState("");
   const [currentRole, setCurrentRole] = useState("");
   const [experience, setExperience] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
-  
+
   // Roadmap interaction state
   const [completedItems, setCompletedItems] = useState<Set<string>>(new Set());
-  const [completedResources, setCompletedResources] = useState<Set<string>>(new Set());
-  const [openPhases, setOpenPhases] = useState<Set<string>>(new Set(["phase-1"]));
+  const [completedResources, setCompletedResources] = useState<Set<string>>(
+    new Set(),
+  );
+  const [openPhases, setOpenPhases] = useState<Set<string>>(
+    new Set(["phase-1"]),
+  );
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
   const [acquiredSkills, setAcquiredSkills] = useState<Set<string>>(new Set());
 
@@ -235,8 +246,8 @@ const CareerPath = () => {
     setIsNewRoadmap(false);
     // Initialize completed items based on roadmap data
     const completed = new Set<string>();
-    roadmap.phases.forEach(phase => {
-      phase.items.forEach(item => {
+    roadmap.phases.forEach((phase) => {
+      phase.items.forEach((item) => {
         if (item.completed) {
           completed.add(item.id);
         }
@@ -248,12 +259,12 @@ const CareerPath = () => {
 
   const handleSaveRoadmap = () => {
     if (!selectedRoadmap) return;
-    
+
     const roadmapToSave = { ...selectedRoadmap, isSaved: true };
-    setSavedRoadmaps(prev => [roadmapToSave, ...prev]);
+    setSavedRoadmaps((prev) => [roadmapToSave, ...prev]);
     setSelectedRoadmap(roadmapToSave);
     setIsNewRoadmap(false);
-    
+
     toast({
       title: "تم الحفظ بنجاح",
       description: "تم حفظ المسار المهني في قائمة المسارات المحفوظة",
@@ -279,7 +290,7 @@ const CareerPath = () => {
         id: `roadmap-${Date.now()}`,
         goal: goal,
         currentRole: currentRole || "غير محدد",
-        createdAt: new Date().toISOString().split('T')[0],
+        createdAt: new Date().toISOString().split("T")[0],
         progress: 0,
         phases: [
           {
@@ -306,9 +317,7 @@ const CareerPath = () => {
                 type: "course",
                 duration: "٤ أسابيع",
                 completed: false,
-                resources: [
-                  { name: "دورة شاملة", skills: ["نظري", "عملي"] },
-                ],
+                resources: [{ name: "دورة شاملة", skills: ["نظري", "عملي"] }],
               },
               {
                 id: "item-3",
@@ -394,7 +403,10 @@ const CareerPath = () => {
 
   const getTotalItems = () => {
     if (!selectedRoadmap) return 0;
-    return selectedRoadmap.phases.reduce((acc, phase) => acc + phase.items.length, 0);
+    return selectedRoadmap.phases.reduce(
+      (acc, phase) => acc + phase.items.length,
+      0,
+    );
   };
 
   const getCompletedCount = () => completedItems.size;
@@ -482,15 +494,38 @@ const CareerPath = () => {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="space-y-6" dir="rtl">
         {/* Header */}
-        <div className="flex items-center justify-between flex-row-reverse">
+        <div className="flex items-center justify-between">
           <div className="text-right">
-            <h1 className="text-2xl font-bold text-foreground">المسار المهني</h1>
+            <h1 className="text-2xl font-bold text-foreground">
+              المسار المهني
+            </h1>
             <p className="text-muted-foreground mt-1">
               حدد هدفك المهني واحصل على خارطة طريق مخصصة للوصول إليه
             </p>
           </div>
+          {isNewRoadmap && selectedRoadmap && (
+            <div className="animate-fade-in flex items-center gap-3">
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  setSelectedRoadmap(null);
+                  setIsNewRoadmap(false);
+                }}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                تجاهل
+              </Button>
+              <Button
+                onClick={handleSaveRoadmap}
+                className="btn-gradient gap-2 px-6"
+              >
+                <Save className="h-4 w-4" />
+                حفظ المسار
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Main Layout: Two columns */}
@@ -518,7 +553,6 @@ const CareerPath = () => {
                       placeholder="مثال: مطور أول (Senior Developer)"
                       value={goal}
                       onChange={(e) => setGoal(e.target.value)}
-                      className="text-right"
                     />
                   </div>
 
@@ -530,7 +564,6 @@ const CareerPath = () => {
                       placeholder="مثال: مطور مبتدئ"
                       value={currentRole}
                       onChange={(e) => setCurrentRole(e.target.value)}
-                      className="text-right"
                     />
                   </div>
 
@@ -542,7 +575,6 @@ const CareerPath = () => {
                       placeholder="مثال: ٢ سنوات"
                       value={experience}
                       onChange={(e) => setExperience(e.target.value)}
-                      className="text-right"
                     />
                   </div>
 
@@ -580,9 +612,9 @@ const CareerPath = () => {
                 {/* Progress Card */}
                 <Card className="card-elevated">
                   <CardContent className="p-6">
-                    <div className="flex items-center justify-between mb-4 flex-row-reverse">
+                    <div className="flex items-center justify-between mb-4">
                       <div className="text-right">
-                        <h2 className="text-xl font-bold text-foreground">
+                        <h2 className="text-xl font-bold text-[#0f172a]">
                           {selectedRoadmap.goal}
                         </h2>
                         <p className="text-muted-foreground text-sm">
@@ -590,23 +622,21 @@ const CareerPath = () => {
                         </p>
                       </div>
                       <div className="flex items-center gap-4">
-                        {isNewRoadmap && (
-                          <Button onClick={handleSaveRoadmap} className="gap-2">
-                            <Save className="h-4 w-4" />
-                            حفظ المسار
-                          </Button>
-                        )}
                         <div className="text-center">
                           <div className="text-3xl font-bold text-primary">
                             {getProgressPercentage()}%
                           </div>
-                          <div className="text-xs text-muted-foreground">مكتمل</div>
+                          <div className="text-xs text-muted-foreground font-bold">
+                            مكتمل
+                          </div>
                         </div>
                       </div>
                     </div>
                     <Progress value={getProgressPercentage()} className="h-3" />
-                    <div className="flex items-center justify-between mt-2 text-sm text-muted-foreground flex-row-reverse">
-                      <span>{getCompletedCount()} من {getTotalItems()} مهمة مكتملة</span>
+                    <div className="flex items-center justify-between mt-2 text-sm text-muted-foreground">
+                      <span>
+                        {getCompletedCount()} من {getTotalItems()} مهمة مكتملة
+                      </span>
                       <span>{selectedRoadmap.phases.length} مراحل</span>
                     </div>
                   </CardContent>
@@ -616,14 +646,15 @@ const CareerPath = () => {
                 <div className="space-y-4">
                   {selectedRoadmap.phases.map((phase, phaseIndex) => {
                     const phaseCompleted = phase.items.every((item) =>
-                      completedItems.has(item.id)
+                      completedItems.has(item.id),
                     );
                     const phaseProgress =
                       phase.items.length > 0
                         ? Math.round(
-                            (phase.items.filter((i) => completedItems.has(i.id)).length /
+                            (phase.items.filter((i) => completedItems.has(i.id))
+                              .length /
                               phase.items.length) *
-                              100
+                              100,
                           )
                         : 0;
 
@@ -632,212 +663,212 @@ const CareerPath = () => {
                         key={phase.id}
                         open={openPhases.has(phase.id)}
                         onOpenChange={() => togglePhase(phase.id)}
+                        className="overflow-hidden bg-[#f8fafc] rounded-2xl border border-border/50 shadow-sm"
                       >
-                        <Card
-                          className={`transition-all duration-300 ${
-                            phaseCompleted
-                              ? "border-success/50 bg-success/5"
-                              : "card-elevated"
-                          }`}
-                        >
-                          <CollapsibleTrigger className="w-full">
-                            <CardHeader className="pb-2">
-                              <div className="flex items-center justify-between flex-row-reverse">
-                                <div className="flex items-center gap-3">
+                        <CollapsibleTrigger className="w-full">
+                          <div className="flex items-center justify-between py-4 px-5 bg-white">
+                            {/* Right side: Title and Step Number */}
+                            <div className="flex items-center gap-5">
+                              <div className="w-10 h-10 rounded-xl bg-[#0f172a] flex items-center justify-center text-white text-lg font-black shadow-[0_4px_12px_rgba(15,23,42,0.3)]">
+                                {phaseIndex + 1}
+                              </div>
+                              <div className="text-right">
+                                <h3 className="text-base font-black text-[#0f172a] leading-tight">
+                                  {phase.title}
+                                </h3>
+                                <p className="text-xs text-muted-foreground font-medium mt-0.5">
+                                  {phase.description}
+                                </p>
+                              </div>
+                            </div>
+
+                            {/* Left side: Progress and Toggle */}
+                            <div className="flex items-center gap-4">
+                              <div className="flex items-center gap-2">
+                                <Badge
+                                  variant="outline"
+                                  className="text-[11px] h-6 border-[#0f172a]/10 text-[#0f172a] bg-[#0f172a]/5 font-medium px-2 rounded-lg"
+                                >
+                                  <Clock className="h-3 w-3 ms-1" />
+                                  {phase.duration}
+                                </Badge>
+                                <span className="text-sm font-bold text-[#0f172a]">
+                                  {
+                                    phase.items.filter((i) =>
+                                      completedItems.has(i.id),
+                                    ).length
+                                  }
+                                  /{phase.items.length}
+                                </span>
+                              </div>
+                              {openPhases.has(phase.id) ? (
+                                <ChevronUp className="h-5 w-5 text-muted-foreground" />
+                              ) : (
+                                <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                              )}
+                            </div>
+                          </div>
+                          <div className="h-1.5 w-full bg-[#0f172a]" />
+                        </CollapsibleTrigger>
+
+                        <CollapsibleContent>
+                          <div className="p-4 space-y-3">
+                            {phase.items.map((item) => {
+                              const isCompleted = completedItems.has(item.id);
+
+                              return (
+                                <Collapsible
+                                  key={item.id}
+                                  open={openItems.has(item.id)}
+                                  onOpenChange={() => toggleItem(item.id)}
+                                  className="group"
+                                >
                                   <div
-                                    className={`w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold ${
-                                      phaseCompleted
-                                        ? "bg-success"
-                                        : "bg-gradient-to-br from-primary to-secondary"
+                                    className={`p-4 rounded-xl border transition-all duration-300 ${
+                                      isCompleted
+                                        ? "bg-success/5 border-success/30 shadow-sm"
+                                        : "bg-white border-border/50 hover:border-primary/30 shadow-sm"
                                     }`}
                                   >
-                                    {phaseCompleted ? (
-                                      <Check className="h-5 w-5" />
-                                    ) : (
-                                      phaseIndex + 1
-                                    )}
-                                  </div>
-                                  <div className="text-right">
-                                    <CardTitle className="text-lg">
-                                      {phase.title}
-                                    </CardTitle>
-                                    <p className="text-sm text-muted-foreground">
-                                      {phase.description}
-                                    </p>
-                                  </div>
-                                </div>
-                                <div className="flex items-center gap-4">
-                                  <div className="text-left">
-                                    <Badge variant="outline" className="mb-1">
-                                      <Clock className="h-3 w-3 ml-1" />
-                                      {phase.duration}
-                                    </Badge>
-                                    <div className="text-xs text-muted-foreground">
-                                      {phaseProgress}% مكتمل
+                                    <div className="flex items-center justify-between w-full">
+                                      {/* Right side: Title and Checkbox */}
+                                      <div className="flex items-center gap-4">
+                                        <Checkbox
+                                          checked={isCompleted}
+                                          onCheckedChange={() =>
+                                            toggleItemCompletion(item.id)
+                                          }
+                                          className="rounded-full h-6 w-6 border-muted-foreground/30 data-[state=checked]:bg-success data-[state=checked]:border-success transition-all duration-300 transform active:scale-90"
+                                        />
+                                        <div className="text-right">
+                                          <div className="flex items-center gap-2 justify-end">
+                                            <a
+                                              href={`https://www.google.com/search?q=${encodeURIComponent(item.title)}`}
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                              className={`font-black text-sm hover:text-primary transition-colors ${isCompleted ? "line-through text-muted-foreground" : "text-[#0f172a]"}`}
+                                            >
+                                              {item.title}
+                                            </a>
+                                            <Badge
+                                              variant="outline"
+                                              className={`${getItemTypeBadgeClass(item.type)} text-[10px] h-5 py-0 px-2 rounded-full border-primary/10 bg-primary/5 font-bold`}
+                                            >
+                                              {getItemIcon(item.type)}
+                                              {getItemTypeLabel(item.type)}
+                                            </Badge>
+                                          </div>
+                                          <p className="text-[11px] text-muted-foreground font-medium mt-1">
+                                            {item.description}
+                                          </p>
+                                        </div>
+                                      </div>
+
+                                      {/* Left side: Toggle and Duration */}
+                                      <div className="flex items-center gap-3">
+                                        <Badge className="bg-[#0f172a] text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-md">
+                                          <Clock className="h-3 w-3" />
+                                          {item.duration}
+                                        </Badge>
+                                        <CollapsibleTrigger asChild>
+                                          <button className="flex items-center gap-1 text-muted-foreground hover:text-foreground p-1 rounded-md hover:bg-muted/50 transition-colors">
+                                            {openItems.has(item.id) ? (
+                                              <ChevronUp className="h-4 w-4" />
+                                            ) : (
+                                              <ChevronDown className="h-4 w-4" />
+                                            )}
+                                          </button>
+                                        </CollapsibleTrigger>
+                                      </div>
                                     </div>
-                                  </div>
-                                  {openPhases.has(phase.id) ? (
-                                    <ChevronUp className="h-5 w-5 text-muted-foreground" />
-                                  ) : (
-                                    <ChevronDown className="h-5 w-5 text-muted-foreground" />
-                                  )}
-                                </div>
-                              </div>
-                            </CardHeader>
-                          </CollapsibleTrigger>
 
-                          <CollapsibleContent>
-                            <CardContent className="pt-0">
-                              <div className="space-y-3 mt-4">
-                                {phase.items.map((item) => {
-                                  const isCompleted = completedItems.has(item.id);
+                                    <CollapsibleContent>
+                                      <div className="mt-4 pt-4 border-t border-dashed border-border/60">
+                                        <div className="flex items-center gap-2 mb-4">
+                                          <BookOpen className="h-4 w-4 text-[#0f172a]" />
+                                          <span className="text-xs font-bold text-[#0f172a]">
+                                            المصادر والمراجع
+                                          </span>
+                                        </div>
+                                        <div className="space-y-3">
+                                          {item.resources?.map(
+                                            (resource, idx) => {
+                                              const resourceKey = `${item.id}-resource-${idx}`;
+                                              const isResourceCompleted =
+                                                completedResources.has(
+                                                  resourceKey,
+                                                );
 
-                                  return (
-                                    <Collapsible
-                                      key={item.id}
-                                      open={openItems.has(item.id)}
-                                      onOpenChange={() => toggleItem(item.id)}
-                                    >
-                                      <div
-                                        className={`p-4 rounded-xl border transition-all duration-200 ${
-                                          isCompleted
-                                            ? "bg-success/5 border-success/30"
-                                            : "bg-muted/30 border-border/50 hover:border-primary/30"
-                                        }`}
-                                      >
-                                        <div className="flex items-start gap-3 flex-row-reverse">
-                                          <Checkbox
-                                            checked={isCompleted}
-                                            onCheckedChange={() =>
-                                              toggleItemCompletion(item.id)
-                                            }
-                                            className="mt-1"
-                                          />
-                                          <CollapsibleTrigger className="flex-1 text-right">
-                                            <div className="flex items-center justify-between flex-row-reverse">
-                                              <div className="flex items-center gap-2">
-                                                <Badge
-                                                  variant="outline"
-                                                  className={`${getItemTypeBadgeClass(
-                                                    item.type
-                                                  )} gap-1`}
-                                                >
-                                                  {getItemIcon(item.type)}
-                                                  {getItemTypeLabel(item.type)}
-                                                </Badge>
-                                                <span
-                                                  className={`font-medium ${
-                                                    isCompleted
-                                                      ? "line-through text-muted-foreground"
-                                                      : ""
+                                              return (
+                                                <div
+                                                  key={idx}
+                                                  className={`flex items-center justify-between p-3 rounded-xl border transition-all duration-300 ${
+                                                    isResourceCompleted
+                                                      ? "bg-success/5 border-success/30"
+                                                      : "bg-muted/30 border-border/40"
                                                   }`}
                                                 >
-                                                  {item.title}
-                                                </span>
-                                              </div>
-                                              <div className="flex items-center gap-2">
-                                                <Badge
-                                                  variant="secondary"
-                                                  className="text-xs"
-                                                >
-                                                  <Clock className="h-3 w-3 ml-1" />
-                                                  {item.duration}
-                                                </Badge>
-                                                {openItems.has(item.id) ? (
-                                                  <ChevronUp className="h-4 w-4 text-muted-foreground" />
-                                                ) : (
-                                                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                                                )}
-                                              </div>
-                                            </div>
-                                            <p className="text-sm text-muted-foreground mt-1">
-                                              {item.description}
-                                            </p>
-                                          </CollapsibleTrigger>
-                                        </div>
-
-                                        <CollapsibleContent>
-                                          {item.resources && item.resources.length > 0 && (
-                                            <div className="mt-4 pt-4 border-t border-border/50">
-                                              <h4 className="text-sm font-medium mb-3 text-right flex items-center gap-2 justify-end">
-                                                <BookOpen className="h-4 w-4" />
-                                                الموارد المقترحة
-                                              </h4>
-                                              <div className="space-y-2">
-                                                {item.resources.map((resource, idx) => {
-                                                  const resourceKey = `${item.id}-resource-${idx}`;
-                                                  const isResourceCompleted =
-                                                    completedResources.has(resourceKey);
-
-                                                  return (
-                                                    <div
-                                                      key={idx}
-                                                      className={`flex items-center justify-between p-3 rounded-lg border transition-all flex-row-reverse ${
-                                                        isResourceCompleted
-                                                          ? "bg-success/5 border-success/30"
-                                                          : "bg-background border-border/50"
-                                                      }`}
+                                                  <div className="text-right">
+                                                    <a
+                                                      href={`https://www.google.com/search?q=${encodeURIComponent(resource.name)}`}
+                                                      target="_blank"
+                                                      rel="noopener noreferrer"
+                                                      className={`text-sm font-bold hover:text-primary transition-colors ${isResourceCompleted ? "line-through text-muted-foreground" : "text-[#0f172a]"}`}
                                                     >
-                                                      <div className="flex items-center gap-3">
-                                                        <Checkbox
-                                                          checked={isResourceCompleted}
-                                                          onCheckedChange={() =>
-                                                            handleCompleteResource(item.id, idx)
-                                                          }
-                                                        />
-                                                        <span
-                                                          className={`text-sm ${
-                                                            isResourceCompleted
-                                                              ? "line-through text-muted-foreground"
-                                                              : ""
-                                                          }`}
-                                                        >
-                                                          {resource.name}
-                                                        </span>
-                                                        {resource.skills && (
-                                                          <div className="flex gap-1 flex-wrap">
-                                                            {resource.skills.map((skill) => (
-                                                              <Badge
-                                                                key={skill}
-                                                                variant="outline"
-                                                                className={`text-xs cursor-pointer transition-all ${
-                                                                  acquiredSkills.has(skill)
-                                                                    ? "bg-primary/10 border-primary/30 text-primary"
-                                                                    : ""
-                                                                }`}
-                                                                onClick={() => toggleSkill(skill)}
-                                                              >
-                                                                {skill}
-                                                              </Badge>
-                                                            ))}
-                                                          </div>
+                                                      {resource.name}
+                                                    </a>
+                                                    {resource.skills && (
+                                                      <div className="flex gap-1 mt-1">
+                                                        {resource.skills.map(
+                                                          (skill) => (
+                                                            <Badge
+                                                              key={skill}
+                                                              variant="secondary"
+                                                              className="text-[9px] h-4 px-1.5 font-bold bg-white text-muted-foreground"
+                                                            >
+                                                              {skill}
+                                                            </Badge>
+                                                          ),
                                                         )}
                                                       </div>
-                                                      <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() =>
-                                                          handleOpenResource(resource.name)
-                                                        }
-                                                        className="text-primary hover:text-primary/80"
-                                                      >
-                                                        <BookOpen className="h-4 w-4" />
-                                                      </Button>
-                                                    </div>
-                                                  );
-                                                })}
-                                              </div>
-                                            </div>
+                                                    )}
+                                                  </div>
+                                                  <Button
+                                                    variant={
+                                                      isResourceCompleted
+                                                        ? "success"
+                                                        : "outline"
+                                                    }
+                                                    size="sm"
+                                                    onClick={() =>
+                                                      handleCompleteResource(
+                                                        item.id,
+                                                        idx,
+                                                      )
+                                                    }
+                                                    className={`h-8 px-4 text-xs font-bold rounded-lg ${
+                                                      isResourceCompleted
+                                                        ? "bg-success text-white"
+                                                        : "bg-white text-muted-foreground hover:text-success border-border/60"
+                                                    }`}
+                                                  >
+                                                    {isResourceCompleted
+                                                      ? "مكتمل"
+                                                      : "اكتمل"}
+                                                  </Button>
+                                                </div>
+                                              );
+                                            },
                                           )}
-                                        </CollapsibleContent>
+                                        </div>
                                       </div>
-                                    </Collapsible>
-                                  );
-                                })}
-                              </div>
-                            </CardContent>
-                          </CollapsibleContent>
-                        </Card>
+                                    </CollapsibleContent>
+                                  </div>
+                                </Collapsible>
+                              );
+                            })}
+                          </div>
+                        </CollapsibleContent>
                       </Collapsible>
                     );
                   })}
@@ -869,12 +900,16 @@ const CareerPath = () => {
           <div className="lg:col-span-1 order-1 lg:order-2">
             <Card className="card-elevated">
               <CardHeader className="pb-4">
-                <div className="flex items-center justify-between flex-row-reverse">
+                <div className="flex items-center justify-between">
                   <CardTitle className="text-lg flex items-center gap-2">
                     <Map className="h-5 w-5" />
                     المسارات المحفوظة
                   </CardTitle>
-                  <Button onClick={handleNewRoadmap} size="sm" className="gap-2">
+                  <Button
+                    onClick={handleNewRoadmap}
+                    size="sm"
+                    className="gap-2"
+                  >
                     <Plus className="h-4 w-4" />
                     جديد
                   </Button>
@@ -894,14 +929,18 @@ const CareerPath = () => {
                       <TableRow
                         key={roadmap.id}
                         className={`cursor-pointer transition-colors hover:bg-muted/50 ${
-                          selectedRoadmap?.id === roadmap.id ? "bg-primary/5" : ""
+                          selectedRoadmap?.id === roadmap.id
+                            ? "bg-primary/5"
+                            : ""
                         }`}
                         onClick={() => handleSelectRoadmap(roadmap)}
                       >
                         <TableCell className="text-right">
-                          <div>
-                            <div className="font-medium text-sm">{roadmap.goal}</div>
-                            <div className="text-xs text-muted-foreground flex items-center gap-1 justify-end mt-1">
+                          <div className="text-right">
+                            <div className="font-bold text-sm text-[#0f172a]">
+                              {roadmap.goal}
+                            </div>
+                            <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1 justify-start">
                               <Calendar className="h-3 w-3" />
                               {roadmap.createdAt}
                             </div>
@@ -909,7 +948,9 @@ const CareerPath = () => {
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center gap-2 justify-end">
-                            <span className="text-sm font-medium">{roadmap.progress}%</span>
+                            <span className="text-sm font-medium">
+                              {roadmap.progress}%
+                            </span>
                             <div className="w-16 h-2 bg-muted rounded-full overflow-hidden">
                               <div
                                 className="h-full bg-primary rounded-full transition-all"
@@ -919,7 +960,11 @@ const CareerPath = () => {
                           </div>
                         </TableCell>
                         <TableCell className="text-center">
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                          >
                             <Eye className="h-4 w-4" />
                           </Button>
                         </TableCell>
