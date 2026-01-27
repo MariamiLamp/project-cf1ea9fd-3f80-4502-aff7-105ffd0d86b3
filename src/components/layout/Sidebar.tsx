@@ -34,7 +34,7 @@ const navItems = [
 ];
 
 const bottomNavItems = [
-  { icon: Settings, label: "الإعدادات", path: "/settings" },
+  { icon: Settings, label: "إعدادات الحساب", path: "/settings" },
 ];
 
 export const Sidebar = () => {
