@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Search, BookOpen, Bookmark, TrendingUp } from "lucide-react";
-import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -134,82 +135,83 @@ const Blog = () => {
   const regularArticles = activeTab === "all" ? filteredArticles.slice(1) : filteredArticles;
   const savedArticles = articles.filter(a => a.isSaved);
   const popularTopics = ["السيرة الذاتية", "مقابلات العمل", "التطوير المهني", "العمل عن بعد", "المهارات التقنية"];
-  return <DashboardLayout>
-      <div dir={isRTL ? "rtl" : "ltr"} className="space-y-6">
-        {/* Header */}
-        <div className={cn("flex flex-col md:flex-row md:items-center md:justify-between gap-4", isRTL && "text-right")}>
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">
-              {t("blog.title")}
-            </h1>
-            <p className="text-muted-foreground">{t("blog.articlesSubtitle")}</p>
+  return (
+    <div className="min-h-screen bg-background flex flex-col">
+      <Header />
+      <main className="flex-1 p-6">
+        <div dir={isRTL ? "rtl" : "ltr"} className="space-y-6 max-w-6xl mx-auto">
+          {/* Header */}
+          <div className={cn("flex flex-col md:flex-row md:items-center md:justify-between gap-4", isRTL && "text-right")}>
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">
+                {t("blog.title")}
+              </h1>
+              <p className="text-muted-foreground">{t("blog.articlesSubtitle")}</p>
+            </div>
+            <div className="relative w-full md:w-80">
+              <Search className={cn("absolute top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground", isRTL ? "right-3" : "left-3")} />
+              <Input placeholder={t("blog.searchArticles")} value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className={cn(isRTL ? "pr-10" : "pl-10")} />
+            </div>
           </div>
-          <div className="relative w-full md:w-80">
-            <Search className={cn("absolute top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground", isRTL ? "right-3" : "left-3")} />
-            <Input placeholder={t("blog.searchArticles")} value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className={cn(isRTL ? "pr-10" : "pl-10")} />
-          </div>
+
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className={cn("w-full", isRTL ? "justify-end" : "justify-start")}>
+              <TabsTrigger value="all" className="gap-2">
+                <BookOpen className="h-4 w-4" />
+                {t("blog.allArticles")}
+              </TabsTrigger>
+              <TabsTrigger value="saved" className="gap-2">
+                <Bookmark className="h-4 w-4" />
+                {t("blog.saved")}
+                {savedArticles.length > 0 && <Badge variant="secondary" className="ml-1 h-5 px-1.5">
+                    {savedArticles.length}
+                  </Badge>}
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="all" className="mt-6 space-y-6">
+              {/* Featured Article */}
+              {featuredArticle && <FeaturedArticle article={featuredArticle} onSave={handleSave} onRead={handleRead} />}
+
+              {/* Category Filter */}
+              <div className={cn("flex flex-wrap gap-2", isRTL && "justify-end")}>
+                {categories.map(category => <Button key={category.id} variant={selectedCategory === category.id ? "default" : "outline"} size="sm" onClick={() => setSelectedCategory(category.id)}>
+                    {t(category.labelKey)}
+                  </Button>)}
+              </div>
+
+              {/* Articles Grid */}
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {regularArticles.map(article => <ArticleCard key={article.id} article={article} onSave={handleSave} onRead={handleRead} />)}
+              </div>
+
+              {regularArticles.length === 0 && <Card>
+                  <CardContent className="py-12 text-center">
+                    <BookOpen className="mx-auto h-12 w-12 text-muted-foreground/50" />
+                    <p className="mt-4 text-muted-foreground">
+                      {t("blog.noArticlesFound")}
+                    </p>
+                  </CardContent>
+                </Card>}
+            </TabsContent>
+
+            <TabsContent value="saved" className="mt-6 space-y-6">
+              {savedArticles.length > 0 ? <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {savedArticles.map(article => <ArticleCard key={article.id} article={article} onSave={handleSave} onRead={handleRead} />)}
+                </div> : <Card>
+                  <CardContent className="py-12 text-center">
+                    <Bookmark className="mx-auto h-12 w-12 text-muted-foreground/50" />
+                    <p className="mt-4 text-muted-foreground">
+                      {t("blog.noSavedArticles")}
+                    </p>
+                  </CardContent>
+                </Card>}
+            </TabsContent>
+          </Tabs>
         </div>
-
-        <div className="space-y-6">
-          {/* Main Content */}
-          <div className="space-y-6">
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className={cn("w-full", isRTL ? "justify-end" : "justify-start")}>
-                <TabsTrigger value="all" className="gap-2">
-                  <BookOpen className="h-4 w-4" />
-                  {t("blog.allArticles")}
-                </TabsTrigger>
-                <TabsTrigger value="saved" className="gap-2">
-                  <Bookmark className="h-4 w-4" />
-                  {t("blog.saved")}
-                  {savedArticles.length > 0 && <Badge variant="secondary" className="ml-1 h-5 px-1.5">
-                      {savedArticles.length}
-                    </Badge>}
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="all" className="mt-6 space-y-6">
-                {/* Featured Article */}
-                {featuredArticle && <FeaturedArticle article={featuredArticle} onSave={handleSave} onRead={handleRead} />}
-
-                {/* Category Filter */}
-                <div className={cn("flex flex-wrap gap-2", isRTL && "justify-end")}>
-                  {categories.map(category => <Button key={category.id} variant={selectedCategory === category.id ? "default" : "outline"} size="sm" onClick={() => setSelectedCategory(category.id)}>
-                      {t(category.labelKey)}
-                    </Button>)}
-                </div>
-
-                {/* Articles Grid */}
-                <div className="grid gap-6 md:grid-cols-2">
-                  {regularArticles.map(article => <ArticleCard key={article.id} article={article} onSave={handleSave} onRead={handleRead} />)}
-                </div>
-
-                {regularArticles.length === 0 && <Card>
-                    <CardContent className="py-12 text-center">
-                      <BookOpen className="mx-auto h-12 w-12 text-muted-foreground/50" />
-                      <p className="mt-4 text-muted-foreground">
-                        {t("blog.noArticlesFound")}
-                      </p>
-                    </CardContent>
-                  </Card>}
-              </TabsContent>
-
-              <TabsContent value="saved" className="mt-6 space-y-6">
-                {savedArticles.length > 0 ? <div className="grid gap-6 md:grid-cols-2">
-                    {savedArticles.map(article => <ArticleCard key={article.id} article={article} onSave={handleSave} onRead={handleRead} />)}
-                  </div> : <Card>
-                    <CardContent className="py-12 text-center">
-                      <Bookmark className="mx-auto h-12 w-12 text-muted-foreground/50" />
-                      <p className="mt-4 text-muted-foreground">
-                        {t("blog.noSavedArticles")}
-                      </p>
-                    </CardContent>
-                  </Card>}
-              </TabsContent>
-            </Tabs>
-          </div>
-        </div>
-      </div>
-    </DashboardLayout>;
+      </main>
+      <Footer />
+    </div>
+  );
 };
 export default Blog;
