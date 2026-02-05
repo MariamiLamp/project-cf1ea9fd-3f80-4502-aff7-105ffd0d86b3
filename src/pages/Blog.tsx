@@ -1,108 +1,96 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { TrendingUp, Users, Bookmark } from "lucide-react";
+import { Search, BookOpen, Bookmark, TrendingUp } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import PostCard, { Post } from "@/components/blog/PostCard";
-import CommentSection, { Comment } from "@/components/blog/CommentSection";
-import CreatePostCard from "@/components/blog/CreatePostCard";
+import ArticleCard, { Article } from "@/components/blog/ArticleCard";
+import FeaturedArticle from "@/components/blog/FeaturedArticle";
 import { useToast } from "@/hooks/use-toast";
 
-// Mock data
-const initialPosts: Post[] = [
+const categories = [
+  { id: "all", labelKey: "blog.allCategories" },
+  { id: "career", labelKey: "blog.categoryCareer" },
+  { id: "cv", labelKey: "blog.categoryCV" },
+  { id: "interview", labelKey: "blog.categoryInterview" },
+  { id: "skills", labelKey: "blog.categorySkills" },
+  { id: "remote", labelKey: "blog.categoryRemote" },
+];
+
+const initialArticles: Article[] = [
   {
     id: "1",
+    title: "كيف تكتب سيرة ذاتية احترافية تجذب انتباه مسؤولي التوظيف",
+    excerpt: "تعرف على أهم النصائح والاستراتيجيات لكتابة سيرة ذاتية مميزة تبرز مهاراتك وخبراتك بشكل احترافي وتزيد فرصك في الحصول على مقابلة عمل.",
+    coverImage: "/placeholder.svg",
+    category: "السيرة الذاتية",
     author: {
       name: "أحمد محمد",
       avatar: "/placeholder.svg",
-      title: "مطور برمجيات أول",
     },
-    content:
-      "سعيد بالإعلان عن انضمامي لفريق التقنية في شركة رائدة! 🎉\n\nرحلة البحث عن العمل كانت تحدياً، لكن بفضل الإصرار والتعلم المستمر، تحقق الحلم.\n\nنصيحتي للباحثين عن عمل: لا تستسلموا، وطوروا مهاراتكم باستمرار.",
-    createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    likes: 124,
-    comments: 18,
-    isLiked: false,
+    publishedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    readingTime: 8,
     isSaved: false,
   },
   {
     id: "2",
+    title: "أسرار النجاح في مقابلات العمل: دليلك الشامل",
+    excerpt: "من التحضير الجيد إلى الإجابة على الأسئلة الصعبة، اكتشف كل ما تحتاج معرفته للتميز في مقابلات العمل وترك انطباع إيجابي.",
+    coverImage: "/placeholder.svg",
+    category: "المقابلات",
     author: {
       name: "سارة العلي",
       avatar: "/placeholder.svg",
-      title: "مديرة موارد بشرية",
     },
-    content:
-      "نصائح لمقابلة العمل الناجحة:\n\n1. ابحث عن الشركة جيداً\n2. حضّر أسئلة ذكية\n3. كن واثقاً ولكن متواضعاً\n4. أظهر شغفك بالمجال\n5. تابع بعد المقابلة\n\nما هي نصيحتكم المفضلة؟ 💼",
-    createdAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-    likes: 89,
-    comments: 32,
-    isLiked: true,
+    publishedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+    readingTime: 12,
     isSaved: true,
   },
   {
     id: "3",
+    title: "مهارات القرن الواحد والعشرين التي يبحث عنها أصحاب العمل",
+    excerpt: "تعرف على أهم المهارات التقنية والشخصية المطلوبة في سوق العمل الحديث وكيفية تطويرها لتعزيز فرصك المهنية.",
+    coverImage: "/placeholder.svg",
+    category: "المهارات",
     author: {
       name: "خالد الشمري",
       avatar: "/placeholder.svg",
-      title: "مستشار توظيف",
     },
-    content:
-      "أخطاء شائعة في السيرة الذاتية يجب تجنبها:\n\n❌ معلومات قديمة\n❌ أخطاء إملائية\n❌ تصميم غير احترافي\n❌ عدم تخصيص السيرة للوظيفة\n\nاستخدموا أدوات فحص السيرة الذاتية المتوفرة على المنصة!",
-    image: "/placeholder.svg",
-    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-    likes: 256,
-    comments: 45,
-    isLiked: false,
+    publishedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+    readingTime: 10,
     isSaved: false,
   },
-];
-
-const initialComments: Record<string, Comment[]> = {
-  "1": [
-    {
-      id: "c1",
-      author: { name: "منى أحمد", avatar: "/placeholder.svg" },
-      content: "مبارك! إنجاز رائع 🎉",
-      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
-      likes: 5,
-      isLiked: false,
-    },
-    {
-      id: "c2",
-      author: { name: "يوسف علي", avatar: "/placeholder.svg" },
-      content: "ألف مبروك، تستاهل كل خير!",
-      createdAt: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
-      likes: 3,
-      isLiked: true,
-    },
-  ],
-  "2": [],
-  "3": [],
-};
-
-const suggestedUsers = [
   {
-    id: "1",
-    name: "فاطمة الزهراء",
-    title: "مصممة UI/UX",
-    avatar: "/placeholder.svg",
+    id: "4",
+    title: "العمل عن بعد: كيف تبني مسيرة مهنية ناجحة من المنزل",
+    excerpt: "نصائح عملية للنجاح في العمل عن بعد، من إدارة الوقت إلى التواصل الفعال مع الفريق والحفاظ على التوازن بين العمل والحياة.",
+    coverImage: "/placeholder.svg",
+    category: "العمل عن بعد",
+    author: {
+      name: "منى أحمد",
+      avatar: "/placeholder.svg",
+    },
+    publishedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+    readingTime: 7,
+    isSaved: false,
   },
   {
-    id: "2",
-    name: "محمد العبدالله",
-    title: "مهندس بيانات",
-    avatar: "/placeholder.svg",
-  },
-  {
-    id: "3",
-    name: "نورة السالم",
-    title: "محللة أعمال",
-    avatar: "/placeholder.svg",
+    id: "5",
+    title: "خطوات بناء مسار مهني واضح وتحقيق أهدافك",
+    excerpt: "دليل شامل لتخطيط مسارك المهني، تحديد أهدافك، وبناء خطة عمل واقعية للوصول إلى النجاح في حياتك العملية.",
+    coverImage: "/placeholder.svg",
+    category: "التطوير المهني",
+    author: {
+      name: "يوسف علي",
+      avatar: "/placeholder.svg",
+    },
+    publishedAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
+    readingTime: 15,
+    isSaved: false,
   },
 ];
 
@@ -111,217 +99,168 @@ const Blog = () => {
   const { toast } = useToast();
   const isRTL = i18n.language === "ar";
 
-  const [posts, setPosts] = useState<Post[]>(initialPosts);
-  const [comments, setComments] =
-    useState<Record<string, Comment[]>>(initialComments);
-  const [expandedComments, setExpandedComments] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState("feed");
+  const [articles, setArticles] = useState<Article[]>(initialArticles);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [activeTab, setActiveTab] = useState("all");
 
-  const handleLike = (postId: string) => {
-    setPosts((prev) =>
-      prev.map((post) =>
-        post.id === postId
-          ? {
-              ...post,
-              isLiked: !post.isLiked,
-              likes: post.isLiked ? post.likes - 1 : post.likes + 1,
-            }
-          : post,
-      ),
+  const handleSave = (articleId: string) => {
+    setArticles((prev) =>
+      prev.map((article) =>
+        article.id === articleId
+          ? { ...article, isSaved: !article.isSaved }
+          : article
+      )
     );
-  };
-
-  const handleSave = (postId: string) => {
-    setPosts((prev) =>
-      prev.map((post) =>
-        post.id === postId ? { ...post, isSaved: !post.isSaved } : post,
-      ),
-    );
-    const post = posts.find((p) => p.id === postId);
+    const article = articles.find((a) => a.id === articleId);
     toast({
-      title: post?.isSaved
+      title: article?.isSaved
         ? t("blog.removedFromSaved")
         : t("blog.addedToSaved"),
     });
   };
 
-  const handleComment = (postId: string) => {
-    setExpandedComments(expandedComments === postId ? null : postId);
+  const handleRead = (articleId: string) => {
+    toast({ title: t("blog.openingArticle") });
   };
 
-  const handleShare = (postId: string) => {
-    navigator.clipboard.writeText(
-      `${window.location.origin}/blog/post/${postId}`,
-    );
-    toast({ title: t("blog.linkCopied") });
-  };
+  const filteredArticles = articles.filter((article) => {
+    const matchesSearch =
+      article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      article.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory =
+      selectedCategory === "all" || article.category === selectedCategory;
+    const matchesTab =
+      activeTab === "all" || (activeTab === "saved" && article.isSaved);
+    return matchesSearch && matchesCategory && matchesTab;
+  });
 
-  const handleAddComment = (postId: string, content: string) => {
-    const newComment: Comment = {
-      id: `c${Date.now()}`,
-      author: { name: "أنت", avatar: "/placeholder.svg" },
-      content,
-      createdAt: new Date().toISOString(),
-      likes: 0,
-      isLiked: false,
-    };
-    setComments((prev) => ({
-      ...prev,
-      [postId]: [...(prev[postId] || []), newComment],
-    }));
-    setPosts((prev) =>
-      prev.map((post) =>
-        post.id === postId ? { ...post, comments: post.comments + 1 } : post,
-      ),
-    );
-  };
+  const featuredArticle = articles[0];
+  const regularArticles = activeTab === "all" 
+    ? filteredArticles.slice(1) 
+    : filteredArticles;
 
-  const handleLikeComment = (postId: string, commentId: string) => {
-    setComments((prev) => ({
-      ...prev,
-      [postId]: prev[postId].map((comment) =>
-        comment.id === commentId
-          ? {
-              ...comment,
-              isLiked: !comment.isLiked,
-              likes: comment.isLiked ? comment.likes - 1 : comment.likes + 1,
-            }
-          : comment,
-      ),
-    }));
-  };
+  const savedArticles = articles.filter((a) => a.isSaved);
 
-  const handleCreatePost = (content: string, image?: string) => {
-    const newPost: Post = {
-      id: `p${Date.now()}`,
-      author: {
-        name: "أنت",
-        avatar: "/placeholder.svg",
-        title: "مستخدم",
-      },
-      content,
-      image,
-      createdAt: new Date().toISOString(),
-      likes: 0,
-      comments: 0,
-      isLiked: false,
-      isSaved: false,
-    };
-    setPosts((prev) => [newPost, ...prev]);
-    setComments((prev) => ({ ...prev, [newPost.id]: [] }));
-    toast({ title: t("blog.postPublished") });
-  };
-
-  const savedPosts = posts.filter((post) => post.isSaved);
+  const popularTopics = [
+    "السيرة الذاتية",
+    "مقابلات العمل",
+    "التطوير المهني",
+    "العمل عن بعد",
+    "المهارات التقنية",
+  ];
 
   return (
     <DashboardLayout>
       <div dir={isRTL ? "rtl" : "ltr"} className="space-y-6">
         {/* Header */}
-        <div className={cn(isRTL && "text-right")}>
-          <h1 className="text-2xl font-bold text-foreground">
-            {t("blog.title")}
-          </h1>
-          <p className="text-muted-foreground">{t("blog.subtitle")}</p>
+        <div className={cn("flex flex-col md:flex-row md:items-center md:justify-between gap-4", isRTL && "text-right")}>
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">
+              {t("blog.title")}
+            </h1>
+            <p className="text-muted-foreground">{t("blog.articlesSubtitle")}</p>
+          </div>
+          <div className="relative w-full md:w-80">
+            <Search className={cn(
+              "absolute top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground",
+              isRTL ? "right-3" : "left-3"
+            )} />
+            <Input
+              placeholder={t("blog.searchArticles")}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className={cn(isRTL ? "pr-10" : "pl-10")}
+            />
+          </div>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-3">
-          {/* Main Feed */}
+          {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList
-                className={cn(
-                  "w-full",
-                  isRTL ? "justify-end" : "justify-start",
-                )}
-              >
-                <TabsTrigger value="feed" className="gap-2">
-                  <TrendingUp className="h-4 w-4" />
-                  {t("blog.feed")}
-                </TabsTrigger>
-                <TabsTrigger value="following" className="gap-2">
-                  <Users className="h-4 w-4" />
-                  {t("blog.following")}
+              <TabsList className={cn("w-full", isRTL ? "justify-end" : "justify-start")}>
+                <TabsTrigger value="all" className="gap-2">
+                  <BookOpen className="h-4 w-4" />
+                  {t("blog.allArticles")}
                 </TabsTrigger>
                 <TabsTrigger value="saved" className="gap-2">
                   <Bookmark className="h-4 w-4" />
                   {t("blog.saved")}
+                  {savedArticles.length > 0 && (
+                    <Badge variant="secondary" className="ml-1 h-5 px-1.5">
+                      {savedArticles.length}
+                    </Badge>
+                  )}
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="feed" className="mt-6 space-y-6">
-                <CreatePostCard onCreatePost={handleCreatePost} />
-                {posts.map((post) => (
-                  <div key={post.id} className="space-y-0">
-                    <PostCard
-                      post={post}
-                      onLike={handleLike}
-                      onSave={handleSave}
-                      onComment={handleComment}
-                      onShare={handleShare}
-                    />
-                    {expandedComments === post.id && (
-                      <Card className="rounded-t-none border-t-0">
-                        <CardContent className="pt-4">
-                          <CommentSection
-                            postId={post.id}
-                            comments={comments[post.id] || []}
-                            onAddComment={handleAddComment}
-                            onLikeComment={handleLikeComment}
-                          />
-                        </CardContent>
-                      </Card>
-                    )}
-                  </div>
-                ))}
-              </TabsContent>
+              <TabsContent value="all" className="mt-6 space-y-6">
+                {/* Featured Article */}
+                {featuredArticle && (
+                  <FeaturedArticle
+                    article={featuredArticle}
+                    onSave={handleSave}
+                    onRead={handleRead}
+                  />
+                )}
 
-              <TabsContent value="following" className="mt-6 space-y-6">
-                <CreatePostCard onCreatePost={handleCreatePost} />
-                <Card>
-                  <CardContent className="py-12 text-center">
-                    <Users className="mx-auto h-12 w-12 text-muted-foreground/50" />
-                    <p className="mt-4 text-muted-foreground">
-                      {t("blog.noFollowingPosts")}
-                    </p>
-                    <Button variant="outline" className="mt-4">
-                      {t("blog.discoverPeople")}
+                {/* Category Filter */}
+                <div className={cn("flex flex-wrap gap-2", isRTL && "justify-end")}>
+                  {categories.map((category) => (
+                    <Button
+                      key={category.id}
+                      variant={selectedCategory === category.id ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setSelectedCategory(category.id)}
+                    >
+                      {t(category.labelKey)}
                     </Button>
-                  </CardContent>
-                </Card>
+                  ))}
+                </div>
+
+                {/* Articles Grid */}
+                <div className="grid gap-6 md:grid-cols-2">
+                  {regularArticles.map((article) => (
+                    <ArticleCard
+                      key={article.id}
+                      article={article}
+                      onSave={handleSave}
+                      onRead={handleRead}
+                    />
+                  ))}
+                </div>
+
+                {regularArticles.length === 0 && (
+                  <Card>
+                    <CardContent className="py-12 text-center">
+                      <BookOpen className="mx-auto h-12 w-12 text-muted-foreground/50" />
+                      <p className="mt-4 text-muted-foreground">
+                        {t("blog.noArticlesFound")}
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
               </TabsContent>
 
               <TabsContent value="saved" className="mt-6 space-y-6">
-                {savedPosts.length > 0 ? (
-                  savedPosts.map((post) => (
-                    <div key={post.id} className="space-y-0">
-                      <PostCard
-                        post={post}
-                        onLike={handleLike}
+                {savedArticles.length > 0 ? (
+                  <div className="grid gap-6 md:grid-cols-2">
+                    {savedArticles.map((article) => (
+                      <ArticleCard
+                        key={article.id}
+                        article={article}
                         onSave={handleSave}
-                        onComment={handleComment}
-                        onShare={handleShare}
+                        onRead={handleRead}
                       />
-                      {expandedComments === post.id && (
-                        <Card className="rounded-t-none border-t-0">
-                          <CardContent className="pt-4">
-                            <CommentSection
-                              postId={post.id}
-                              comments={comments[post.id] || []}
-                              onAddComment={handleAddComment}
-                              onLikeComment={handleLikeComment}
-                            />
-                          </CardContent>
-                        </Card>
-                      )}
-                    </div>
-                  ))
+                    ))}
+                  </div>
                 ) : (
                   <Card>
                     <CardContent className="py-12 text-center">
                       <Bookmark className="mx-auto h-12 w-12 text-muted-foreground/50" />
                       <p className="mt-4 text-muted-foreground">
-                        {t("blog.noSavedPosts")}
+                        {t("blog.noSavedArticles")}
                       </p>
                     </CardContent>
                   </Card>
@@ -332,65 +271,45 @@ const Blog = () => {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Suggested Users */}
+            {/* Popular Topics */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">
-                  {t("blog.suggestedUsers")}
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  {t("blog.popularTopics")}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                {suggestedUsers.map((user) => (
-                  <div
-                    key={user.id}
-                    className="flex items-center justify-between"
+              <CardContent className="flex flex-wrap gap-2">
+                {popularTopics.map((topic) => (
+                  <Badge
+                    key={topic}
+                    variant="secondary"
+                    className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
                   >
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-10 w-10">
-                        <AvatarImage src={user.avatar} />
-                        <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      <div className={cn(isRTL && "text-right")}>
-                        <p className="text-sm font-medium">{user.name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {user.title}
-                        </p>
-                      </div>
-                    </div>
-                    <Button variant="outline" size="sm">
-                      {t("blog.follow")}
-                    </Button>
-                  </div>
+                    {topic}
+                  </Badge>
                 ))}
               </CardContent>
             </Card>
 
-            {/* Trending Topics */}
-            <Card>
+            {/* Newsletter */}
+            <Card className="bg-primary text-primary-foreground">
               <CardHeader>
                 <CardTitle className="text-lg">
-                  {t("blog.trendingTopics")}
+                  {t("blog.newsletter")}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
-                {[
-                  "#التوظيف",
-                  "#السيرة_الذاتية",
-                  "#مقابلات_العمل",
-                  "#التطوير_المهني",
-                  "#العمل_عن_بعد",
-                ].map((topic) => (
-                  <Button
-                    key={topic}
-                    variant="ghost"
-                    className={cn(
-                      "w-full text-primary",
-                      isRTL ? "justify-start text-right" : "justify-start",
-                    )}
-                  >
-                    {topic}
-                  </Button>
-                ))}
+              <CardContent className="space-y-4">
+                <p className="text-sm opacity-90">
+                  {t("blog.newsletterDescription")}
+                </p>
+                <Input
+                  placeholder={t("blog.emailPlaceholder")}
+                  className="bg-primary-foreground text-foreground"
+                />
+                <Button variant="secondary" className="w-full">
+                  {t("blog.subscribe")}
+                </Button>
               </CardContent>
             </Card>
           </div>
