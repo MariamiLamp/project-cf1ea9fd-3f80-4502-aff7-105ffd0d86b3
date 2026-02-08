@@ -78,10 +78,6 @@ const Blog = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
 
-  const handleRead = (articleId: string) => {
-    // Navigate to article detail in the future
-  };
-
   const filteredArticles = initialArticles.filter((article) => {
     const matchesSearch =
       article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -91,8 +87,12 @@ const Blog = () => {
     return matchesSearch && matchesCategory;
   });
 
-  const featuredArticle = initialArticles[0];
-  const regularArticles = filteredArticles.filter((a) => a.id !== featuredArticle.id);
+  const regularArticles = filteredArticles;
+
+  const handleRead = (articleId: string) => {
+    // Navigate to article detail in the future
+  };
+
 
   return (
     <div dir={isRTL ? "rtl" : "ltr"} className="min-h-screen bg-background flex flex-col">
@@ -120,9 +120,6 @@ const Blog = () => {
               />
             </div>
           </div>
-
-          {/* Featured Article */}
-          <FeaturedArticle article={featuredArticle} onRead={handleRead} />
 
           {/* Category Filter */}
           <div className="flex flex-wrap gap-2">
