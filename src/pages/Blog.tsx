@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Search, BookOpen } from "lucide-react";
 import { Header } from "@/components/layout/Header";
@@ -74,6 +75,7 @@ const initialArticles: Article[] = [
 
 const Blog = () => {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
   const isRTL = i18n.language === "ar";
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -90,7 +92,7 @@ const Blog = () => {
   const regularArticles = filteredArticles;
 
   const handleRead = (articleId: string) => {
-    // Navigate to article detail in the future
+    navigate(`/article/${articleId}`);
   };
 
 
