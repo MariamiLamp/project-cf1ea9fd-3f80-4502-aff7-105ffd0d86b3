@@ -40,7 +40,7 @@ const ArticleCard = ({ article, onRead }: ArticleCardProps) => {
   const Arrow = isRTL ? ArrowLeft : ArrowRight;
 
   return (
-    <Card className="overflow-hidden transition-all hover:shadow-lg group">
+    <Card className="overflow-hidden transition-all hover:shadow-lg group cursor-pointer" onClick={() => onRead(article.id)}>
       <div className="relative h-48 overflow-hidden">
         <img
           src={article.coverImage}
