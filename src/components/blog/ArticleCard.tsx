@@ -17,6 +17,7 @@ export interface Article {
   };
   publishedAt: string;
   readingTime: number;
+  content?: string;
 }
 
 interface ArticleCardProps {
