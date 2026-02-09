@@ -1,5 +1,6 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { Search, SlidersHorizontal, MapPin, Briefcase, Clock, Building2, Bookmark, ArrowLeft, X, Sparkles, Loader2, FileText, Copy, Check, Eye, Upload, ChevronLeft, ChevronRight } from "lucide-react";
+import { GuestLayout } from "@/components/layout/GuestLayout";
+import { Search, SlidersHorizontal, MapPin, Briefcase, Clock, Building2, Bookmark, ArrowLeft, X, Sparkles, Loader2, FileText, Copy, Check, Eye, Upload, ChevronLeft, ChevronRight, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,9 +15,10 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Mock saved CV data - in production this would come from user profile/database
 const savedCV = {
@@ -102,6 +104,7 @@ const filters = [
 ];
 
 const JobsPage = () => {
+  const { isAuthenticated } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
@@ -188,8 +191,11 @@ ${applicationForm.fullName || "[اسمك]"}`;
     return "low";
   };
 
+  const Layout = isAuthenticated ? DashboardLayout : GuestLayout;
+
   return (
-    <DashboardLayout>
+    <Layout>
+      <div className={cn(!isAuthenticated && "container mx-auto px-6 py-8")} dir="rtl">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-foreground mb-2">فرص العمل</h1>
         <p className="text-muted-foreground">
@@ -255,9 +261,11 @@ ${applicationForm.fullName || "[اسمك]"}`;
                     </span>
                   </div>
                 </div>
-                <span className={cn("match-badge", getMatchBadgeClass(selectedJob.matchScore))}>
-                  {selectedJob.matchScore}%
-                </span>
+                {isAuthenticated && (
+                  <span className={cn("match-badge", getMatchBadgeClass(selectedJob.matchScore))}>
+                    {selectedJob.matchScore}%
+                  </span>
+                )}
               </div>
 
               {/* Job Description */}
@@ -280,15 +288,32 @@ ${applicationForm.fullName || "[اسمك]"}`;
               </div>
 
               {/* Apply Button */}
-              <Button 
-                variant="gradient" 
-                size="lg" 
-                className="w-full"
-                onClick={() => handleApply(selectedJob)}
-              >
-                <Briefcase className="w-5 h-5" />
-                التقديم على هذه الوظيفة
-              </Button>
+              {isAuthenticated ? (
+                <Button 
+                  variant="gradient" 
+                  size="lg" 
+                  className="w-full"
+                  onClick={() => handleApply(selectedJob)}
+                >
+                  <Briefcase className="w-5 h-5" />
+                  التقديم على هذه الوظيفة
+                </Button>
+              ) : (
+                <div className="space-y-3">
+                  <Link to="/auth" className="block">
+                    <Button variant="gradient" size="lg" className="w-full">
+                      <LogIn className="w-5 h-5" />
+                      سجّل دخولك للتقديم
+                    </Button>
+                  </Link>
+                  <p className="text-xs text-muted-foreground text-center">
+                    ليس لديك حساب؟{" "}
+                    <Link to="/register" className="text-primary hover:underline font-medium">
+                      إنشاء حساب مجاني
+                    </Link>
+                  </p>
+                </div>
+              )}
             </div>
           ) : (
             <div className="card-elevated p-12 text-center">
@@ -368,9 +393,11 @@ ${applicationForm.fullName || "[اسمك]"}`;
                     </span>
                   </div>
 
-                  <span className={cn("match-badge text-xs", getMatchBadgeClass(job.matchScore))}>
-                    نسبة التوافق: {job.matchScore}%
-                  </span>
+                  {isAuthenticated && (
+                    <span className={cn("match-badge text-xs", getMatchBadgeClass(job.matchScore))}>
+                      نسبة التوافق: {job.matchScore}%
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -596,7 +623,8 @@ ${applicationForm.fullName || "[اسمك]"}`;
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </DashboardLayout>
+      </div>
+    </Layout>
   );
 };
 
