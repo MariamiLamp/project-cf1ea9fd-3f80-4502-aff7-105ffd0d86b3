@@ -112,9 +112,7 @@ const ArticleDetail = () => {
           <Separator />
 
           {/* Excerpt */}
-          <p className="text-lg text-muted-foreground leading-relaxed font-medium border-s-4 border-primary/30 ps-4">
-            {article.excerpt}
-          </p>
+          
 
           {/* Content */}
           <article className="prose-custom">
