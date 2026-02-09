@@ -9,28 +9,28 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { articles } from "@/data/articles";
-
 const ArticleDetail = () => {
-  const { id } = useParams();
+  const {
+    id
+  } = useParams();
   const navigate = useNavigate();
-  const { t, i18n } = useTranslation();
+  const {
+    t,
+    i18n
+  } = useTranslation();
   const isRTL = i18n.language === "ar";
   const BackArrow = isRTL ? ArrowRight : ArrowLeft;
-
-  const article = articles.find((a) => a.id === id);
-
+  const article = articles.find(a => a.id === id);
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat(isRTL ? "ar-SA" : "en-US", {
       day: "numeric",
       month: "long",
-      year: "numeric",
+      year: "numeric"
     }).format(date);
   };
-
   if (!article) {
-    return (
-      <div dir={isRTL ? "rtl" : "ltr"} className="min-h-screen bg-background flex flex-col">
+    return <div dir={isRTL ? "rtl" : "ltr"} className="min-h-screen bg-background flex flex-col">
         <Header />
         <main className="flex-1 flex items-center justify-center p-6">
           <div className="text-center space-y-4">
@@ -44,67 +44,47 @@ const ArticleDetail = () => {
           </div>
         </main>
         <Footer />
-      </div>
-    );
+      </div>;
   }
-
   const renderContent = (content: string) => {
     const lines = content.trim().split("\n");
     return lines.map((line, index) => {
       const trimmed = line.trim();
       if (!trimmed) return null;
-
       if (trimmed.startsWith("## ")) {
-        return (
-          <h2 key={index} className="text-xl font-bold text-foreground mt-8 mb-3">
+        return <h2 key={index} className="text-xl font-bold text-foreground mt-8 mb-3">
             {trimmed.replace("## ", "")}
-          </h2>
-        );
+          </h2>;
       }
-
       if (trimmed.startsWith("- **")) {
         const match = trimmed.match(/- \*\*(.+?)\*\*:?\s*(.*)/);
         if (match) {
-          return (
-            <li key={index} className="flex gap-2 text-muted-foreground leading-relaxed mb-2">
+          return <li key={index} className="flex gap-2 text-muted-foreground leading-relaxed mb-2">
               <span className="text-primary mt-1.5 shrink-0">•</span>
               <span>
                 <strong className="text-foreground">{match[1]}</strong>
                 {match[2] && <>: {match[2]}</>}
               </span>
-            </li>
-          );
+            </li>;
         }
       }
-
       if (trimmed.startsWith("- ")) {
-        return (
-          <li key={index} className="flex gap-2 text-muted-foreground leading-relaxed mb-2">
+        return <li key={index} className="flex gap-2 text-muted-foreground leading-relaxed mb-2">
             <span className="text-primary mt-1.5 shrink-0">•</span>
             <span>{trimmed.replace("- ", "")}</span>
-          </li>
-        );
+          </li>;
       }
-
-      return (
-        <p key={index} className="text-muted-foreground leading-relaxed mb-4">
+      return <p key={index} className="text-muted-foreground leading-relaxed mb-4">
           {trimmed}
-        </p>
-      );
+        </p>;
     });
   };
-
-  return (
-    <div dir={isRTL ? "rtl" : "ltr"} className="min-h-screen bg-background flex flex-col">
+  return <div dir={isRTL ? "rtl" : "ltr"} className="min-h-screen bg-background flex flex-col">
       <Header />
       <main className="flex-1">
         {/* Hero Section */}
         <div className="relative h-64 md:h-80 bg-muted overflow-hidden">
-          <img
-            src={article.coverImage}
-            alt={article.title}
-            className="w-full h-full object-cover"
-          />
+          <img src={article.coverImage} alt={article.title} className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/40 to-transparent" />
           <div className="absolute bottom-0 inset-x-0 p-6 md:p-8">
             <div className="max-w-3xl mx-auto">
@@ -121,38 +101,13 @@ const ArticleDetail = () => {
         {/* Article Meta & Content */}
         <div className="max-w-3xl mx-auto px-6 py-8 space-y-6">
           {/* Back button */}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="gap-2 -mx-2 text-muted-foreground hover:text-foreground"
-            onClick={() => navigate("/blog")}
-          >
+          <Button variant="ghost" size="sm" className="gap-2 -mx-2 text-muted-foreground hover:text-foreground" onClick={() => navigate("/blog")}>
             <BackArrow className="h-4 w-4" />
             {t("blog.backToBlog", "العودة للمدونة")}
           </Button>
 
           {/* Author & Meta */}
-          <div className="flex items-center gap-4">
-            <Avatar className="h-12 w-12 border-2 border-primary/20">
-              <AvatarImage src={article.author.avatar} alt={article.author.name} />
-              <AvatarFallback className="bg-primary/10 text-primary">
-                <User className="h-5 w-5" />
-              </AvatarFallback>
-            </Avatar>
-            <div className="space-y-1">
-              <p className="font-semibold text-foreground">{article.author.name}</p>
-              <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  <Calendar className="h-3.5 w-3.5" />
-                  {formatDate(article.publishedAt)}
-                </span>
-                <span className="flex items-center gap-1">
-                  <Clock className="h-3.5 w-3.5" />
-                  {t("blog.readingTime", { minutes: article.readingTime })}
-                </span>
-              </div>
-            </div>
-          </div>
+          
 
           <Separator />
 
@@ -163,20 +118,14 @@ const ArticleDetail = () => {
 
           {/* Content */}
           <article className="prose-custom">
-            {article.content ? renderContent(article.content) : (
-              <p className="text-muted-foreground">{article.excerpt}</p>
-            )}
+            {article.content ? renderContent(article.content) : <p className="text-muted-foreground">{article.excerpt}</p>}
           </article>
 
           <Separator className="mt-8" />
 
           {/* Bottom Navigation */}
           <div className="flex justify-center pb-8">
-            <Button
-              variant="outline"
-              className="gap-2"
-              onClick={() => navigate("/blog")}
-            >
+            <Button variant="outline" className="gap-2" onClick={() => navigate("/blog")}>
               <BackArrow className="h-4 w-4" />
               {t("blog.backToBlog", "العودة للمدونة")}
             </Button>
@@ -184,8 +133,6 @@ const ArticleDetail = () => {
         </div>
       </main>
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default ArticleDetail;
