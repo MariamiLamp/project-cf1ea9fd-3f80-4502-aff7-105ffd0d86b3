@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/dashboard/RichTextEditor";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -236,7 +236,6 @@ export const BlogManagement = () => {
                 <TableRow>
                   <TableHead className="text-right">العنوان</TableHead>
                   <TableHead className="text-right">التصنيف</TableHead>
-                  <TableHead className="text-right">الكاتب</TableHead>
                   <TableHead className="text-right">التاريخ</TableHead>
                   <TableHead className="text-right">الحالة</TableHead>
                   <TableHead className="text-right">إجراءات</TableHead>
@@ -249,7 +248,6 @@ export const BlogManagement = () => {
                     <TableCell>
                       <Badge variant="secondary">{article.category}</Badge>
                     </TableCell>
-                    <TableCell>{article.author}</TableCell>
                     <TableCell>{article.publishedAt}</TableCell>
                     <TableCell>
                       <Badge variant={article.status === "published" ? "default" : "outline"}>
@@ -270,7 +268,7 @@ export const BlogManagement = () => {
                 ))}
                 {articles.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
                       لا توجد مقالات
                     </TableCell>
                   </TableRow>
@@ -343,12 +341,11 @@ export const BlogManagement = () => {
               </div>
               <div className="space-y-2">
                 <Label className="text-right block">المقتطف</Label>
-                <Textarea
+                <Input
                   value={articleForm.excerpt}
                   onChange={(e) => setArticleForm({ ...articleForm, excerpt: e.target.value })}
                   className="text-right"
                   placeholder="وصف مختصر للمقال"
-                  rows={2}
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -385,22 +382,11 @@ export const BlogManagement = () => {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-right block">الكاتب</Label>
-                <Input
-                  value={articleForm.author}
-                  onChange={(e) => setArticleForm({ ...articleForm, author: e.target.value })}
-                  className="text-right"
-                  placeholder="اسم الكاتب"
-                />
-              </div>
-              <div className="space-y-2">
                 <Label className="text-right block">المحتوى</Label>
-                <Textarea
-                  value={articleForm.content}
-                  onChange={(e) => setArticleForm({ ...articleForm, content: e.target.value })}
-                  className="text-right"
-                  placeholder="محتوى المقال (يدعم Markdown)"
-                  rows={8}
+                <RichTextEditor
+                  content={articleForm.content}
+                  onChange={(html) => setArticleForm({ ...articleForm, content: html })}
+                  placeholder="محتوى المقال"
                 />
               </div>
             </div>
