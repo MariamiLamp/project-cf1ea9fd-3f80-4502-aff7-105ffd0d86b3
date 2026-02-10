@@ -94,6 +94,7 @@ import { AdPlacementSelector } from "@/components/dashboard/AdPlacementSelector"
 import { DataTableFilters } from "@/components/dashboard/DataTableFilters";
 import { AdminDashboardLayout } from "@/components/layout/AdminDashboardLayout";
 import { FinancialReports } from "@/components/dashboard/FinancialReports";
+import { BlogManagement } from "@/components/dashboard/BlogManagement";
 
 // Mock data - Users
 const mockUsers = [
@@ -2746,6 +2747,11 @@ const AdminDashboard = () => {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+
+        {/* Blog Tab */}
+        <TabsContent value="blog">
+          <BlogManagement />
+        </TabsContent>
 
         {/* Ad Delete Confirmation Dialog */}
         <AlertDialog
