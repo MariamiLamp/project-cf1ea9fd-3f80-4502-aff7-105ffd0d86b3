@@ -2339,6 +2339,11 @@ const AdminDashboard = () => {
               </CardContent>
             </Card>
           </TabsContent>
+
+          {/* Blog Tab */}
+          <TabsContent value="blog">
+            <BlogManagement />
+          </TabsContent>
         </Tabs>
 
         {/* Plan Dialog */}
@@ -2748,10 +2753,6 @@ const AdminDashboard = () => {
           </AlertDialogContent>
         </AlertDialog>
 
-        {/* Blog Tab */}
-        <TabsContent value="blog">
-          <BlogManagement />
-        </TabsContent>
 
         {/* Ad Delete Confirmation Dialog */}
         <AlertDialog
