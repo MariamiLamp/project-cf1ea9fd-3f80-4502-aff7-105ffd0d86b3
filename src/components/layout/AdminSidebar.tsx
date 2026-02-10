@@ -5,6 +5,7 @@ import {
   Building2,
   UserCheck,
   Megaphone,
+  BookOpen,
   CheckCircle,
   Plus,
   LayoutTemplate,
@@ -31,6 +32,13 @@ const navGroups = [
       { icon: Users, label: "الباحثين عن عمل", value: "users" },
       { icon: Building2, label: "الشركات", value: "companies" },
       { icon: UserCheck, label: "موظفي HR", value: "hr" },
+    ],
+  },
+  {
+    title: "المدونة",
+    icon: BookOpen,
+    items: [
+      { icon: BookOpen, label: "إدارة المدونة", value: "blog" },
     ],
   },
   {
@@ -61,6 +69,7 @@ export const AdminSidebar = ({ activeTab, onTabChange }: AdminSidebarProps) => {
   const { collapsed, toggle } = useSidebarState();
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
     {
+      المدونة: true,
       المالية: true,
       الإعلانات: true,
       النظام: true,
